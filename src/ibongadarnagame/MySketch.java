@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package ibongadarnagame;
-
 import processing.core.PApplet;
 /**
  *
@@ -21,5 +20,10 @@ public class MySketch extends PApplet {
     
     public void draw() {
         
+    }
+    
+    
+    public static void gameOver() {
+        ////unfinished
     }
 }
