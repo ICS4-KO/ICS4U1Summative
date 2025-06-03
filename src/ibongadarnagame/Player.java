@@ -43,7 +43,7 @@ public class Player {
      * @param inventory        Player's inventory object
      * @param imagePath        Image of character based on user's selection
      */
-    public Player(Papplet p, int x, int y, String name, int characterTraits, Inventory inventory, String imagePath) {
+    public Player(PApplet p, int x, int y, String name, int characterTraits, Inventory inventory, String imagePath) {
         this.app = p;
         this.x = x;
         this.y = y;
@@ -75,7 +75,7 @@ public class Player {
      * @param inventory        Player's inventory object
      * @param characterTraits  Character trait distribution made by user
      */
-    public Player(Papplet p, int x, int y, String name, int characterTraits, Inventory inventory) {
+    public Player(PApplet p, int x, int y, String name, int characterTraits, Inventory inventory) {
         this.app = p;
         this.x = x;
         this.y = y;
@@ -110,7 +110,7 @@ public class Player {
      * @param inventory        Player's inventory object
      * @param imagePath        Image of character based on user's selection
      */
-    public Player(Papplet p, int x, int y, int characterTraits, Inventory inventory, String imagePath) {
+    public Player(PApplet p, int x, int y, int characterTraits, Inventory inventory, String imagePath) {
         this.app = p;
         this.x = x;
         this.y = y;
@@ -143,12 +143,11 @@ public class Player {
      * @param characterTraits  Character trait distribution made by user
      * @param inventory        Player's inventory object
      */
-    public Player(Papplet p, int x, int y, int characterTraits, Inventory inventory) {
+    public Player(PApplet p, int x, int y, int characterTraits, Inventory inventory) {
         this.app = p;
         this.x = x;
         this.y = y;
         this.inventory = inventory;
-        this.image = app.loadImage(imagePath);
         
         //Set character name to default name
         this.name = DEFAULT_NAME;
@@ -271,8 +270,11 @@ public class Player {
                 else
                     health = healthPerLife; //Set health in new life to maximum amount (health per life)
             } //End if statement checking if user has less than 3 lives and surplus HP can transfer into additional life
-        } //End if statement checking if user has a surplus of HP after health boost
-        
+        } //End if statement checking if user has a surplus of HP after health boost   
+    }
+    
+    public void draw() {
+        app.image(image, x, y); //Draw the image at the character's position
     }
     
 

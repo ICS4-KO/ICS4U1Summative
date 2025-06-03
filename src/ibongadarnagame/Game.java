@@ -52,7 +52,14 @@ public class Game {
         gameScores[gameIndex][1] = tries;
     }
     
+    /**
+     * Getter method to return description attribute of Game object
+     * 
+     * @return  Description of game
+     */
+    public String getDescription() {
+        return description; //Return description of game
+    }
     
-+ getDescription(text:String)
     
 }
