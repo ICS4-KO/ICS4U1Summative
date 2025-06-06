@@ -24,6 +24,11 @@ public class MySketch extends PApplet {
     boolean chooseCharacter2 = false; //True if character clothing v2 is currently displayed
     //Variables for Stage 1 (Begin Story)
     int currentScreen1 = 1; //Keeps track of the different screens being shown in the same stage
+    int traitDistrubtion; //0 means neutral, 1 means high strength, 2 means high intelligence
+    int currentStrengthPoints = 0; //Current number of character trait points assigned to strength
+    int currentIntelligencePoints = 0; //Current number of character trait points assigned to intelligence
+    boolean pointsError = false; //True if not all character trait points have been distributed (error0
+    
     
     //Buttons
     //Buttons for Stage 0 (Main Menu)
@@ -58,8 +63,22 @@ public class MySketch extends PApplet {
     boolean overRightArrow = false; //Set variable indicating mouse is over right arrow button to false
     int rightArrowX = 602; //Set x position of right arrow button
     int rightArrowY = 245; //Set y position of right arrow button
-            
-     
+    
+    //Buttons for Stage 1 (Distrubute Character Points)
+    boolean overPlusStrength = false; //Set variable indicating mouse is over plus strength button to false
+    int plusStrengthX = 0; //Set x position of plus strength button
+    int plusStrengthY = 0; //Set y position of plus strength button
+    boolean overMinusStrength = false; //Set variable indicating mouse is over minus strength button to false
+    int minusStrengthX = 0; //Set x position of minus strength button
+    int minusStrengthY = 0; //Set y position of minus strength button
+    boolean overPlusIntelligence = false; //Set variable indicating mouse is over plus intelligence button to false
+    int plusIntelligenceX = 0; //Set x position of plus intelligence button
+    int plusIntelligenceY = 0; //Set y position of plus intelligence button
+    boolean overMinusIntelligence = false; //Set variable indicating mouse is over minus intelligence button to false
+    int minusIntelligenceX = 0; //Set x position of minus intelligence button
+    int minusIntelligenceY = 0; //Set y position of minus intelligence button
+    
+    
     //Declare images
     //Declare images for Stage 0 (Main Menu)
     PImage testimg; ////
@@ -86,7 +105,15 @@ public class MySketch extends PApplet {
     //Declare images for Stage 1 (Begin Story)
     PImage tellStory1;     //Tell the player about the story before they begin (part 1)
     PImage tellStory2;     //Tell the player about the story before they begin (part 2)
+    PImage selectTraits;   //Character traits point distribution (strength/intelligence)
     PImage pressSpaceToContinue;  //Message telling the player to press space to continue
+    PImage plusStrengthButton;       //Button to add one point to strength trait
+    PImage minusStrengthButton;      //Button to subtract one point to strength trait
+    PImage plusInteligenceButton;     //Button to add one point to intelligence trait
+    PImage minusIntelligenctButton;    //Button to subtract one point to intelligence trait
+    PImage zero;    //Zero points assigned to trait
+    PImage one;     //One point assigned to trait
+    PImage two;     //Two points assigned to trait
     
     
     
@@ -135,7 +162,19 @@ public class MySketch extends PApplet {
         //Load images for Stage 1 (Begin Story)
         tellStory1 = loadImage("images/story1.jpg");    //Part 1 of story introduction
         tellStory2 = loadImage("images/story2.jpg");    //Part 2 of story introduction
+        selectTraits  = loadImage("images/selecttraits.jpg");   //Character traits point distribution (strength/intelligence)
+
         pressSpaceToContinue = loadImage("images/spacetocontinue.png");  //Press SPACE to continue message
+        
+        plusStrengthButton = loadImage("images/plusstrengthbutton.jpg");   //Button to add one point to strength trait
+        minusStrengthButton = loadImage("images/minusstrengthbutton.jpg");   //Button to subtract one point to strength trait
+        plusInteligenceButton = loadImage("images/plusintelligencebutton.jpg");   //Button to add one point to intelligence trait
+        minusIntelligenctButton = loadImage("images/minusintelligencebutton.jpg");   //Button to subtract one point to intelligence trait
+        
+        zero = loadImage("images/zero.png");  //Zero points assigned to trait
+        one = loadImage("images/one.png");  //One point assigned to trait
+        two = loadImage("images/two.png");  //Two points assigned to trait
+        
         
     }
     
@@ -164,21 +203,6 @@ public class MySketch extends PApplet {
             image(startButton, startX, startY);                 //Start button
             
             
-            /**
-            image(customname, 200, 500); 
-            image(customclothes, 200, 500); 
-            image(character, 200, 500); 
-            
-            if (customName) {
-                text("Enter name:", 20, 50);
-                text(userInput, 20, 100);
-            }
-            
-            if (customCharacter) {
-                image(leftButton, 200, 500); 
-                image(rightButton, 200, 500); 
-            }
-            * */
             
         //Choose Character's Name
         } else if (stage == -2) {  
@@ -217,17 +241,63 @@ public class MySketch extends PApplet {
                 
             
             //Display button options
-            image(leftButton, leftArrowX, leftArrowY); 
-            image(rightButton, rightArrowX, rightArrowY); 
+            image(leftButton, leftArrowX, leftArrowY);     //Left arrow button
+            image(rightButton, rightArrowX, rightArrowY);  //Right arrow button
             
         
+        //Begin Story
         } else if (stage == 1) {
+            //Part 1 of story introduction
             if (currentScreen1 == 1)
+                //Tell the player about the story before they begin (part 1)
                 background(tellStory1);
+            //Part 2 of story introduction
             else if (currentScreen1 == 2)
+                //Tell the player about the story before they begin (part 2)
                 background(tellStory2);
-            else
+            //Character traits point distribution (strength/intelligence)
+            else if (currentScreen1 == 3) {
                 background(selectTraits);
+                
+            //Display button options
+            image(plusStrengthButton, plusStrengthX, plusStrengthY); 
+            image(minusStrengthButton, minusStrengthX, minusStrengthY); 
+            image(plusInteligenceButton, plusIntelligenceX, plusIntelligenceY); 
+            image(minusIntelligenctButton, minusIntelligenceX, minusIntelligenceX); 
+
+
+            //Current number of character trait points assigned to strength is 0
+            if (currentStrengthPoints == 0)
+                image(zero, 0, 0); //Display the number 0 for strength trait
+            //Current number of character trait points assigned to strength is 1
+            else if (currentStrengthPoints == 1)
+                image(one, 0, 0); //Display the number 1 for strength trait
+            //Current number of character trait points assigned to strength is 2
+            else
+                image(two, 0, 0); //Display the number 2 for strength trait
+
+            //Current number of character trait points assigned to intelligence is 0
+            if (currentIntelligencePoints == 0)
+                image(zero, 0, 0); //Display the number 0 for intelligence trait
+            //Current number of character trait points assigned to intelligence is 1
+            else if (currentIntelligencePoints == 1)
+                image(one, 0, 0); //Display the number 1 for intelligence trait
+            //Current number of character trait points assigned to intelligence is 2
+            else
+                image(two, 0, 0); //Display the number 2 for intelligence trait
+                
+            
+             if (currentStrengthPoints == 2)
+                 traitDistrubtion = 1; //High strength
+             else if (currentIntelligencePoints == 2)
+                 traitDistrubtion = 2; //High intelligence
+             else
+                traitDistrubtion = 0; //Neutral strength/intelligence
+             
+                
+            } else if (currentScreen1 == 4) {
+                
+            }
             
             image(pressSpaceToContinue, 280, 450);
             
@@ -274,8 +344,13 @@ public class MySketch extends PApplet {
         //Variables for Stage -3 (Customize Clothes)
         overLeftArrow = false;   //Left arrow button
         overRightArrow = false;  //Right arrow button
+        //Variables for Stage 1 (Begin Story)
+        overPlusStrength = false; //Button to add one point to strength trait
+        overMinusStrength = false; //Button to subtract one point from strength trait
+        overPlusIntelligence = false; //Button to add one point to intelligence trait
+        overMinusIntelligence = false; //Button to subtract one point from inteeligence trait
        
-    
+
     
         //Stage 0 (Main Menu)
         if (stage == 0) {
@@ -303,6 +378,20 @@ public class MySketch extends PApplet {
                 overLeftArrow = true; //Set variable indicating mouse is over left arrow button to true
             else if (overImage(rightButton, rightArrowX, rightArrowY)) //Right arrow button
                 overRightArrow = true; //Set variable indicating mouse is over right arrow button to true
+        //Stage 1 (Begin Story)
+        } else if (stage == 1) {
+            //Mouse is over a specific button in Stage 1 (Begin Story)
+            if (overImage(plusStrengthButton, plusStrengthX, plusStrengthY)) //Button to add one point to strength trait
+                overPlusStrength = true; //Set variable indicating mouse is over add strength button to true
+            else if (overImage(minusStrengthButton, minusStrengthX, minusStrengthY)) //Button to subtract one point to strength trait
+                overMinusStrength = true; //Set variable indicating mouse is over minus strength button to true
+            if (overImage(plusInteligenceButton, plusIntelligenceX, plusIntelligenceY)) //Button to add one point to intelligence trait
+                overPlusIntelligence = true; //Set variable indicating mouse is over add intelligenct button to true
+            else if (overImage(minusIntelligenctButton, minusIntelligenceX, minusIntelligenceY)) //Button to subtract one point to intelligence trait
+                overMinusIntelligence = true; //Set variable indicating mouse is over minus intelligenct button to true
+           
+                
+    
         }
        
         
@@ -381,11 +470,52 @@ public class MySketch extends PApplet {
                 } else {
                     chooseCharacter1 = true;
                 }
-        
+        //Stage 1 (Begin Story)
+        } else if (stage == 1) {
+            if (overPlusStrength) {
+                if (currentStrengthPoints == 0 && currentIntelligencePoints == 0)
+                    currentStrengthPoints = 1;
+                else if (currentIntelligencePoints == 2)
+                    currentStrengthPoints = 1;
+                    currentIntelligencePoints = 1;
+                else if (currentStrengthPoints == 0) 
+                    currentStrengthPoints = 1;
+                else {
+                    currentStrengthPoints = 2;
+                }
+            } else if (overMinusStrength) {
+                if (currentStrengthPoints == 2)
+                   currentStrengthPoints = 1;
+                else {
+                    currentStrengthPoints = 0;
+                }
+            } else if (overPlusIntelligence) {
+                if (currentStrengthPoints == 0 && currentIntelligencePoints == 0)
+                    currentIntelligencePoints = 1;
+                else if (currentIntelligencePoints == 2)
+                    currentStrengthPoints = 1;
+                    currentIntelligencePoints = 1;
+                else if (currentIntelligencePoints == 0) 
+                    currentIntelligencePoints = 1;
+                else {
+                    currentIntelligencePoints = 2;
+                }
+            } else if (overMinusIntelligence) {
+                if (currentIntelligencePoints == 2)
+                   currentIntelligencePoints = 1;
+                else {
+                    currentIntelligencePoints = 0;
+                }
+            }
+                
+                    
+                    
+            } 
+            
+            
         }
         
     
-    }
 
       
     @Override
@@ -399,7 +529,13 @@ public class MySketch extends PApplet {
                     currentScreen1 = 2;
                 else if (currentScreen1 == 2) //If screen currently being shown is the second part of the story introduction
                     currentScreen1 = 3;
-                else {
+                else if (currentScreen1 == 3) { //If screen currently being shown is the character traits distrubution
+                    pointsError = false; //Set error indicator for points distribution false in case it was set to true previously
+                    if ((currentStrengthPoints == 0 && currentIntelligencePoints == 0) || (currentStrengthPoints == 1 && currentIntelligencePoints == 0) || (currentStrengthPoints == 0 && currentIntelligencePoints == 1)) {
+                        pointsError = true;
+                    } else  
+                        currentScreen1 = 4;
+                } else {
                     stage = 2;
                     currentScreen1 = 1; //Reset screen to be shown for Stage 1 to the first part of the story introduction
                 } 
