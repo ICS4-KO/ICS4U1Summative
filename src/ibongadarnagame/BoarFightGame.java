@@ -11,38 +11,55 @@ import processing.core.PImage;
  * @author 343330528
  */
 public class BoarFightGame extends Game {
-    private int playerHealth = 100;
-    private int boarHealth = 150;
-    private int playerAttackPower = 5;
-    private int boarAttackPower = 30;
-    private int attackInterval = 800;
-    private int timer = 0;
-    private int neutralInterval = 300;
-    //Score is based on how much life they have left
-    
-    private int HPLost = 0; //Amount of damage taken by the user
-    PImage boar;
-    PImage player;
-    
-    // New variables for player position and movement speed
-    private int playerX = 112; // Initial x position
-    private int playerY = 78;  // Initial y position
-    private int playerSpeed = 15; // Pixels per key press
-    private int boarX = 550; // Initial x position
-    private int boarY = 420;  // Initial y position
+    private int playerHealth = 100; //Default player health
+    private int fullHealth = 100; //Full player health
+    private int boarHealth = 150; //Boar health
+    private int playerAttackPower = 5; //Damage dealt with each player attack
+    private int boarAttackPower = 40; //Damage dealt with each boar attack
+    private int timer = 0; //Timer to keep track of attack/neutral intervals
+    private int attackInterval = 800; //Time duration of player's attack, max. duration of boar's attack
+    private int neutralInterval = 300; //Time duration of neutral intervals between attack turns
+    private int totalTime = 0; //Time it takes the user to complete the game
+    private int playerX = 112; //Initial x position of player 
+    private int playerY = 78;  //Initial y position of player
+    private int playerSpeed = 15; // Player's speed (pixels per key press)
+    private int boarX = 550; //Initial x position of boar
+    private int boarY = 420;  //Initial y position of boar
     private int boarSpeed = 2; //Boar's speed
-    boolean boarAttackTurn = true;
-    boolean neutralTime = false;
-    boolean gameWon = false;
+    boolean boarAttackTurn = true; //True when it is the boar's turn to attack
+    boolean neutralTime = false; //True during the neutral times between the player and boar's turns
+    private String message = "Boar's Turn"; //Tells player whose attack turn it is
+    private String background; //Current background image path
+    
+    //Declare Images
+    PImage boar; //Boar
+    PImage player; //Player
+    PImage gameBG; //Minigame background (player's turn)
+    PImage mediumGameBG; //Medium minigame background (neutral turn)
+    PImage darkGameBG; //Dark minigame background (boar's turn)
+    
+    
+    
+    private int damageTaken = 0; //Amount of damage taken by the user
+    
+    boolean gameWon = false; //True if user wins the game
     
 
+    
     public BoarFightGame(PApplet p, String name, int maxScore, int gameIndex, String chosenCharacter, int traitsDistribution) {
         super(p, name, maxScore, gameIndex, chosenCharacter);
-        if (traitsDistribution == 1) //If player has high strength
+        if (traitsDistribution == 1) { //If player has high strength 
             playerHealth = 120; //Set higher health points to start with
+            fullHealth = 120;
+        }
         
-        boar = gameApp.loadImage("images/boar.png");
-        player = gameApp.loadImage(chosenCharacter);
+        //Load Images
+        gameBG = gameApp.loadImage("images/gamebg.jpg"); //Load minigame background
+        mediumGameBG = gameApp.loadImage("images/mediumgamebg.jpg"); //Load medium minigame background
+        darkGameBG = gameApp.loadImage("images/darkgamebg.jpg"); //Load dark minigame background
+        boar = gameApp.loadImage("images/boar.png"); //Load boar image
+        
+        player = gameApp.loadImage(chosenCharacter); //Load character image
         boar.resize(166, 122); //Make boar smaller for the minigame
         player.resize(118, 230); //Make character smaller for the minigame
     }
@@ -52,11 +69,14 @@ public class BoarFightGame extends Game {
         if (!gameOver) {
             timer++;
             if (neutralTime) {
-                if (timer >= neutralInterval)
+                if (timer >= neutralInterval) {
+                    totalTime += neutralInterval;
                     neutralTime = false;
+                }
             } else {
                 if (timer >= attackInterval) {
                     boarAttackTurn = !boarAttackTurn;
+                    totalTime += attackInterval;
                     timer = 0;
                     neutralTime = true;
                     return;
@@ -66,11 +86,13 @@ public class BoarFightGame extends Game {
                     if (boarAttackTurn) {
                         playerHealth -= boarAttackPower;
                         neutralTime = true;
+                        totalTime += timer;
                         timer = 0;
                         boarAttackTurn = false;
                         
                         if (playerHealth <= 0) {
                             playerHealth = 0;
+                            gameWon = false;
                             gameOver = true;
                         }
                     } else if (!boarAttackTurn){
@@ -87,6 +109,13 @@ public class BoarFightGame extends Game {
 
     @Override
     void draw() {
+        //Set minigame background
+        if (neutralTime)
+            gameApp.background(mediumGameBG);
+        else if (boarAttackTurn)
+            gameApp.background(darkGameBG);
+        else gameApp.background(gameBG);
+        
         if (!gameOver) {
             //Draw character
             gameApp.image(player, playerX, playerY);
@@ -101,20 +130,35 @@ public class BoarFightGame extends Game {
             // Display health bars
             gameApp.fill(0);
             gameApp.textAlign(gameApp.CENTER, gameApp.CENTER);
-            gameApp.textSize(20);
-            gameApp.text("Player Health: " + playerHealth, gameApp.width / 2, 50);
-            gameApp.text("Boar Health: " + boarHealth, gameApp.width / 2, 100);
-            if (boarAttackTurn)
-                gameApp.text("Boar's  Attack " + timer, gameApp.width / 2, 150);
-            else
-                gameApp.text("Your Attack " + timer, gameApp.width / 2, 150);
+            gameApp.textSize(18);
+            gameApp.text("Player Health: " + playerHealth + " " + totalTime, gameApp.width / 2, 50);
+            gameApp.text("Boar Health: " + boarHealth, gameApp.width / 2, 80);
+            gameApp.text(message, gameApp.width / 2, 110);
             if (neutralTime)
-                gameApp.text("Netural", gameApp.width / 2, 200);
+                message = "No one's turn - Get ready!";
+            else if (boarAttackTurn)
+                message = "Boar's Turn - Run away from the boar!";
+            else if (isColliding())
+                message = "Your Turn - Click on the boar now!";
+            else
+                message = "Your Turn - Get close to the boar!";
+            
 
         } else {
+            calculatePoints(); 
+            damageTaken = fullHealth - playerHealth;
+            
+            if (gameWon) {
+                background
+            }
+            
             // Display game over message
             gameApp.fill(0);
-            gameApp.text("Game Over", gameApp.width / 2, gameApp.height / 2);
+            gameApp.textSize(24);
+            gameApp.text("Total Time:  " + Math.round(totalTime), gameApp.width / 2, 230);
+            gameApp.text("Points Earned:  " + score, gameApp.width / 2, 280);
+            gameApp.text("Damage Taken:  " + damageTaken, gameApp.width / 2, 330);
+            
         }
     }
 
@@ -186,5 +230,29 @@ public class BoarFightGame extends Game {
         // Keep boar within window bounds
         boarX = gameApp.constrain(boarX, 0, gameApp.width - boar.width); 
         boarY = gameApp.constrain(boarY, 0, gameApp.height - boar.height); 
+    }
+    
+    
+    public void calculatePoints() {
+        if (totalTime >= 3300)
+            score = 5;
+        else if (totalTime >= 2800)
+            score = 10;
+        else if (totalTime >= 2300)
+            score = 15;
+        else if (totalTime >= 1800)
+            score = 20;
+        else
+            score = 25;
+        
+        if (!gameWon)
+            score -= 5;
+    }
+    
+    
+    
+    @Override
+    public String returnGameResults() {
+        return "a";
     }
 }

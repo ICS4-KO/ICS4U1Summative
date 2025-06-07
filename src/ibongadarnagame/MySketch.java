@@ -34,6 +34,8 @@ public class MySketch extends PApplet {
     boolean pointsError = false; //True if not all character trait points have been distributed (error)
     //Variables for Stage 2 (Fork in the Road)
     boolean willFightBoar; //True if player chooses the path with the boar
+    //Variables for Stage 4 (Encounter Boar)
+    int currentScreen4 = 1;
     
     
     //Buttons
@@ -129,8 +131,10 @@ public class MySketch extends PApplet {
     PImage forkInTheRoadBG; //Fork in the road background
     //Declare iamges for Stage 4 (Encounter Boar)
     PImage encounterBoarBG; //Background if user chooses path with the boar
+    PImage boarFightInstructions; //Background displaying boar fight instructions
     PImage noBoarBG; //Background if user does not choose path with the boar
     PImage boar; //Wild boar
+    
     
     
     
@@ -206,6 +210,7 @@ public class MySketch extends PApplet {
         encounterBoarBG = loadImage("images/encounterboarbg.jpg");  //Background if user chooses path with the boar
         noBoarBG = loadImage("images/noboarbg.jpg");  //Background if user does not choose path with the boar
         boar = loadImage("images/boar.png"); //Wild boar
+        boarFightInstructions = loadImage("images/boarfightinstructions.jpg"); //Background displaying boar fight instructions
         
         
         
@@ -396,20 +401,26 @@ public class MySketch extends PApplet {
             
         //Encounter Boar
         } else if (stage == 4) {
-            //If user chose path with the boar
-            if (willFightBoar) {
-                //Set background where user encounters boar
-                background (encounterBoarBG);
-                image(boar,420, 370); //Draw boar on the screen
-                player.draw(); //Draw character on the screen
-                if (player.x < 140) //Keep moving character until it reaches a specific point on the screen
+            //Player encounters boar
+            if (currentScreen4 == 1) {
+                //If user chose path with the boar
+                if (willFightBoar) {
+                    //Set background where user encounters boar
+                    background (encounterBoarBG);
+                    image(boar,420, 370); //Draw boar on the screen
+                    player.draw(); //Draw character on the screen
+                    if (player.x < 140) //Keep moving character until it reaches a specific point on the screen
+                        player.move(2, 0); //Move character to the right
+                //If user chose path without the boar
+                } else {
+                    //Set background where user does not encounter boar
+                    background (noBoarBG);
+                    player.draw(); //Draw character on the screen
                     player.move(2, 0); //Move character to the right
-            //If user chose path without the boar
-            } else {
-                //Set background where user does not encounter boar
-                background (noBoarBG);
-                player.draw(); //Draw character on the screen
-                player.move(2, 0); //Move character to the right
+                }
+            //Display instructions for boar fight minigame
+            } else if (currentScreen4 == 2) {
+                background(boarFightInstructions);
             }
             
             
@@ -649,18 +660,23 @@ public class MySketch extends PApplet {
                 stage = 3; //Go to next stage (Fork in the Road)
                 player.moveTo(-90, 255); //Set new player position
             //Spacebar is pressed in Stage 4 (Encounter boar)
-            } else if (stage == 4) {
-                if (willFightBoar) { //If user chose path with boar
+            } else if (stage == 4) {    
+                if (currentScreen4 == 1) { //If screen currently being shown is the encounter with the boar
+                    if (willFightBoar) { //If user chose path with boar
+                        currentScreen4 = 2; //Display boar fight minigame instructions
+                    } else //If user chose path without boar
+                        stage = 6; //Go to the next stage (Meet hermit)
+                } else if (currentScreen4 == 2){ //If screen currently being shown is the boar fight minigame instructions
+                    if (chooseCharacter1)
+                        currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter1.png", traitDistribution);
+                    else if (chooseCharacter2)
+                        currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter2.png", traitDistribution);
+                    else
+                        currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter3.pn", traitDistribution);
+                         
                     stage = 5; //Go to the boar fight minigame
-                        if (chooseCharacter1)
-                            currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter1.png", traitDistribution);
-                        else if (chooseCharacter2)
-                            currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter2.png", traitDistribution);
-                        else
-                            currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter3.pn", traitDistribution);
-                } else //If user chose path without boar
-                    stage = 6; //Go to the next stage (Meet hermit)
-                
+                }
+        
             }
         } 
         
