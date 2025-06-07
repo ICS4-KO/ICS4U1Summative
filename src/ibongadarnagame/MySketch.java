@@ -10,6 +10,8 @@ import processing.core.PImage;
  * @author 343330528
  */
 public class MySketch extends PApplet {
+    Player player; //Player object representing character
+    
     //Variables
     int stage = 0; //Current stage of the game starts at 0
     String userInput = ""; //Stores user input text
@@ -27,7 +29,9 @@ public class MySketch extends PApplet {
     int traitDistribution; //0 means neutral, 1 means high strength, 2 means high intelligence
     int currentStrengthPoints = 0; //Current number of character trait points assigned to strength
     int currentIntelligencePoints = 0; //Current number of character trait points assigned to intelligence
-    boolean pointsError = false; //True if not all character trait points have been distributed (error0
+    boolean pointsError = false; //True if not all character trait points have been distributed (error)
+    //Variables for Stage 2 (Fork in the Road)
+    boolean willFightBoar; //True if player chooses the path with the boar
     
     
     //Buttons
@@ -117,6 +121,14 @@ public class MySketch extends PApplet {
     PImage one;     //One point assigned to trait
     PImage two;     //Two points assigned to trait
     PImage pointsErrorMessage; //Error message for if character trait points have not been distributed
+    //Declare images for Stage 2 (Leaving Castle)
+    PImage castleBG; //Castle background
+    //Declare images for Stage 3 (Fork in the Road)
+    PImage forkInTheRoadBG; //Fork in the road background
+    //Declare iamges for Stage 4 (Encounter Boar)
+    PImage encounterBoarBG; //Background if user chooses path with the boar
+    PImage noBoarBG; //Background if user does not choose path with the boar
+    PImage boar; //Wild boar
     
     
     
@@ -127,7 +139,6 @@ public class MySketch extends PApplet {
     public void setup() {
         background(100, 100, 100); ////Set background
         textSize(20); //Set text size
-        Player player; //Player object representing character
         
         //Load images
         //Load images for Stage 0 (Main Menu)
@@ -183,6 +194,18 @@ public class MySketch extends PApplet {
         
         pointsErrorMessage = loadImage("images/pointserror.png");  //Error message for incomplete point distribution
         
+        //Load images for Stage 2 (Leaving Castle)
+        castleBG = loadImage("images/castlebg.jpg");  //Castle background
+        
+        //Load images for Stage 3 (Fork in the Road)
+        forkInTheRoadBG = loadImage("images/forkintheroadbg.jpg");  //Fork in the road background
+        
+        //Load images for Stage 4 (Encounter Boar)
+        encounterBoarBG = loadImage("images/encounterboarbg.jpg");  //Background if user chooses path with the boar
+        noBoarBG = loadImage("images/noboarbg.jpg");  //Background if user does not choose path with the boar
+        boar = loadImage("images/boar.png"); //Wild boar
+        
+        
         
     }
     
@@ -221,12 +244,17 @@ public class MySketch extends PApplet {
             //Set fill colour to black for user input text
             fill(0);
             //Display user input text
-            text(userInput, 450, 185);
+            text(userInput, 450, 125);
             
             //If user presses enter to confirm their chosen name but the name is not between 1 and 10 characters long
             if(nameError) 
-                image(nameErrorMessage, 225, 200); //Display error message regarding name length
-            ////Remember to set it back to false and put default name "don juan" as well as clothes
+                image(nameErrorMessage, 225, 140); //Display error message regarding name length
+            
+            //Draw character below name
+            if (customCharacter)
+                image(currentChoice, 312, 180); 
+            else
+                image(character1, 312, 180);
             
             
         
@@ -248,7 +276,7 @@ public class MySketch extends PApplet {
                 currentChoice = character3; //Set current character clothing choice to be displayed as character v3
             
             //Draw user's current character clothing choice (v1/v2/v3)
-            image(currentChoice, 0, 0);
+            image(currentChoice, 312, 167);
                 
             
             //Display button options
@@ -328,29 +356,63 @@ public class MySketch extends PApplet {
             image(pressSpaceToContinue, 280, 450);
             
             
-            /**
+            
             if (customName && customCharacter) {
                 if (chooseCharacter1)
-                    player = new Player(this, 0, 0, enteredName, int characterTraits, Inventory inventory, String imagePat);
+                    player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter1.png");
                 else if (chooseCharacter2)
-                    player = new Player(this, 0, 0, enteredName, int characterTraits, Inventory inventory, String imagePat);
+                    player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter2.png");
                 else
-                    player = new Player(this, 0, 0, enteredName, int characterTraits, Inventory inventory, String imagePat);
+                    player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter3.png");
             } else if (customName) {
-                player = new Player(this, 0, 0, enteredName, int characterTraits, Inventory inventory);
+                player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3));
             } else if (customCharacter) {
                 if (chooseCharacter1)
-                   player = new Player(this, 0, 0, int characterTraits, Inventory inventory, String imagePat);
-               else if (chooseCharacter2)
-                   player = new Player(this, 0, 0, int characterTraits, Inventory inventory, String imagePat);
-               else
-                   player = new Player(this, 0, 0, int characterTraits, Inventory inventory, String imagePat);
+                   player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter1.png");
+                else if (chooseCharacter2)
+                   player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter2.png");
+                else
+                   player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter3.png");
             } else {
-                player = new Player(this, 0, 0, int characterTraits, Inventory inventory);
+                player = new Player(this, 155, 255, traitDistribution, new Inventory(3));
             }
-            * */
-                
-        } 
+           
+        //Leaving Castle
+        } else if (stage == 2) {
+            //Set castle background
+            background(castleBG);
+            player.draw(); //Draw character on the screen
+            player.move(2, 0); //Move character to the right
+            
+        //Fork in the Road
+        } else if (stage == 3) {
+            //Set fork in the road background
+            background(forkInTheRoadBG);
+            player.draw();
+            if (player.x < 240)
+                player.move(2, 0);
+            
+        //Encounter Boar
+        } else if (stage == 4) {
+            //If user chose path with the boar
+            if (willFightBoar) {
+                //Set background where user encounters boar
+                background (encounterBoarBG);
+                image(boar,420, 370); //Draw boar on the screen
+                player.draw(); //Draw character on the screen
+                if (player.x < 140) //Keep moving character until it reaches a specific point on the screen
+                    player.move(2, 0); //Move character to the right
+            //If user chose path without the boar
+            } else {
+                //Set background where user does not encounter boar
+                background (noBoarBG);
+                player.draw(); //Draw character on the screen
+                player.move(2, 0); //Move character to the right
+            }
+            
+            
+            
+        }
     }
     
     
@@ -556,10 +618,10 @@ public class MySketch extends PApplet {
     @Override
     public void keyPressed() {
         if (key == ' ') {
-            if (stage == -3)
+            if (stage == -3) {
                 stage = -1;
             //Spacebar is pressed in Stage 1 (Begin Story)
-            else if (stage == 1) {
+            } else if (stage == 1) {
                 if (currentScreen1 == 1) //If screen currently being shown is the first part of the story introduction
                     currentScreen1 = 2;
                 else if (currentScreen1 == 2) //If screen currently being shown is the second part of the story introduction
@@ -575,10 +637,20 @@ public class MySketch extends PApplet {
                 else {
                     stage = 2;
                     currentScreen1 = 1; //Reset screen to be shown for Stage 1 to the first part of the story introduction
-                }
-                    
+                }   
+            //Spacebar is pressed in Stage 2 (Leaving Castle)
+            } else if (stage == 2) {
+                stage = 3; //Go to next stage (Fork in the Road)
+                player.moveTo(-90, 255); //Set new player position
+            //Spacebar is pressed in Stage 4 (Encounter boar)
+            } else if (stage == 4) {
+                if (willFightBoar) //If user chose path with boar
+                    stage = 5; //Go to the boar fight minigame
+                else //If user chose path without boar
+                    stage = 6; //Go to the next stage (Meet hermit)
+                
             }
-        }
+        } 
         
         if (stage == -2) {
             if (keyCode == ENTER) { //If enter key is pressed
@@ -596,6 +668,20 @@ public class MySketch extends PApplet {
             } else if (key != CODED) { // checks if it is an ASCII character
                 userInput += key; // add each keystroke to user input string
             } // end nested if
+            
+        //Fork in the Road
+        } else if (stage == 3) {
+            //If user presses left arrow key
+            if (keyCode == LEFT) {
+                willFightBoar = false; //User will not play boar fight minigame
+                stage = 4; //Go to the next stage (Encounter Boar)
+                player.moveTo(-90, 255); //Set new player position
+            //If user presses right arrow key
+            } else if (keyCode == RIGHT){
+                willFightBoar = true; //User will play boar fight minigame
+                stage = 4; //Go to the next stage (Encounter Boar)
+                player.moveTo(-90, 255); //Set new player position
+            }
         }
         
     }

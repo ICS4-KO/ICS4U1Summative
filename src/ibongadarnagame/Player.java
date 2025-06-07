@@ -12,7 +12,7 @@ import processing.core.PImage;
  */
 public class Player {
     //Instance Variables
-    private int x, y; //Position of the character
+    public int x, y; //Position of the character
     private String name; //Name of the player
     private int lives = 3;  //Player has 3 lives
     private int health; //Current health
@@ -27,7 +27,7 @@ public class Player {
     
     //Default Constants
     private static String DEFAULT_NAME = "Don Juan"; //Default player name
-    private static String DEFAULT_CLOTHES = "images/redShirt.png"; //Default character image
+    private static String DEFAULT_CLOTHES = "images/chosenCharacter1.png"; //Default character image
     private static int NORMAL_HEALTH = 500; //Normal health per life
     private static int HIGH_HEALTH = 700; //More HP for players with high strength
     
@@ -275,6 +275,16 @@ public class Player {
     
     public void draw() {
         app.image(image, x, y); //Draw the image at the character's position
+    }
+    
+    public void move(int dx, int dy) {
+        x += dx;
+        y += dy;
+    }
+    
+    public void moveTo(int dx, int dy) {
+        x = dx;
+        y = dy;
     }
     
 
