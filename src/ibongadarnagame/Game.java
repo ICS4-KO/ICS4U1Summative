@@ -3,19 +3,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package ibongadarnagame;
+import processing.core.PApplet;
 
 /**
  *
  * @author 343330528
  */
-public class Game {
+public abstract class Game {
     //Instance variables
-    private String name; //Name of the game
-    private String description; //Description of the game
-    private int maxScore; //Maximum amount of points user can earn from playing the game
-    private int gameIndex; //Index number of game in user's 2D array of game scores
-    private int score = 0; //Current player's score
-    private int numTries = 0; //Number of tries the current player makes
+    PApplet gameApp;
+    String name; //Name of the game
+    int maxScore; //Maximum amount of points user can earn from playing the game
+    int gameIndex; //Index number of game in user's 2D array of game scores
+    int score = 0; //Current player's score
+    int numTries = 0; //Number of tries the current player makes
+    boolean gameOver = false;
     
     //Static variables
     private static int highestScore = 0; //Highest score among all players
@@ -24,16 +26,17 @@ public class Game {
     private static final int NUM_TRIES = 3; //Total number of tries per game
     
     /**
-     * Constructor creates an instance of the Game class with its own name, description, and maximum score
+     * Constructor creates an instance of the Game class with its own name and maximum score
      * 
+     * @param p            Reference to canvas
      * @param name         Name of game
-     * @param description  Description of game/rules
      * @param maxScore     Maximum number of points that can possibly be earned
      * @param gameIndex    Index number of game in user's 2D array of game scores
+     * @param chosenCharacter  Character appearance chosen by the user
      */
-    public Game(String name, String description, int maxScore, int gameIndex) {
+    public Game(PApplet p, String name, int maxScore, int gameIndex, String chosenCharacter) {
+        this.gameApp = p;
         this.name = name; //Set name attribute to entered value
-        this.description = description; //Set description attribute to entered value
         this.maxScore = maxScore; //Set masScore attribute to entered value
         this.gameIndex = gameIndex; //Set gameIndex attribute to entered value
     }
@@ -52,14 +55,20 @@ public class Game {
         gameScores[gameIndex][1] = tries;
     }
     
-    /**
-     * Getter method to return description attribute of Game object
-     * 
-     * @return  Description of game
-     */
-    public String getDescription() {
-        return description; //Return description of game
+    public boolean isGameOver() {
+        return gameOver;
     }
+    
+    public String returnGameResults() {
+        System.out.println("a");
+        return "a";
+    }
+    
+    abstract void update();
+    abstract void draw();
+    abstract void mousePressed();
+    abstract void keyPressed();
+    
     
     
 }

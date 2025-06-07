@@ -10,7 +10,9 @@ import processing.core.PImage;
  * @author 343330528
  */
 public class MySketch extends PApplet {
+    PApplet app;
     Player player; //Player object representing character
+    Game currentGame; //Current minigame being played
     
     //Variables
     int stage = 0; //Current stage of the game starts at 0
@@ -411,7 +413,10 @@ public class MySketch extends PApplet {
             }
             
             
-            
+        //Boar Fight Minigame
+        } else if (stage == 5) {
+            currentGame.update();
+            currentGame.draw();
         }
     }
     
@@ -606,8 +611,9 @@ public class MySketch extends PApplet {
             }
                 
                     
-                    
-            } 
+            } else if (stage == 5) {
+                currentGame.mousePressed();
+            }
             
             
         }
@@ -644,9 +650,15 @@ public class MySketch extends PApplet {
                 player.moveTo(-90, 255); //Set new player position
             //Spacebar is pressed in Stage 4 (Encounter boar)
             } else if (stage == 4) {
-                if (willFightBoar) //If user chose path with boar
+                if (willFightBoar) { //If user chose path with boar
                     stage = 5; //Go to the boar fight minigame
-                else //If user chose path without boar
+                        if (chooseCharacter1)
+                            currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter1.png", traitDistribution);
+                        else if (chooseCharacter2)
+                            currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter2.png", traitDistribution);
+                        else
+                            currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter3.pn", traitDistribution);
+                } else //If user chose path without boar
                     stage = 6; //Go to the next stage (Meet hermit)
                 
             }
@@ -682,6 +694,9 @@ public class MySketch extends PApplet {
                 stage = 4; //Go to the next stage (Encounter Boar)
                 player.moveTo(-90, 255); //Set new player position
             }
+        //Boar Fight Minigame
+        } else if (stage == 5) {
+            currentGame.keyPressed();
         }
         
     }
