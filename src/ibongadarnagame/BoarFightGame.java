@@ -11,6 +11,7 @@ import processing.core.PImage;
  * @author 343330528
  */
 public class BoarFightGame extends Game {
+    //Instance variables
     private int playerHealth = 100; //Default player health
     private int fullHealth = 100; //Full player health
     private int boarHealth = 150; //Boar health
@@ -31,7 +32,7 @@ public class BoarFightGame extends Game {
     private String message = "Boar's Turn"; //Tells player whose attack turn it is
     private String background; //Current background image path
     
-    //Declare Images
+    //Declare images
     PImage boar; //Boar
     PImage player; //Player
     PImage gameBG; //Minigame background (player's turn)
@@ -43,7 +44,7 @@ public class BoarFightGame extends Game {
     
     
     
-    boolean gameWon = false; //True if user wins the game
+    //boolean gameWon = false; //True if user wins the game
     
 
     
@@ -65,6 +66,9 @@ public class BoarFightGame extends Game {
         player = gameApp.loadImage(chosenCharacter); //Load character image
         boar.resize(166, 122); //Make boar smaller for the minigame
         player.resize(118, 230); //Make character smaller for the minigame
+        
+        gameOver = false; ////
+        gameWon = false; ////
     }
 
     @Override

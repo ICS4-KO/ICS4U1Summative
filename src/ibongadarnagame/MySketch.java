@@ -158,6 +158,14 @@ public class MySketch extends PApplet {
     PImage ignoreHermitButton; //Press to ignore the hermit
     PImage hermit; //Hermit character
     PImage hermitWithFood; //Hermit character holding food
+    //Declare images for Stage 8 (Walking in the Forest 2)
+    PImage fillerForest2; //Filler forest scene 2
+    //Declare images for Stage 9 (Find Adarna Bird)
+    PImage seeAdarnaBG1;
+    PImage seeAdarnaBG2;
+    PImage sheerWillButton;
+    PImage limeJuiceButton;
+    
     
     
     
@@ -247,6 +255,9 @@ public class MySketch extends PApplet {
         ignoreHermitButton = loadImage("images/ignorehim.jpg"); //Press to ignore the hermit
         hermit = loadImage("images/hermit.png"); //Hermit character
         hermitWithFood = loadImage("images/hermitwithfood.png"); //Hermit character holding food
+        
+        //Load images for Stage 8 (Walking in the Forest 2)
+        fillerForest2 = loadImage("images/fillerforest2.jpg"); //Filler forest scene 2
         
         
     }
@@ -477,7 +488,7 @@ public class MySketch extends PApplet {
                 stage = 7;
             }
                 
-            
+        //Meet Hermit
         } else if (stage == 7) {
             if (currentScreen7 == 1) {
                 background(meetHermitBG1);
@@ -503,8 +514,18 @@ public class MySketch extends PApplet {
                 player.move(3, 0); //Move character to the right
             }
                 
-            
+        //Walking in the Forest 2   
         } else if (stage == 8) {
+            background(fillerForest2);
+            player.draw(); //Draw character on the screen
+            player.move(3, 0); //Move character to the right
+            if (player.x > 800) {
+                player.moveTo(85, 240); //Set new player position
+                stage = 9;
+            }
+            
+        //Adarna Bird
+        } else if (stage == 9) {
             
         }
         
@@ -790,8 +811,10 @@ public class MySketch extends PApplet {
             } else if (stage == 7) {
                 if (currentScreen7 == 1) //meeting
                     currentScreen7 = 2; //buttons
-                if (currentScreen7 == 3) //meeting
-                    stage = 8; //buttons
+                if (currentScreen7 == 3) { //response
+                    player.moveTo(-90, 255); //Set new player position
+                    stage = 8; //Walking in the Forest 2
+                }
             }
                 
         } 
