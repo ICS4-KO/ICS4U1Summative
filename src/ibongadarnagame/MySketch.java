@@ -40,6 +40,9 @@ public class MySketch extends PApplet {
     //Variables for Stage 7 (Meet Hermit)
     int currentScreen7 = 1;
     boolean playerHelpsHermit; //True if user decides to help the hermit
+    //Variables for Stage 9 (Find Adarna bird)
+    int currentScreen9 = 1;
+    boolean sheerWill; //What user uses to stay awake, which will affect the rhythm minigame
     
     
     //Buttons
@@ -97,6 +100,14 @@ public class MySketch extends PApplet {
     boolean overIgnoreHermit = false; //Set variable indicating mouse is over help hermit button to false
     int ignoreHermitX = 230; //Set x position of ignore hermit button
     int ignoreHermitY = 375; //Set y position of ignore hermit button
+    
+    //Buttons for Stage 9 (Find Adarna Bird)
+    boolean overSheerWill = false; //Set variable indicating mouse is over sheer will button to false
+    int sheerWillX = 230; //Set x position of sheer will button
+    int sheerWillY = 220; //Set y position of sheer will button
+    boolean overLimeJuice = false; //Set variable indicating mouse is over lime juice button to false
+    int limeJuiceX = 230; //Set x position of lime juice button
+    int limeJuiceY = 375; //Set y position of lime juice button
     
     
     
@@ -161,10 +172,11 @@ public class MySketch extends PApplet {
     //Declare images for Stage 8 (Walking in the Forest 2)
     PImage fillerForest2; //Filler forest scene 2
     //Declare images for Stage 9 (Find Adarna Bird)
-    PImage seeAdarnaBG1;
-    PImage seeAdarnaBG2;
-    PImage sheerWillButton;
-    PImage limeJuiceButton;
+    PImage seeAdarnaBG1; //Background when seeing the Adarna bird (part 1)
+    PImage seeAdarnaBG2; //Background when seeing the Adarna bird (part 2)
+    PImage rhythmGameInstructions; //Background displaying rhythm game instructions
+    PImage sheerWillButton; //Button to use sheer will to stay awake
+    PImage limeJuiceButton; //Button to use lime juice to stay awake
     
     
     
@@ -258,6 +270,14 @@ public class MySketch extends PApplet {
         
         //Load images for Stage 8 (Walking in the Forest 2)
         fillerForest2 = loadImage("images/fillerforest2.jpg"); //Filler forest scene 2
+        
+        //Load images for Stage 9 (Find Adarna Bird)
+        seeAdarnaBG1 = loadImage("images/seeadarna1.jpg"); //Background when seeing the Adarna bird (part 1)
+        seeAdarnaBG2 = loadImage("images/seeadarna2.jpg"); //Background when seeing the Adarna bird (part 2)
+        rhythmGameInstructions = loadImage("images/rhythmgameinstructions.jpg"); //Background displaying rhythm game instructions
+        sheerWillButton = loadImage("images/sheerwillbutton.jpg"); //Button to use sheer will to stay awake
+        limeJuiceButton = loadImage("images/limejuicebutton.jpg"); //Button to use lime juice to stay awake
+        
         
         
     }
@@ -505,6 +525,9 @@ public class MySketch extends PApplet {
                     background(meetHermitBG3);
                     image(hermitWithFood, 380, 220);
                     player.getInventory().consumeFood();
+                    player.getInventory().addItem("Lime Juice");
+                    player.getInventory().addItem("Rope");
+                    player.getInventory().addItem("Golden Cage");
                     player.addVirtue(50);
                 } else {
                     background(meetHermitBG4);
@@ -526,8 +549,26 @@ public class MySketch extends PApplet {
             
         //Adarna Bird
         } else if (stage == 9) {
+            System.out.println(currentScreen9);
+            if (currentScreen9 == 1) {
+                background(seeAdarnaBG1);
+                player.draw();
+            } else if (currentScreen9 == 2) {
+                background(seeAdarnaBG2);
+                player.draw();
+                image(sheerWillButton, sheerWillX, sheerWillY);
+                if (player.getInventory().hasItem("Lime Juice"))
+                    image(limeJuiceButton, limeJuiceX, limeJuiceY);
+            } else if (currentScreen9 == 3) {
+                background(rhythmGameInstructions);
+            }
             
+        //Rhythm Game Minigame
+        } else if (stage == 10) {
+            currentGame.update();
+            currentGame.draw();
         }
+        
         
         } //End else player death ////
     }
@@ -558,8 +599,10 @@ public class MySketch extends PApplet {
         //Variables for Stage 7 (Help Hermit)
         overHelpHermit = false; //Help hermit button
         overIgnoreHermit = false; //Ignore hermit button
-        
-       
+        //Variables for Stage 9 (Find Adarna Bird)
+        overSheerWill = false; //Sheer will button
+        overLimeJuice = false; //Lime juice button
+    
     
         //Stage 0 (Main Menu)
         if (stage == 0) {
@@ -607,11 +650,21 @@ public class MySketch extends PApplet {
             //Mouse is over a specific button in Stage 7 (Meet Hermit)
             if (overImage(ignoreHermitButton, ignoreHermitX, ignoreHermitY)) //Button to ignore hermit
                 overIgnoreHermit = true; //Set variable indicating mouse is over ignore hermit button to true
+            
+        //Stage 9 (Find Adarna Bird)
+        } else if (stage == 9) {
+            //Mouse is over a specific button in Stage 9 (Find Adarna Bird)
+            if (overImage(sheerWillButton, sheerWillX, sheerWillY)) //Button to use sheer will to stay awake
+                overSheerWill = true; //Set variable indicating mouse is over sheer will button to true
+            if (player.getInventory().hasItem("Lime Juice")) {
+                if (overImage(limeJuiceButton, limeJuiceX, limeJuiceY)) //Button to use lime juice to stay awake
+                overLimeJuice = true; //Set variable indicating mouse is over lime juice button to true
+            }
         }
         
         
     
-       
+        
         
     
         
@@ -749,6 +802,20 @@ public class MySketch extends PApplet {
                     currentScreen7 = 3;
                 }
                     
+            } else if (stage == 9) {
+                if (currentScreen9 == 2)
+                    if (overSheerWill) {
+                        sheerWill = true;
+                        currentScreen9 = 3;
+                    } else if (overLimeJuice && player.getInventory().hasItem("Lime Juice")) {
+                        sheerWill = false;
+                        currentScreen9 = 3;
+                    }
+                        
+                        
+            //Rhythm Game Minigame
+            } else if (stage == 10) {
+                currentGame.mousePressed();
             }
                 
                 
@@ -815,8 +882,22 @@ public class MySketch extends PApplet {
                     player.moveTo(-90, 255); //Set new player position
                     stage = 8; //Walking in the Forest 2
                 }
+            //Find Adarna Bird
+            } else if (stage == 9) {
+                if (currentScreen9 == 1) //If screen currently being shown is the first sighting of the Adarna bird
+                    currentScreen9 = 2; //Show button options to stay awake using sheer will or lime juice
+                else if (currentScreen9 == 3) { //If screen currently being shown is the rhythm minigame instructions
+                    if (chooseCharacter1)
+                        currentGame = new RhythmGame(this, "Rhythm Game", 100, 1, "images/chosenCharacter1.png", traitDistribution, sheerWill);
+                     else if (chooseCharacter2)
+                        currentGame = new RhythmGame(this, "Rhythm Game", 100, 1, "images/chosenCharacter2.png", traitDistribution, sheerWill);
+                    else
+                        currentGame = new RhythmGame(this, "Rhythm Game", 100, 1, "images/chosenCharacter3.png", traitDistribution, sheerWill);
+                    
+                    stage = 10; //Go to the Rhythm Minigame
+                }
             }
-                
+            
         } 
         
         if (stage == -2) {
@@ -851,6 +932,9 @@ public class MySketch extends PApplet {
             }
         //Boar Fight Minigame
         } else if (stage == 5) {
+            currentGame.keyPressed();
+        //Rhythm Game Minigame
+        } else if (stage == 10) {
             currentGame.keyPressed();
         }
         
