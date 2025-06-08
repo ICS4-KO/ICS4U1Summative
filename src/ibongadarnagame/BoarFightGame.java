@@ -37,10 +37,11 @@ public class BoarFightGame extends Game {
     PImage gameBG; //Minigame background (player's turn)
     PImage mediumGameBG; //Medium minigame background (neutral turn)
     PImage darkGameBG; //Dark minigame background (boar's turn)
+    PImage boarGameVictory; 
+    PImage boarGameDefeat;
     
     
     
-    private int damageTaken = 0; //Amount of damage taken by the user
     
     boolean gameWon = false; //True if user wins the game
     
@@ -58,6 +59,8 @@ public class BoarFightGame extends Game {
         mediumGameBG = gameApp.loadImage("images/mediumgamebg.jpg"); //Load medium minigame background
         darkGameBG = gameApp.loadImage("images/darkgamebg.jpg"); //Load dark minigame background
         boar = gameApp.loadImage("images/boar.png"); //Load boar image
+        boarGameVictory = gameApp.loadImage("images/boargamevictory.jpg"); 
+        boarGameDefeat = gameApp.loadImage("images/boargamedefeat.jpg"); 
         
         player = gameApp.loadImage(chosenCharacter); //Load character image
         boar.resize(166, 122); //Make boar smaller for the minigame
@@ -131,7 +134,7 @@ public class BoarFightGame extends Game {
             gameApp.fill(0);
             gameApp.textAlign(gameApp.CENTER, gameApp.CENTER);
             gameApp.textSize(18);
-            gameApp.text("Player Health: " + playerHealth + " " + totalTime, gameApp.width / 2, 50);
+            gameApp.text("Player Health: " + playerHealth + " " + totalTime/60, gameApp.width / 2, 50);
             gameApp.text("Boar Health: " + boarHealth, gameApp.width / 2, 80);
             gameApp.text(message, gameApp.width / 2, 110);
             if (neutralTime)
@@ -149,15 +152,20 @@ public class BoarFightGame extends Game {
             damageTaken = fullHealth - playerHealth;
             
             if (gameWon) {
-                background
+                gameApp.background(boarGameVictory);
+            } else {
+                gameApp.background(boarGameDefeat);
             }
             
             // Display game over message
-            gameApp.fill(0);
+            gameApp.textAlign(gameApp.LEFT, gameApp.LEFT);
             gameApp.textSize(24);
+            gameApp.text(returnGameResults(), 245, 240);
+            /**
             gameApp.text("Total Time:  " + Math.round(totalTime), gameApp.width / 2, 230);
             gameApp.text("Points Earned:  " + score, gameApp.width / 2, 280);
             gameApp.text("Damage Taken:  " + damageTaken, gameApp.width / 2, 330);
+            * */
             
         }
     }
@@ -191,7 +199,12 @@ public class BoarFightGame extends Game {
                 // Keep player within window bounds
                 playerX = gameApp.constrain(playerX, 0, gameApp.width - 118); // Adjust for player image width
                 playerY = gameApp.constrain(playerY, 0, gameApp.height - 230); // Adjust for player image height
+        } else {
+            if (gameApp.key == ' ') {
+                ((MySketch) gameApp).stage = 6; //Walking in the Forest
+                ((MySketch) gameApp).player.moveTo(-90, 255); //Set new player position
             }
+        }
         
     }
     
@@ -253,6 +266,6 @@ public class BoarFightGame extends Game {
     
     @Override
     public String returnGameResults() {
-        return "a";
+        return super.returnGameResults() + "Total Time: " + totalTime;
     }
 }

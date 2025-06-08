@@ -216,6 +216,10 @@ public class Player {
         return gameScores; //Return player's 2D array of min-game scores
     }
     
+    public Inventory getInventory() {
+        return inventory;
+    }
+    
     
     /**
      * Removes specified amount of HP from user's health and calls game over method if user has no more lives

@@ -13,6 +13,7 @@ public class MySketch extends PApplet {
     PApplet app;
     Player player; //Player object representing character
     Game currentGame; //Current minigame being played
+    boolean playerDeath = false;
     
     //Variables
     int stage = 0; //Current stage of the game starts at 0
@@ -36,6 +37,9 @@ public class MySketch extends PApplet {
     boolean willFightBoar; //True if player chooses the path with the boar
     //Variables for Stage 4 (Encounter Boar)
     int currentScreen4 = 1;
+    //Variables for Stage 7 (Meet Hermit)
+    int currentScreen7 = 1;
+    boolean playerHelpsHermit; //True if user decides to help the hermit
     
     
     //Buttons
@@ -86,6 +90,15 @@ public class MySketch extends PApplet {
     int minusIntelligenceX = 320; //Set x position of minus intelligence button
     int minusIntelligenceY = 370; //Set y position of minus intelligence button
     
+    //Buttons for Stage 7 (Meet Hermit)
+    boolean overHelpHermit = false; //Set variable indicating mouse is over help hermit button to false
+    int helpHermitX = 230; //Set x position of help hermit button
+    int helpHermitY = 220; //Set y position of help hermit button
+    boolean overIgnoreHermit = false; //Set variable indicating mouse is over help hermit button to false
+    int ignoreHermitX = 230; //Set x position of ignore hermit button
+    int ignoreHermitY = 375; //Set y position of ignore hermit button
+    
+    
     
     //Declare images
     //Declare images for Stage 0 (Main Menu)
@@ -129,12 +142,22 @@ public class MySketch extends PApplet {
     PImage castleBG; //Castle background
     //Declare images for Stage 3 (Fork in the Road)
     PImage forkInTheRoadBG; //Fork in the road background
-    //Declare iamges for Stage 4 (Encounter Boar)
+    //Declare images for Stage 4 (Encounter Boar)
     PImage encounterBoarBG; //Background if user chooses path with the boar
     PImage boarFightInstructions; //Background displaying boar fight instructions
     PImage noBoarBG; //Background if user does not choose path with the boar
     PImage boar; //Wild boar
-    
+    //Declare images for Stage 6 (Walking in the Forest)
+    PImage fillerForest1; //Filler forest scene
+    //Declare images for Stage 7 (Meet Hermit)
+    PImage meetHermitBG1; //Background when meeting the hermit (part 1)
+    PImage meetHermitBG2; //Background when meeting the hermit (part 2)
+    PImage meetHermitBG3; //Background when meeting the hermit (part 3)
+    PImage meetHermitBG4; //Background when meeting the hermit (part 4)
+    PImage helpHermitButton; //Press to help the hermit
+    PImage ignoreHermitButton; //Press to ignore the hermit
+    PImage hermit; //Hermit character
+    PImage hermitWithFood; //Hermit character holding food
     
     
     
@@ -212,6 +235,18 @@ public class MySketch extends PApplet {
         boar = loadImage("images/boar.png"); //Wild boar
         boarFightInstructions = loadImage("images/boarfightinstructions.jpg"); //Background displaying boar fight instructions
         
+        //Load images for Stage 6 (Walking in the Forest)
+        fillerForest1 = loadImage("images/fillerforest1.jpg"); //Filler forest scene
+        
+        //Load images for Stage 7 (Meet Hermit)
+        meetHermitBG1 = loadImage("images/meethermit1.jpg"); //Background when meeting the hermit (part 1)
+        meetHermitBG2 = loadImage("images/meethermit2.jpg"); //Background when meeting the hermit (part 2)
+        meetHermitBG3 = loadImage("images/meethermit3.jpg"); //Background when meeting the hermit (part 3)
+        meetHermitBG4 = loadImage("images/meethermit4.jpg"); //Background when meeting the hermit (part 4)
+        helpHermitButton = loadImage("images/helpthehermit.jpg"); //Press to help the hermit
+        ignoreHermitButton = loadImage("images/ignorehim.jpg"); //Press to ignore the hermit
+        hermit = loadImage("images/hermit.png"); //Hermit character
+        hermitWithFood = loadImage("images/hermitwithfood.png"); //Hermit character holding food
         
         
     }
@@ -219,6 +254,10 @@ public class MySketch extends PApplet {
     public void draw() {
         background(255); //Reset background
         update(mouseX, mouseY); //Update variables indicating button clicks
+        
+        if (playerDeath) {
+            text("Game Over", 0, 0);
+        } else {
         
         //Main menu
         if (stage == 0) {
@@ -428,7 +467,48 @@ public class MySketch extends PApplet {
         } else if (stage == 5) {
             currentGame.update();
             currentGame.draw();
+            
+        } else if (stage == 6) {
+            background(fillerForest1);
+            player.draw(); //Draw character on the screen
+            player.move(3, 0); //Move character to the right
+            if (player.x > 800) {
+                player.moveTo(85, 240); //Set new player position
+                stage = 7;
+            }
+                
+            
+        } else if (stage == 7) {
+            if (currentScreen7 == 1) {
+                background(meetHermitBG1);
+                player.draw(); //Draw character on the screen
+                image(hermit, 380, 220);
+            } else if (currentScreen7 == 2) {
+                background(meetHermitBG2);
+                player.draw(); //Draw character on the screen
+                image(hermit, 380, 220);
+                image(helpHermitButton, helpHermitX, helpHermitY);
+                image(ignoreHermitButton, ignoreHermitX, ignoreHermitY);
+            } else if (currentScreen7 == 3) {
+                if (playerHelpsHermit) {
+                    background(meetHermitBG3);
+                    image(hermitWithFood, 380, 220);
+                    player.getInventory().consumeFood();
+                    player.addVirtue(50);
+                } else {
+                    background(meetHermitBG4);
+                    image(hermit, 380, 220);
+                }
+                player.draw(); //Draw character on the screen
+                player.move(3, 0); //Move character to the right
+            }
+                
+            
+        } else if (stage == 8) {
+            
         }
+        
+        } //End else player death ////
     }
     
     
@@ -454,9 +534,11 @@ public class MySketch extends PApplet {
         overMinusStrength = false; //Button to subtract one point from strength trait
         overPlusIntelligence = false; //Button to add one point to intelligence trait
         overMinusIntelligence = false; //Button to subtract one point from inteeligence trait
+        //Variables for Stage 7 (Help Hermit)
+        overHelpHermit = false; //Help hermit button
+        overIgnoreHermit = false; //Ignore hermit button
+        
        
-
-    
     
         //Stage 0 (Main Menu)
         if (stage == 0) {
@@ -496,8 +578,18 @@ public class MySketch extends PApplet {
             else if (overImage(minusIntelligenceButton, minusIntelligenceX, minusIntelligenceY)) //Button to subtract one point to intelligence trait
                 overMinusIntelligence = true; //Set variable indicating mouse is over minus intelligence button to true
            
-                
+        //Stage 7 (Meet Hermit)
+        } else if (stage == 7) {
+            //Mouse is over a specific button in Stage 7 (Meet Hermit)
+            if (overImage(helpHermitButton, helpHermitX, helpHermitY)) //Button to help hermit
+                overHelpHermit = true; //Set variable indicating mouse is over help hermit button to true
+            //Mouse is over a specific button in Stage 7 (Meet Hermit)
+            if (overImage(ignoreHermitButton, ignoreHermitX, ignoreHermitY)) //Button to ignore hermit
+                overIgnoreHermit = true; //Set variable indicating mouse is over ignore hermit button to true
         }
+        
+        
+    
        
         
     
@@ -624,10 +716,26 @@ public class MySketch extends PApplet {
                     
             } else if (stage == 5) {
                 currentGame.mousePressed();
+                
+            //Stage 7 (Meet Hermit)
+            } else if (stage == 7) {
+                if (currentScreen7 == 2) {
+                    //If mouse is over help hermit button when mouse is clicked
+                    if (overHelpHermit)
+                        playerHelpsHermit = true; //Indicate that player helped hermit, determines the next screen
+                    else if (overIgnoreHermit)
+                        playerHelpsHermit = false; //Indicate that player didn't help hermit, determines the next screen
+                    currentScreen7 = 3;
+                }
+                    
+            }
+                
+                
+                
             }
             
             
-        }
+        
         
     
 
@@ -664,8 +772,10 @@ public class MySketch extends PApplet {
                 if (currentScreen4 == 1) { //If screen currently being shown is the encounter with the boar
                     if (willFightBoar) { //If user chose path with boar
                         currentScreen4 = 2; //Display boar fight minigame instructions
-                    } else //If user chose path without boar
-                        stage = 6; //Go to the next stage (Meet hermit)
+                    } else { //If user chose path without boar 
+                        player.moveTo(85, 240); //Set new player position
+                        stage = 7; //Go to the next stage (Meet Hermit)
+                    }
                 } else if (currentScreen4 == 2){ //If screen currently being shown is the boar fight minigame instructions
                     if (chooseCharacter1)
                         currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter1.png", traitDistribution);
@@ -676,8 +786,14 @@ public class MySketch extends PApplet {
                          
                     stage = 5; //Go to the boar fight minigame
                 }
-        
+            //Meet Hermit
+            } else if (stage == 7) {
+                if (currentScreen7 == 1) //meeting
+                    currentScreen7 = 2; //buttons
+                if (currentScreen7 == 3) //meeting
+                    stage = 8; //buttons
             }
+                
         } 
         
         if (stage == -2) {

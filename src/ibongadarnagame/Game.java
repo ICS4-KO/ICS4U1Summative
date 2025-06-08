@@ -17,6 +17,10 @@ public abstract class Game {
     int gameIndex; //Index number of game in user's 2D array of game scores
     int score = 0; //Current player's score
     int numTries = 0; //Number of tries the current player makes
+    
+    int damageTaken = 0; //Amount of damage taken by the user
+    
+    boolean gameWon = false; //True if user wins the game
     boolean gameOver = false;
     
     //Static variables
@@ -60,8 +64,15 @@ public abstract class Game {
     }
     
     public String returnGameResults() {
-        System.out.println("a");
-        return "a";
+        return "Points Earned: " + score + "\n\nDamage Taken: " + damageTaken + "\n\n";
+    }
+    
+    
+    public boolean playerWonGame() {
+        return gameWon;
+    }
+    public int getNumTries() {
+        return numTries;
     }
     
     abstract void update();
