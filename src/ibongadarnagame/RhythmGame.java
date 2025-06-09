@@ -16,12 +16,12 @@ public class RhythmGame extends Game {
     //Instance variables
     int roundsToWin = 6; //Rounds player has to win to win the minigame
     int roundsWon = 0; //Rounds player has won so far
-    int round = -1; //Current round
+    int round = 0; //Current round
     int currentLetter = 0; //Current letter in each round
     int pointsPerLetter = 5;
-    int letterInterval = 300;
-    int roundInterval = 200;
-    int breakInterval = 100;
+    //int letterInterval = 300;
+    int roundInterval = 600;
+    int breakInterval = 200;
     int timer = 0;
     boolean roundRunning = false; //True if round is currently being played
     static final int TOTAL_ROUNDS = 7;
@@ -58,7 +58,7 @@ public class RhythmGame extends Game {
             roundsToWin = 5; //Player only needs to win 5 rounds to win
             
         if (sheerWill) {
-            letterInterval = 200;
+            roundInterval = 200;
             pointsPerLetter = 1;
         }
         }
@@ -91,28 +91,88 @@ public class RhythmGame extends Game {
         if (!gameOver) {
             timer++;
             if (roundRunning) {
-                if (timer >= letterInterval) {
-                    pastLetters[currentLetter][0] = expectedKey;
-                    pastLetters[currentLetter][1] = userInput;
-                    timer = 0;
-                    currentLetter++;
+                if (timer >= roundInterval) {
+                    //pastLetters[currentLetter][0] = expectedKey;
+                    //pastLetters[currentLetter][1] = userInput.toUpperCase();
+                    for (int i = 0; i < pastLetters.length; i++) {
+                        for (int j = 0; j < pastLetters[i].length; j++) {
+                            if (pastLetters[i][j] != null)
+                                pastLetters[i][j] = null;
+                        }
+                    }
+                    if (round < 7) {
+                        try {
+            // Pause the current thread for 2000 milliseconds (2 seconds)
+            Thread.sleep(2000); 
+        } catch (InterruptedException e) {
+            // Handle the case where the thread is interrupted while sleeping
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+            System.err.println("Thread was interrupted while sleeping.");
+        }
+                        
+                        round += 1;
+                        roundRunning = false;
+                        currentLetter = 0;
+                        timer = 0;
+                    } else {
+                        try {
+            // Pause the current thread for 2000 milliseconds (2 seconds)
+            Thread.sleep(2000); 
+        } catch (InterruptedException e) {
+            // Handle the case where the thread is interrupted while sleeping
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+            System.err.println("Thread was interrupted while sleeping.");
+        }
+                        
+                        gameOver = true;
+                    }
+                    //userInput = "";
+                    //currentLetter++;
+                    
                 }
+    
+                    
+                
                 if (currentLetter >= sequence.size()) {
-                    roundsWon += 1;
-                    roundRunning = false;
-                    timer = 0;
+                    if (round < 7) {
+                        try {
+            // Pause the current thread for 2000 milliseconds (2 seconds)
+            Thread.sleep(2000); 
+        } catch (InterruptedException e) {
+            // Handle the case where the thread is interrupted while sleeping
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+            System.err.println("Thread was interrupted while sleeping.");
+        }
+                        
+                        roundsWon += 1;
+                        round += 1;
+                        roundRunning = false;
+                        currentLetter = 0;
+                        timer = 0;
+                    } else {
+                        try {
+            // Pause the current thread for 2000 milliseconds (2 seconds)
+            Thread.sleep(2000); 
+        } catch (InterruptedException e) {
+            // Handle the case where the thread is interrupted while sleeping
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+            System.err.println("Thread was interrupted while sleeping.");
+        }
+                        
+                        gameOver = true;
+                    }
                 } else {
                     
                     // Check if the input matches the expected key for this round
                     expectedKey = sequence.get(currentLetter);
                     System.out.println(expectedKey + " " + userInput + " " + userInput.trim().toUpperCase().equalsIgnoreCase(expectedKey) + " " + timer);
-                    if (userInput.length() > 0) {
+                    if (!userInput.trim().equals("")) {
                         if (userInput.trim().toUpperCase().equalsIgnoreCase(expectedKey)) {
-                            message = "Correct!";
                             score += pointsPerLetter;
                             pastLetters[currentLetter][0] = expectedKey;
                             pastLetters[currentLetter][1] = expectedKey;
-                            timer = 0;
+                            //timer = 0;
+                            userInput = "";
                             currentLetter++;
                         } else {
                             message = "Wrong key!";
@@ -123,14 +183,15 @@ public class RhythmGame extends Game {
                 }
 
             } else {
-                if (round < 8) {
+                if (round < 7) {
                     if (timer >= breakInterval) {
                         sequence.clear();
                         for (int i = 0; i < TOTAL_ROUNDS; i++) {
                             String newKey = KEYS[random.nextInt(KEYS.length)]; //Return random integer from 0 to 6
                             sequence.add(newKey);
                         }
-                        round += 1;
+                        //round += 1;
+                        userInput = "";
                         timer = 0;
                         roundRunning = true;
                     }
@@ -148,7 +209,9 @@ public class RhythmGame extends Game {
         gameApp.background(gameBG);
         
         if (!gameOver) {
+            
             if (roundRunning) {
+                
                 gameApp.background(gameBG);
                 gameApp.fill(0);
                 gameApp.textAlign(gameApp.CENTER, gameApp.CENTER);
@@ -162,26 +225,35 @@ public class RhythmGame extends Game {
                 gameApp.textSize(18);
                 
                 //original
-                gameApp.text(userInput, 0, 0);
-                gameApp.text(sequence.get(currentLetter), 0, 0);
+                //gameApp.text(userInput, 0, 0);
+                //gameApp.text(sequence.get(currentLetter), 0, 0);
                 
-                if (round > 1) {
+                
                     //make (3d-7 - positions, pastletters-reset)
-                    for (int i = 0; i < (round-1); i++) {
+                    for (int i = 0; i < currentLetter; i++) {
                         gameApp.text(pastLetters[i][0], EXPECTED_X, positions[i]);
                         gameApp.text(pastLetters[i][1], PLAYER_X, positions[i]);
+                        gameApp.text(pastLetters[i][0], 0, 0);
                     }
+                
+                
+                for (int i = 0; i < (currentLetter); i++) {
+                    System.out.println(pastLetters[i][0] + " "  + pastLetters[i][1]);
                 }
                 
-                gameApp.text(userInput, PLAYER_X, positions[round]);
-                gameApp.text(sequence.get(currentLetter), EXPECTED_X, positions[round]);
+                if(currentLetter < 7) { //index 7 out of bounds
+                    gameApp.text(userInput.toUpperCase(), PLAYER_X, positions[currentLetter]);
+                    gameApp.text(sequence.get(currentLetter), EXPECTED_X, positions[currentLetter]);
+                }
                 
                 gameApp.image(player, 580, 170);
                 
             } else {
                 gameApp.text("Round " + round, gameApp.width / 2, gameApp.height / 2);
             }
-        }
+            
+            gameApp.text(timer, 10, 10);
+        } //Game Over
     }
     
     @Override
@@ -199,7 +271,7 @@ public class RhythmGame extends Game {
                 if (userInput.length() > 0) 
                     userInput = userInput.substring(0, userInput.length() - 1); //Remove last character from user input string
             } else if (gameApp.key != gameApp.CODED) { // checks if it is an ASCII character
-                if (userInput.length() < 2)
+                if (userInput.length() < 1)
                     userInput += gameApp.key; // add each keystroke to user input string
 
             } // end nested if
