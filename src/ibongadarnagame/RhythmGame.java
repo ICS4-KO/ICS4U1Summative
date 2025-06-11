@@ -28,9 +28,9 @@ public class RhythmGame extends Game {
     String expectedKey = "";
     String userInput = "";
     String message = "Type in the letter you see!";
-    static final int EXPECTED_X = 315;
-    static final int PLAYER_X = 435;
-    static int positions[] = {130, 195, 260, 325, 390, 455, 520};
+    static final int EXPECTED_X = 335;
+    static final int PLAYER_X = 485;
+    static int positions[] = {145, 210, 275, 340, 410, 478, 543};
     String[][] pastLetters = new String[7][2];
     
                                                 
@@ -45,10 +45,9 @@ public class RhythmGame extends Game {
     //Declare images
     PImage player; //Player
     PImage gameBG; //Minigame background
-    PImage mediumGameBG; //Medium minigame background
-    PImage darkGameBG; //Dark minigame background
-    PImage boarGameVictory; 
-    PImage boarGameDefeat;
+    PImage rhythmGameVictory; //Rhythm game victory screen
+    PImage rhythmGameDefeat; //Rhythm game defeat screen
+    PImage rhythmGameBG; //Background for rhythm game
     
     
     
@@ -58,17 +57,16 @@ public class RhythmGame extends Game {
             roundsToWin = 5; //Player only needs to win 5 rounds to win
             
         if (sheerWill) {
-            roundInterval = 200;
+            roundInterval = 300;
             pointsPerLetter = 1;
         }
         }
         
         //Load Images
         gameBG = gameApp.loadImage("images/gamebg.jpg"); //Load minigame background
-        mediumGameBG = gameApp.loadImage("images/mediumgamebg.jpg"); //Load medium minigame background
-        darkGameBG = gameApp.loadImage("images/darkgamebg.jpg"); //Load dark minigame background
-        boarGameVictory = gameApp.loadImage("images/boargamevictory.jpg"); 
-        boarGameDefeat = gameApp.loadImage("images/boargamedefeat.jpg"); 
+        rhythmGameVictory = gameApp.loadImage("images/gamevictory.jpg"); //Load rhythm game victory screen
+        rhythmGameDefeat = gameApp.loadImage("images/rhythmgamedefeat.jpg"); //Load rhythm game defeat screen
+        rhythmGameBG = gameApp.loadImage("images/rhythmgamebg.jpg"); //Load rhythm game background
         
         player = gameApp.loadImage(chosenCharacter); //Load character image
         player.resize(155, 300); //Make character smaller for the minigame
@@ -101,29 +99,18 @@ public class RhythmGame extends Game {
                         }
                     }
                     if (round < 7) {
-                        try {
-            // Pause the current thread for 2000 milliseconds (2 seconds)
-            Thread.sleep(2000); 
-        } catch (InterruptedException e) {
-            // Handle the case where the thread is interrupted while sleeping
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-            System.err.println("Thread was interrupted while sleeping.");
-        }
+                        pause();
                         
                         round += 1;
                         roundRunning = false;
                         currentLetter = 0;
                         timer = 0;
                     } else {
-                        try {
-            // Pause the current thread for 2000 milliseconds (2 seconds)
-            Thread.sleep(2000); 
-        } catch (InterruptedException e) {
-            // Handle the case where the thread is interrupted while sleeping
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-            System.err.println("Thread was interrupted while sleeping.");
-        }
+                        pause();
                         
+                        //If player matched or exceeded the number of rounds they needed to win
+                        if (roundsWon >= roundsToWin)
+                            gameWon = true; //Set game won to true
                         gameOver = true;
                     }
                     //userInput = "";
@@ -135,14 +122,7 @@ public class RhythmGame extends Game {
                 
                 if (currentLetter >= sequence.size()) {
                     if (round < 7) {
-                        try {
-            // Pause the current thread for 2000 milliseconds (2 seconds)
-            Thread.sleep(2000); 
-        } catch (InterruptedException e) {
-            // Handle the case where the thread is interrupted while sleeping
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-            System.err.println("Thread was interrupted while sleeping.");
-        }
+                        pause();
                         
                         roundsWon += 1;
                         round += 1;
@@ -150,15 +130,11 @@ public class RhythmGame extends Game {
                         currentLetter = 0;
                         timer = 0;
                     } else {
-                        try {
-            // Pause the current thread for 2000 milliseconds (2 seconds)
-            Thread.sleep(2000); 
-        } catch (InterruptedException e) {
-            // Handle the case where the thread is interrupted while sleeping
-            Thread.currentThread().interrupt(); // Restore the interrupted status
-            System.err.println("Thread was interrupted while sleeping.");
-        }
+                        pause();
                         
+                        //If player matched or exceeded the number of rounds they needed to win
+                        if (roundsWon >= roundsToWin)
+                            gameWon = true; //Set game won to true
                         gameOver = true;
                     }
                 } else {
@@ -196,6 +172,9 @@ public class RhythmGame extends Game {
                         roundRunning = true;
                     }
                 } else {
+                    //If player matched or exceeded the number of rounds they needed to win
+                    if (roundsWon >= roundsToWin)
+                        gameWon = true; //Set game won to true
                     gameOver = true;
                 }
 
@@ -207,22 +186,22 @@ public class RhythmGame extends Game {
     @Override
     void draw() {
         gameApp.background(gameBG);
+        gameApp.fill(0);
         
         if (!gameOver) {
             
             if (roundRunning) {
-                
-                gameApp.background(gameBG);
-                gameApp.fill(0);
+                //Set rhythm game background
+                gameApp.background(rhythmGameBG);
                 gameApp.textAlign(gameApp.CENTER, gameApp.CENTER);
                 gameApp.textSize(18);
-                gameApp.text("Round: " + round + " of 7", gameApp.width / 2, 50);
+                gameApp.text("Round: " + (round+1) + " of 7", gameApp.width / 2, 50);
                 //gameApp.text("Match the sequence!", gameApp.width / 2, 80);
                 gameApp.text(message, gameApp.width / 2, 80);
 
                 //gameApp.text(String.join(" ", sequence.subList(0, sequence.size())), gameApp.width / 2, 150);
 
-                gameApp.textSize(18);
+                gameApp.textSize(24);
                 
                 //original
                 //gameApp.text(userInput, 0, 0);
@@ -249,11 +228,26 @@ public class RhythmGame extends Game {
                 gameApp.image(player, 580, 170);
                 
             } else {
-                gameApp.text("Round " + round, gameApp.width / 2, gameApp.height / 2);
+                gameApp.text("Round " + (round+1), gameApp.width / 2, gameApp.height / 2);
             }
             
             gameApp.text(timer, 10, 10);
-        } //Game Over
+            
+        } else {//Game Over
+            //Player loses 10 HP for each letter they didn't get
+            damageTaken = 10 * (49 - (score/5)); //Dividing by 5 because each letter is worth 5 points
+            
+            if (gameWon) {
+                gameApp.background(rhythmGameVictory);
+            } else {
+                gameApp.background(rhythmGameDefeat);
+            }
+            
+            // Display game over message
+            gameApp.textAlign(gameApp.LEFT, gameApp.LEFT);
+            gameApp.textSize(18);
+            gameApp.text(returnGameResults(), 245, 240);
+        }
     }
     
     @Override
@@ -275,6 +269,11 @@ public class RhythmGame extends Game {
                     userInput += gameApp.key; // add each keystroke to user input string
 
             } // end nested if
+        } else {
+            if (gameApp.key == ' ') { //If spacebar is pressed
+                ((MySketch) gameApp).stage = 11; //Go to the next stage (Catching the Adarna Bird)
+                ((MySketch) gameApp).player.moveTo(-90, 255); //Set new player position
+            }
         }
     }
     
@@ -321,7 +320,22 @@ public class RhythmGame extends Game {
     }
     */
     
+    static void pause() {
+        try {
+        // Pause the current thread for 2000 milliseconds (2 seconds)
+            Thread.sleep(2000); 
+        } catch (InterruptedException e) {
+            // Handle the case where the thread is interrupted while sleeping
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+            System.err.println("Thread was interrupted while sleeping.");
+        }
+    }
     
     
+    @Override
+    public String returnGameResults() {
+        return super.returnGameResults() + "Letters Matched: " + (score/5) + " / 49\n\n" + "Rounds to Win: " + roundsToWin
+                + " / 7\n\n" + "Rounds Won: " + roundsWon + " / 7";
+    }
 }
 

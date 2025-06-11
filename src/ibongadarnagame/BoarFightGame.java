@@ -60,7 +60,7 @@ public class BoarFightGame extends Game {
         mediumGameBG = gameApp.loadImage("images/mediumgamebg.jpg"); //Load medium minigame background
         darkGameBG = gameApp.loadImage("images/darkgamebg.jpg"); //Load dark minigame background
         boar = gameApp.loadImage("images/boar.png"); //Load boar image
-        boarGameVictory = gameApp.loadImage("images/boargamevictory.jpg"); 
+        boarGameVictory = gameApp.loadImage("images/gamevictory.jpg"); 
         boarGameDefeat = gameApp.loadImage("images/boargamedefeat.jpg"); 
         
         player = gameApp.loadImage(chosenCharacter); //Load character image
@@ -204,8 +204,8 @@ public class BoarFightGame extends Game {
                 playerX = gameApp.constrain(playerX, 0, gameApp.width - 118); // Adjust for player image width
                 playerY = gameApp.constrain(playerY, 0, gameApp.height - 230); // Adjust for player image height
         } else {
-            if (gameApp.key == ' ') {
-                ((MySketch) gameApp).stage = 6; //Walking in the Forest
+            if (gameApp.key == ' ') { //If spacebar is pressed
+                ((MySketch) gameApp).stage = 6; //Go to the next stage (Walking in the Forest)
                 ((MySketch) gameApp).player.moveTo(-90, 255); //Set new player position
             }
         }

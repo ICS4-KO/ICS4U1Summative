@@ -43,6 +43,10 @@ public class MySketch extends PApplet {
     //Variables for Stage 9 (Find Adarna bird)
     int currentScreen9 = 1;
     boolean sheerWill; //What user uses to stay awake, which will affect the rhythm minigame
+    //Variables for Stage 11 (Catch the Adarna Bird)
+    boolean clickedCage = false; //True after user clicks on cage, after which it will disappear
+    boolean clickedRope = false; //True after user clicks on rope, after which it will disappear
+    
     
     
     //Buttons
@@ -108,6 +112,17 @@ public class MySketch extends PApplet {
     boolean overLimeJuice = false; //Set variable indicating mouse is over lime juice button to false
     int limeJuiceX = 230; //Set x position of lime juice button
     int limeJuiceY = 375; //Set y position of lime juice button
+    
+    //Buttons for Stage 11 (Catch the Adarna Bird)
+    boolean overCatchAdarnaCage = false; //Set variable indicating mouse is over golden cage to false
+    int catchAdarnaCageX = 110; //Set x position of golden cage
+    int catchAdarnaCageY = 160; //Set y position of golden cage
+    boolean overCatchAdarnaRope = false; //Set variable indicating mouse is over rope to false
+    int catchAdarnaRopeX = 420; //Set x position of rope
+    int catchAdarnaRopeY = 420; //Set y position of rope
+    boolean overAdarnaBird = false; //Set variable indicating mouse is over Adarna bird to false
+    int adarnaBirdX = -100; //X position of Adarna bird
+    int adarnaBirdY = 225; //Y position of Adarna bird
     
     
     
@@ -177,6 +192,14 @@ public class MySketch extends PApplet {
     PImage rhythmGameInstructions; //Background displaying rhythm game instructions
     PImage sheerWillButton; //Button to use sheer will to stay awake
     PImage limeJuiceButton; //Button to use lime juice to stay awake
+    //Declare images for Stage 11 (Catch the Adarna Bird)
+    PImage catchAdarnaBG1; //Background when catching the Adarna bird (player has rope and golden cage)
+    PImage catchAdarnaCage; //Golden cage user clicks to catch Adarna bird
+    PImage catchAdarnaRope; //Rope user clicks to catch Adarna bird
+    PImage barelyAwakeMessage; //Message if user lost rhythm minigame
+    PImage wideAwakeMessage; //Message if user won rhythm minigame
+    PImage adarnaBird; //Image of Adarna bird
+    PImage catchAdarnaBG2; //Background when catching the Adarna bird (player doesn't have rope and golden cage)
     
     
     
@@ -277,6 +300,17 @@ public class MySketch extends PApplet {
         rhythmGameInstructions = loadImage("images/rhythmgameinstructions.jpg"); //Background displaying rhythm game instructions
         sheerWillButton = loadImage("images/sheerwillbutton.jpg"); //Button to use sheer will to stay awake
         limeJuiceButton = loadImage("images/limejuicebutton.jpg"); //Button to use lime juice to stay awake
+        
+        //Load images for Stage 11 (Catch the Adarna Bird)
+        catchAdarnaBG1 = loadImage("images/catchadarna1.jpg"); //Background when catching the Adarna bird (player has rope and golden cage)
+        catchAdarnaCage = loadImage("images/catchadarnacage.png"); //Golden cage user clicks to catch Adarna bird
+        catchAdarnaRope = loadImage("images/catchadarnarope.png"); //Rope user clicks to catch Adarna bird
+        barelyAwakeMessage = loadImage("images/barelyawakemessage.png"); //Message if user lost rhythm minigame
+        wideAwakeMessage = loadImage("images/wideawakemessage.png"); //Message if user won rhythm minigame
+        adarnaBird = loadImage("images/adarnabird.png"); //Image of Adarna bird
+        catchAdarnaBG2 = loadImage("images/catchadarna2.jpg"); //Background when catching the Adarna bird (player doesn't have rope and golden cage)
+        
+ 
         
         
         
@@ -567,6 +601,48 @@ public class MySketch extends PApplet {
         } else if (stage == 10) {
             currentGame.update();
             currentGame.draw();
+            
+        //Catch the Adarna Bird
+        } else if (stage == 11) {
+            //If player has lime juice in their inventory, which would have been used in the last stage
+            if (player.getInventory().hasItem("Lime Juice"))
+                player.getInventory().removeItem("Lime Juice"); //Remove lime juice from their inventory
+            
+            //If player has rope and golden cage in their inventory, given by the hermit
+            if (player.getInventory().hasItem("Rope") && player.getInventory().hasItem("Golden Cage")) {
+                //Set background to catching the Adarna bird (player has rope and golden cage)
+                background(catchAdarnaBG1);
+              
+                //While user has not yet clicked on image of golden cage
+                if (!clickedCage)
+                    image(catchAdarnaCage, catchAdarnaCageX, catchAdarnaCageY); //Draw cage on screen
+                //While user has not yet clicked on image of rope
+                if (!clickedRope)
+                    image(catchAdarnaRope, catchAdarnaRopeX, catchAdarnaRopeY); //Draw rope on screen
+                 
+                
+            //If player does not have rope and cage from hermit
+            } else {
+                //Set background to catching the Adarna bird (player does not have rope and golden cage)
+                background(catchAdarnaBG2);
+                
+                image(adarnaBird, adarnaBirdX, adarnaBirdY); //Draw Adarna bird on screen
+                adarnaBirdX += 4; //Move Adarna bird across the screen
+                
+                if (adarnaBirdX > 800) //If the Adarna bird goes off the right edge of the screen
+                    adarnaBirdX = -100; //Set x position of bird back to the left edge of the screen
+                
+ 
+            }
+            
+            //If player won the rhythm game
+            if (currentGame.playerWonGame()) 
+                image(wideAwakeMessage, 138, 55); //Display message saying user stayed wide awake
+            //If player lost the rhythm game
+            else
+                image(barelyAwakeMessage, 138, 55); //Display message saying user barely stayed awake
+
+                
         }
         
         
@@ -602,8 +678,14 @@ public class MySketch extends PApplet {
         //Variables for Stage 9 (Find Adarna Bird)
         overSheerWill = false; //Sheer will button
         overLimeJuice = false; //Lime juice button
-    
-    
+        //Variables for Stage 11 (Catch the Adarna Bird)
+        overCatchAdarnaCage = false; //Player clicks golden cage to catch the bird
+        overCatchAdarnaRope = false; //Player clicks on rope to catch the bird
+        overAdarnaBird = false; //Player clicks on Adarna bird to catch it
+        
+            int adarnaBirdX = -100; //X position of Adarna bird
+    int adarnaBirdY = 225; //Y position of Adarna bird
+        
         //Stage 0 (Main Menu)
         if (stage == 0) {
             //Set boolean variable of a button to true if the mouse if over it (used for button clicks)
@@ -660,10 +742,25 @@ public class MySketch extends PApplet {
                 if (overImage(limeJuiceButton, limeJuiceX, limeJuiceY)) //Button to use lime juice to stay awake
                 overLimeJuice = true; //Set variable indicating mouse is over lime juice button to true
             }
+            
+        //Stage 11 (Catch the Adarna Bird)
+        } else if (stage == 11) {
+            //If player has rope and golden cage in their inventory
+            if (player.getInventory().hasItem("Rope") && player.getInventory().hasItem("Golden Cage")) {
+                //Mouse is over a specific button in Stage 11 (Catch the Adarna Bird)
+                if (overImage(catchAdarnaCage, catchAdarnaCageX, catchAdarnaCageY)) //Image of golden cage
+                    overCatchAdarnaCage = true; //Set variable indicating mouse is over golden cage to true
+                else if (overImage(catchAdarnaRope, catchAdarnaRopeX, catchAdarnaRopeY)) //Image of rope
+                    overCatchAdarnaRope = true; //Set variable indicating mouse is over rope to true
+            //If player does not have rope and golden cage in their inventory
+            } else {
+                //Mouse is over a specific button in Stage 11 (Catch the Adarna Bird)
+                if (overImage(adarnaBird, adarnaBirdX, adarnaBirdY)) //Image of Adarna bird
+                    overAdarnaBird = true; //Set variable indicating mouse is over Adarna bird to true
+            }
         }
         
         
-    
         
         
     
@@ -816,6 +913,30 @@ public class MySketch extends PApplet {
             //Rhythm Game Minigame
             } else if (stage == 10) {
                 currentGame.mousePressed();
+                
+                
+            //Stage 11 (Find Adarna)
+            } else if (stage == 11) {
+                //If mouse is over golden cage when mouse is clicked
+                if (overCatchAdarnaCage) {
+                    clickedCage = true; //Indicate that player clicked cage
+                    if (clickedRope) //If user already clicked rope as well
+                       stage = 12; //Go to the next stage (Caught Bird) 
+                }
+                //If mouse is over rope when mouse is clicked
+                else if (overCatchAdarnaRope) {
+                    clickedRope = true; //Indicate that player clicked rope
+                    if (clickedCage) //If user already clicked cage as well
+                       stage = 12; //Go to the next stage (Caught Bird) 
+                }
+                //If mouse is over Adarna bird when mouse is clicked
+                if (overAdarnaBird) {
+                    stage = 12; //Go to the next stage (Caught Bird) 
+                }
+                        
+                      
+                
+    
             }
                 
                 
@@ -888,11 +1009,11 @@ public class MySketch extends PApplet {
                     currentScreen9 = 2; //Show button options to stay awake using sheer will or lime juice
                 else if (currentScreen9 == 3) { //If screen currently being shown is the rhythm minigame instructions
                     if (chooseCharacter1)
-                        currentGame = new RhythmGame(this, "Rhythm Game", 100, 1, "images/chosenCharacter1.png", traitDistribution, sheerWill);
+                        currentGame = new RhythmGame(this, "Rhythm Game", 245, 1, "images/chosenCharacter1.png", traitDistribution, sheerWill);
                      else if (chooseCharacter2)
-                        currentGame = new RhythmGame(this, "Rhythm Game", 100, 1, "images/chosenCharacter2.png", traitDistribution, sheerWill);
+                        currentGame = new RhythmGame(this, "Rhythm Game", 245, 1, "images/chosenCharacter2.png", traitDistribution, sheerWill);
                     else
-                        currentGame = new RhythmGame(this, "Rhythm Game", 100, 1, "images/chosenCharacter3.png", traitDistribution, sheerWill);
+                        currentGame = new RhythmGame(this, "Rhythm Game", 245, 1, "images/chosenCharacter3.png", traitDistribution, sheerWill);
                     
                     stage = 10; //Go to the Rhythm Minigame
                 }
