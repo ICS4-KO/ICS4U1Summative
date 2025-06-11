@@ -246,7 +246,7 @@ public class RhythmGame extends Game {
             // Display game over message
             gameApp.textAlign(gameApp.LEFT, gameApp.LEFT);
             gameApp.textSize(18);
-            gameApp.text(returnGameResults(), 245, 240);
+            gameApp.text(returnGameResults(), 245, 245);
         }
     }
     

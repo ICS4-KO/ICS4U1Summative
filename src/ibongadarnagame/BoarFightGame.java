@@ -164,7 +164,7 @@ public class BoarFightGame extends Game {
             // Display game over message
             gameApp.textAlign(gameApp.LEFT, gameApp.LEFT);
             gameApp.textSize(24);
-            gameApp.text(returnGameResults(), 245, 240);
+            gameApp.text(returnGameResults(), 245, 250);
             /**
             gameApp.text("Total Time:  " + Math.round(totalTime), gameApp.width / 2, 230);
             gameApp.text("Points Earned:  " + score, gameApp.width / 2, 280);

@@ -25,6 +25,8 @@ public class Player {
     private PApplet app; //The canvas used to display graphical elements
     private PImage image; //Image of the character
     
+    private boolean savedBrothers; //True if player chose to save their brothers, who were turned to stone
+    
     //Default Constants
     private static String DEFAULT_NAME = "Don Juan"; //Default player name
     private static String DEFAULT_CLOTHES = "images/chosenCharacter1.png"; //Default character image
@@ -213,13 +215,24 @@ public class Player {
      * @return  Array of user's mini-game scores 
      */
     public int[][] getGameScores() {
-        return gameScores; //Return player's 2D array of min-game scores
+        return gameScores; //Return player's 2D array of mini-game scores
     }
     
     public Inventory getInventory() {
         return inventory;
     }
     
+    
+    /**
+     * Setter method to set savedBrothers attribute of Player object
+     * 
+     * @param answer  True if player chose to save their brothers, who were turned to stone
+     */
+    public void setSavedBrothers(boolean answer) {
+        savedBrothers = answer; //Set variable indicating whether player saved brothers
+    }
+            
+            
     
     /**
      * Removes specified amount of HP from user's health and calls game over method if user has no more lives
@@ -290,6 +303,6 @@ public class Player {
         x = dx;
         y = dy;
     }
-    
+
 
 }

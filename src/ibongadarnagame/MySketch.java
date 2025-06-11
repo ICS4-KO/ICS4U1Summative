@@ -13,7 +13,7 @@ public class MySketch extends PApplet {
     PApplet app;
     Player player; //Player object representing character
     Game currentGame; //Current minigame being played
-    boolean playerDeath = false;
+    boolean playerDeath = false; //True if player runs out of lives
     
     //Variables
     int stage = 0; //Current stage of the game starts at 0
@@ -36,16 +36,22 @@ public class MySketch extends PApplet {
     //Variables for Stage 2 (Fork in the Road)
     boolean willFightBoar; //True if player chooses the path with the boar
     //Variables for Stage 4 (Encounter Boar)
-    int currentScreen4 = 1;
+    int currentScreen4 = 1; //Current screen being shown in Stage 4
     //Variables for Stage 7 (Meet Hermit)
-    int currentScreen7 = 1;
+    int currentScreen7 = 1; //Current screen being shown in Stage 7
     boolean playerHelpsHermit; //True if user decides to help the hermit
     //Variables for Stage 9 (Find Adarna bird)
-    int currentScreen9 = 1;
+    int currentScreen9 = 1; //Current screen being shown in Stage 9
     boolean sheerWill; //What user uses to stay awake, which will affect the rhythm minigame
     //Variables for Stage 11 (Catch the Adarna Bird)
     boolean clickedCage = false; //True after user clicks on cage, after which it will disappear
     boolean clickedRope = false; //True after user clicks on rope, after which it will disappear
+    //Variables for Stage 13 (Find Brothers)
+    int currentScreen13 = 1; //Current screen being shown in Stage 13
+    int donPedroX = 390; //X position of Don Pedro
+    int donPedroY = 255; //Y position of Don Pedro
+    int donDiegoX = 205; //X position of Don Diego
+    int donDiegoY = 255; //Y position of Don Diego
     
     
     
@@ -83,7 +89,7 @@ public class MySketch extends PApplet {
     int rightArrowX = 602; //Set x position of right arrow button
     int rightArrowY = 245; //Set y position of right arrow button
     
-    //Buttons for Stage 1 (Distrubute Character Points)
+    //Buttons for Stage 1 (Distribute Character Points)
     boolean overPlusStrength = false; //Set variable indicating mouse is over plus strength button to false
     int plusStrengthX = 425; //Set x position of plus strength button
     int plusStrengthY = 270; //Set y position of plus strength button
@@ -123,6 +129,15 @@ public class MySketch extends PApplet {
     boolean overAdarnaBird = false; //Set variable indicating mouse is over Adarna bird to false
     int adarnaBirdX = -100; //X position of Adarna bird
     int adarnaBirdY = 225; //Y position of Adarna bird
+    
+    //Buttons for Stage 13 (Find Brothers)
+    boolean overSaveThem = false; //Set variable indicating mouse is over save them button to false
+    int saveThemX = 230; //Set x position of save them button
+    int saveThemY = 220; //Set y position of save them button
+    boolean overleaveThem = false; //Set variable indicating mouse is over leave them button to false
+    int leaveThemX = 230; //Set x position of save them button
+    int leaveThemY = 375; //Set y position of save them button
+    
     
     
     
@@ -200,6 +215,23 @@ public class MySketch extends PApplet {
     PImage wideAwakeMessage; //Message if user won rhythm minigame
     PImage adarnaBird; //Image of Adarna bird
     PImage catchAdarnaBG2; //Background when catching the Adarna bird (player doesn't have rope and golden cage)
+    //Declare images for Stage 12 (Caught the Adarna Bird)
+    PImage afterCaptureBG; //Background after capturing Adarna bird
+    PImage adarnaInCage; //Image of Adarna bird in a cage
+    //Declare images for Stage 13 (Find Brothers)
+    PImage findBrothersBG1; //Background when seeing brothers for the first time
+    PImage findBrothersBG2; //Background when choosing to save or leave brothers
+    PImage findBrothersBG3; //Background if user saves brothers
+    PImage findBrothersBG4; //Background if user leaves brothers
+    PImage leaveThemButton; //Leave them button (brothers)
+    PImage saveThemButton; //Save them button (brothers)
+    PImage donPedro; //Brother 1
+    PImage donDiego; //Brother 2
+    //Declare images for Stage 14 (Betrayal)
+    PImage betrayalBG1; //Background when brothers take the Adarna bird
+    PImage betrayalBG2; //Background when player is thrown down a well
+    PImage betrayalBG3; //Background when brothers leave
+
     
     
     
@@ -252,7 +284,6 @@ public class MySketch extends PApplet {
         gameInstructions1 = loadImage("images/instructions1.jpg"); //Part 1 of game instructions
         gameInstructions2 = loadImage("images/instructions2.jpg"); //Part 2 of game instructions
                 
-
         pressSpaceToContinue = loadImage("images/spacetocontinue.png");  //Press SPACE to continue message
         
         plusStrengthButton = loadImage("images/plusbutton.jpg");   //Button to add one point to strength trait
@@ -310,7 +341,24 @@ public class MySketch extends PApplet {
         adarnaBird = loadImage("images/adarnabird.png"); //Image of Adarna bird
         catchAdarnaBG2 = loadImage("images/catchadarna2.jpg"); //Background when catching the Adarna bird (player doesn't have rope and golden cage)
         
- 
+        //Load images for Stage 12 (Caught the Adarna Bird)
+        afterCaptureBG = loadImage("images/aftercapturebg.jpg"); //Background after capturing Adarna bird
+        adarnaInCage = loadImage("images/adarnaincage.png"); //Image of Adarna bird in a cage
+      
+        //Load images for Stage 13 (Find Brothers)
+        findBrothersBG1 = loadImage("images/findbrothers1.jpg"); //Background when seeing brothers for the first time
+        findBrothersBG2 = loadImage("images/findbrothers2.jpg"); //Background when choosing to save or leave brothers
+        findBrothersBG3 = loadImage("images/findbrothers3.jpg"); //Background if user saves brothers
+        findBrothersBG4 = loadImage("images/findbrothers4.jpg"); //Background if user leaves brothers
+        leaveThemButton = loadImage("images/leavethembutton.jpg"); //Leave them button (brothers)
+        saveThemButton = loadImage("images/savethembutton.jpg"); //Save them button (brothers)
+        donPedro = loadImage("images/donpedro.png"); //Brother 1
+        donDiego = loadImage("images/dondiego.png"); //Brother 2    
+        
+        //Load images for Stage 14 (Betrayal)
+        betrayalBG1 = loadImage("images/betrayal1.jpg"); //Background when brothers take the Adarna bird
+        betrayalBG2 = loadImage("images/betrayal2.jpg"); //Background when player is thrown down a well
+        betrayalBG3 = loadImage("images/betrayal3.jpg"); //Background when brothers leave
         
         
         
@@ -361,11 +409,11 @@ public class MySketch extends PApplet {
             if(nameError) 
                 image(nameErrorMessage, 225, 140); //Display error message regarding name length
             
-            //Draw character below name
-            if (customCharacter)
-                image(currentChoice, 312, 180); 
-            else
-                image(character1, 312, 180);
+            //Draw character below the area where the user types in the name
+            if (customCharacter) //If the user has chosen a character already in the customize clothing option
+                image(currentChoice, 312, 180); //Display the character (1/2/3) that they chose to play as
+            else //If the user has not chosen a character yet
+                image(character1, 312, 180); //Display the default character option
             
             
         
@@ -466,27 +514,38 @@ public class MySketch extends PApplet {
             //Display text instructions telling the user to press space to continue
             image(pressSpaceToContinue, 280, 450);
             
-            
-            
+            //Create an instance of the Player class to represent the character the user will be playing as
+//If the user entered their own name and character clothing
             if (customName && customCharacter) {
-                if (chooseCharacter1)
+                if (chooseCharacter1) //If the player chose character option 1
+	        //Create new Player with parameters for name and character image, using the image of character 1
                     player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter1.png");
-                else if (chooseCharacter2)
+                else if (chooseCharacter2) //If the player chose character option 2
+                    //Create new Player with parameters for name and character image, using the image of character 2
                     player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter2.png");
-                else
+                else //If the player chose character option 3
+	        //Create new Player with parameters for name and character image, using the image of character 3
                     player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter3.png");
+	//If user entered their own name but did not customize the character clothing
             } else if (customName) {
+	    //Create new Player with parameter for the name
                 player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3));
+	//If user did not enter their own name but customized the character clothing
             } else if (customCharacter) {
-                if (chooseCharacter1)
+                if (chooseCharacter1) //If the player chose character option 1
+	       //Create new Player with parameter for the character image, using image of character 1
                    player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter1.png");
-                else if (chooseCharacter2)
+                else if (chooseCharacter2) //If the player chose character option 2
+	       //Create new Player with parameter for the character image, using image of character 2
                    player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter2.png");
-                else
+                else //If the player chose character option 3
+	       //Create new Player with parameter for the charcter image, using image of character 3
                    player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter3.png");
+	//If user did not enter their own name and did not customize the character clothing
             } else {
+	     //Create new Player using constructor with no extra parameters to set default values for name and character image
                 player = new Player(this, 155, 255, traitDistribution, new Inventory(3));
-            }
+            } //End if statement deciding which Player constructor to call depending on the custom values entered by the user
            
         //Leaving Castle
         } else if (stage == 2) {
@@ -499,9 +558,9 @@ public class MySketch extends PApplet {
         } else if (stage == 3) {
             //Set fork in the road background
             background(forkInTheRoadBG);
-            player.draw();
-            if (player.x < 240)
-                player.move(2, 0);
+            player.draw(); //Draw character on the screen
+            if (player.x < 240) //While character is still left of a certain position on the screen
+                player.move(2, 0); //Keep moving character to the right
             
         //Encounter Boar
         } else if (stage == 4) {
@@ -524,83 +583,101 @@ public class MySketch extends PApplet {
                 }
             //Display instructions for boar fight minigame
             } else if (currentScreen4 == 2) {
+	    //Set backgrounds with boar fight minigame instructions
                 background(boarFightInstructions);
-            }
+            } //End if statement deciding which screen to show for Stage 4
             
             
         //Boar Fight Minigame
         } else if (stage == 5) {
-            currentGame.update();
-            currentGame.draw();
+            currentGame.update(); //Call update method for boar fight minigame
+            currentGame.draw(); //Call draw method for boar fight minigame
             
+        //Walking in the Forest 1
         } else if (stage == 6) {
+	//Set background to filler forest scene 1
             background(fillerForest1);
             player.draw(); //Draw character on the screen
             player.move(3, 0); //Move character to the right
-            if (player.x > 800) {
+            if (player.x > 800) { //Once player passes the right edge of the screen
                 player.moveTo(85, 240); //Set new player position
-                stage = 7;
+                stage = 7; //Go to the next stage (Meet Hermit)
             }
                 
         //Meet Hermit
         } else if (stage == 7) {
+	//If player is meeting hermit for the first time
             if (currentScreen7 == 1) {
+	    //Set background to meeting the hermit for the first time
                 background(meetHermitBG1);
                 player.draw(); //Draw character on the screen
-                image(hermit, 380, 220);
+                image(hermit, 380, 220);  //Draw hermit on the screen
+	//If player is choosing how to stay awake
             } else if (currentScreen7 == 2) {
+	    //Set background to responding to the hermit
                 background(meetHermitBG2);
                 player.draw(); //Draw character on the screen
-                image(hermit, 380, 220);
-                image(helpHermitButton, helpHermitX, helpHermitY);
-                image(ignoreHermitButton, ignoreHermitX, ignoreHermitY);
+                image(hermit, 380, 220); //Draw hermit on the screen
+                image(helpHermitButton, helpHermitX, helpHermitY); //Draw button to help hermit
+                image(ignoreHermitButton, ignoreHermitX, ignoreHermitY); //Draw button to ignore hermit
+	//If player made their choice in response to the hermit
             } else if (currentScreen7 == 3) {
+	    //If player chose to help hermit
                 if (playerHelpsHermit) {
-                    background(meetHermitBG3);
-                    image(hermitWithFood, 380, 220);
-                    player.getInventory().consumeFood();
-                    player.getInventory().addItem("Lime Juice");
-                    player.getInventory().addItem("Rope");
-                    player.getInventory().addItem("Golden Cage");
-                    player.addVirtue(50);
+	        //Set background to leaving the hermit
+                    background(meetHermitBG3); 
+                    image(hermitWithFood, 380, 220); //Draw hermit on the screen with food
+                    player.getInventory().consumeFood(); //Remove one food item from player's inventory (given to hermit)
+	        //Add items given by the hermit in response to the player's decision to help
+                    player.getInventory().addItem("Lime Juice"); //Add lime juice to player's inventory
+                    player.getInventory().addItem("Rope"); //Add rope to player's inventory
+                    player.getInventory().addItem("Golden Cage"); //Add golden cage to player's inventory
+                    player.addVirtue(50); //Give player virtue points for helping the hermit
+	    //If player chose to ignore the hermit
                 } else {
-                    background(meetHermitBG4);
-                    image(hermit, 380, 220);
-                }
+	        //Set background to leaving the hermit
+                    background(meetHermitBG4); 
+                    image(hermit, 380, 220); //Draw hermit on the screen
+                } //End if statement that awards the player with items and virtue points if they chose to help the hermit
                 player.draw(); //Draw character on the screen
                 player.move(3, 0); //Move character to the right
-            }
+            } //End if statement deciding which screen to show for Stage 7
                 
         //Walking in the Forest 2   
         } else if (stage == 8) {
+	//Set background to filler forest scene 2
             background(fillerForest2);
             player.draw(); //Draw character on the screen
             player.move(3, 0); //Move character to the right
-            if (player.x > 800) {
+            if (player.x > 800) { //Once player passes the right edge of the screen
                 player.moveTo(85, 240); //Set new player position
-                stage = 9;
-            }
+                stage = 9; //Go to the next stage (Adarna Bird)
+            } //End if statement checking if player is still on the screen
             
         //Adarna Bird
         } else if (stage == 9) {
-            System.out.println(currentScreen9);
+            //If player is seeing the Adarna bird for the first time
             if (currentScreen9 == 1) {
-                background(seeAdarnaBG1);
-                player.draw();
+                background(seeAdarnaBG1); //Set background to first time seeing the bird
+                player.draw(); //Draw player on the screen
+	//If player is deciding how to stay awake during the Adarna bird's songs
             } else if (currentScreen9 == 2) {
+	    //Set background to deciding how to stay awake
                 background(seeAdarnaBG2);
-                player.draw();
-                image(sheerWillButton, sheerWillX, sheerWillY);
-                if (player.getInventory().hasItem("Lime Juice"))
-                    image(limeJuiceButton, limeJuiceX, limeJuiceY);
+                player.draw();  //Draw player on the screen
+                image(sheerWillButton, sheerWillX, sheerWillY); //Draw sheer will button on the screen
+                if (player.getInventory().hasItem("Lime Juice")) //If player does not have lime juice, they have an additional option
+                    image(limeJuiceButton, limeJuiceX, limeJuiceY); //Draw lime juice button on the screen
+	//Display instructions for the rhythm minigame
             } else if (currentScreen9 == 3) {
+	    //Set background to rhythm minigame instructions
                 background(rhythmGameInstructions);
-            }
+            } //End if statement deciding which screen to show for Stage 9
             
         //Rhythm Game Minigame
         } else if (stage == 10) {
-            currentGame.update();
-            currentGame.draw();
+            currentGame.update(); //Call update method for rhythm minigame
+            currentGame.draw(); //Call draw method for rhythm minigame
             
         //Catch the Adarna Bird
         } else if (stage == 11) {
@@ -642,7 +719,95 @@ public class MySketch extends PApplet {
             else
                 image(barelyAwakeMessage, 138, 55); //Display message saying user barely stayed awake
 
+        //Caught the Adarna Bird
+        } else if (stage == 12) {
+            //Set background to after player catches the Adarna bird
+            background(afterCaptureBG);
+            player.draw(); //Draw character on the screen
+            player.move(-2, 0); //Move character to the left
+            
+            //If player has golden cage in their inventory from the hermit
+            if (player.getInventory().hasItem("Golden Cage"))
+                image(adarnaInCage, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character in the golden cage
+            ///If player has golden cage in their inventory from the hermit
+            else
+                image(adarnaBird, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character without a cage
+            
+            adarnaBirdX -= 2; //Move Adarna bird to the left with the player
+        
+        //Find Brothers
+        } else if (stage == 13) {
+            //If player is seeing brothers for the first time
+            if (currentScreen13 == 1) {
+                //Set background to seeing brothers for the first time
+                background(findBrothersBG1);
+                player.draw(); //Draw character on the screen
+                //If player has golden cage in their inventory from the hermit
+                if (player.getInventory().hasItem("Golden Cage")) 
+                    image(adarnaInCage, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character in the golden cage
+                ///If player has golden cage in their inventory from the hermit
+                else
+                    image(adarnaBird, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character without a cage
+                 
+            //If player is choosing to save or leave brothers
+            } else if (currentScreen13 == 2) {
+                //Set background to choosing to save or leave brothers
+                background(findBrothersBG2);
+                player.draw(); //Draw character on the screen
+                //If player has golden cage in their inventory from the hermit
+                if (player.getInventory().hasItem("Golden Cage")) 
+                    image(adarnaInCage, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character in the golden cage
+                ///If player has golden cage in their inventory from the hermit
+                else
+                    image(adarnaBird, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character without a cage
                 
+                image(saveThemButton, saveThemX, saveThemY); //Draw button to save brothers 
+                image(leaveThemButton, leaveThemX, leaveThemY); //Draw button to leave brothers 
+                
+            //Player chose to save brothers
+            } else if (currentScreen13 == 3) {
+                //Set background to after choosing to save brothers
+                background(findBrothersBG3);
+                player.draw(); //Draw character on the screen
+                //If player has golden cage in their inventory from the hermit
+                if (player.getInventory().hasItem("Golden Cage")) 
+                    image(adarnaInCage, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character in the golden cage
+                ///If player has golden cage in their inventory from the hermit
+                else
+                    image(adarnaBird, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character without a cage
+                image(donPedro, donPedroX, donPedroY); //Draw brother 1 on the screen
+                image(donDiego, donDiegoX, donDiegoY); //Draw brother 2 on the screen
+                
+                //Move characters and Adarna bird to the left
+                player.move(-3, 0); //Move character to the left
+                adarnaBirdX -= 3; //Move Adarna bird to the left
+                donPedroX -= 3; //Move brother 1 to the left
+                donDiegoX -= 3; //Move brother 2 to the left
+                
+            //Player chose to leave brothers
+            } else if (currentScreen13 == 4) {
+                //Set background to after choosing to leave brothers
+                background(findBrothersBG4);
+                player.draw(); //Draw character on the screen
+                //If player has golden cage in their inventory from the hermit
+                if (player.getInventory().hasItem("Golden Cage")) 
+                    image(adarnaInCage, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character in the golden cage
+                ///If player has golden cage in their inventory from the hermit
+                else
+                    image(adarnaBird, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character without a cage
+
+                //Move character and Adarna bird to the left
+                player.move(-3, 0); //Move character to the left
+                adarnaBirdX -= 3; //Move Adarna bird to the left
+            } //End if statement checking which screen of Stage 13 to show
+            
+            
+        //Betrayal
+        } else if (stage == 14) {
+            background(betrayalBG1); //Set background to when brothers take the Adarna bird
+            background(betrayalBG2); //Set background to when player is thrown down a well
+            background(betrayalBG3); //Set background to when brothers leave
+            
         }
         
         
@@ -682,9 +847,14 @@ public class MySketch extends PApplet {
         overCatchAdarnaCage = false; //Player clicks golden cage to catch the bird
         overCatchAdarnaRope = false; //Player clicks on rope to catch the bird
         overAdarnaBird = false; //Player clicks on Adarna bird to catch it
+        //Variables for Stage 13 (Find Brothers)
+        overSaveThem = false; //Button to save brothers
+        overleaveThem = false; //Button to leave brothers
         
-            int adarnaBirdX = -100; //X position of Adarna bird
-    int adarnaBirdY = 225; //Y position of Adarna bird
+        
+    
+           //// int adarnaBirdX = -100; //X position of Adarna bird
+   //// int adarnaBirdY = 225; //Y position of Adarna bird
         
         //Stage 0 (Main Menu)
         if (stage == 0) {
@@ -741,7 +911,7 @@ public class MySketch extends PApplet {
             if (player.getInventory().hasItem("Lime Juice")) {
                 if (overImage(limeJuiceButton, limeJuiceX, limeJuiceY)) //Button to use lime juice to stay awake
                 overLimeJuice = true; //Set variable indicating mouse is over lime juice button to true
-            }
+            } //End if statement for if user has lime juice in their inventory
             
         //Stage 11 (Catch the Adarna Bird)
         } else if (stage == 11) {
@@ -758,6 +928,17 @@ public class MySketch extends PApplet {
                 if (overImage(adarnaBird, adarnaBirdX, adarnaBirdY)) //Image of Adarna bird
                     overAdarnaBird = true; //Set variable indicating mouse is over Adarna bird to true
             }
+            
+        //Stage 13 (Find Brothers)
+        } else if (stage == 13) {
+            //Mouse is over a specific button in Stage 13 (Find Brothers)
+            if (overImage(saveThemButton, saveThemX, saveThemY)) //Button clicked to save brothers
+                overSaveThem = true; //Set variable indicating mouse is over save them button to true
+            else if (overImage(leaveThemButton, leaveThemX, leaveThemY)) //Button clicked to elave brothers
+                overleaveThem = true; //Set variable indicating mouse is over leave them button to true
+        
+    
+            
         }
         
         
@@ -807,9 +988,8 @@ public class MySketch extends PApplet {
             else if (overCustomize) 
                 stage = -3; //Go to customize character screen
             //If mouse is over start button when mouse is clicked
-            else if (overStart) {
+            else if (overStart) 
                 stage = 1; //Begin story
-            }
             
     
     
@@ -820,99 +1000,131 @@ public class MySketch extends PApplet {
                 //If character clothing v1 is currently being shown, show v3 (v1 is false and v2 is false)
                 if (chooseCharacter1) {
                     chooseCharacter1 = false; //Set variable indicating character v1 is showing to false
-                //If character clothing v2 is currently being shown
+                //If character clothing v2 is currently being shown, show v1
                 } else if (chooseCharacter2) {
                     chooseCharacter2 = false; //Set variable indicating character v2 is showing to false
-                    chooseCharacter1 = true;
-                } else {
-                    chooseCharacter2 = true;
-                }
+                    chooseCharacter1 = true; //Set variable indicating character v1 is showing to true
+	    //If character clothing v3 is currently being shown, show v2
+                } else { 
+                    chooseCharacter2 = true; //Set variable indicating character v2 is showing to true
+                } //End if statement deciding which character clothing version to show when left button is clicked
                             
             //If mouse is over right arrow button when mouse is clicked
             else if (overRightArrow)
+	    //If character clothing v1 is currently being shown, show v3 (v1 is false and v2 is false)
                 if (chooseCharacter1) {
-                    chooseCharacter1 = false;
-                    chooseCharacter2 = true;
+                    chooseCharacter1 = false; //Set variable indicating character v1 is showing to false
+                    chooseCharacter2 = true; //Set variable indicating character v2 is showing to true
+	    //If character clothing v2 is currently being shown, show v3 (v1 is false and v2 is false)
                 } else if (chooseCharacter2) {
-                    chooseCharacter2 = false;
+                    chooseCharacter2 = false; //Set variable indicating character v2 is showing to false
+	    //If character clothing v3 is currently being shown, show v1 (v1 is false and v2 is false)
                 } else {
-                    chooseCharacter1 = true;
-                }
+                    chooseCharacter1 = true; //Set variable indicating character v1 is showing to true
+                } //End if statement deciding which character clothing version to show when right button is clicked
+
         //Stage 1 (Begin Story)
         } else if (stage == 1) {
+	//If mouse is over plus strength button when mouse is clicked
             if (overPlusStrength) {
+	    //If the user has no strength points and no intelligence points
                 if (currentStrengthPoints == 0 && currentIntelligencePoints == 0)
-                    currentStrengthPoints = 1;
+                    currentStrengthPoints = 1; //Set current strength points to 1
+	    //If user has the maximum number of intelligence points
                 else if (currentIntelligencePoints == 2) {
-                    currentStrengthPoints = 1;
-                    currentIntelligencePoints = 1;
+                    currentStrengthPoints = 1; //Set current strength points to 1
+                    currentIntelligencePoints = 1; //Set current intelligence points to 1
+	    //If user has no strength points and one intelligence point
                 } else if (currentStrengthPoints == 0) 
-                    currentStrengthPoints = 1;
+                    currentStrengthPoints = 1; //Set current strength points to 1
+	    //If user has one strength point and one intelligence point
                 else if (currentStrengthPoints == 1 && currentIntelligencePoints == 1) {
-                    currentStrengthPoints = 2;
-                    currentIntelligencePoints = 0;
-                }
-                else {
-                    currentStrengthPoints = 2;
-                }
+                    currentStrengthPoints = 2; //Set current strength points to 2
+                    currentIntelligencePoints = 0; //Set current intelligence points to 0
+	    //If the user has one strength point and no intelligence points
+                } else {
+                    currentStrengthPoints = 2; //Set current strength points to 2
+                } //End if statement deciding how to set the points when the plus strength button is clicked
+
+	//If mouse is over minus strength button when mouse is clicked
             } else if (overMinusStrength) {
+	    //If user has maximum strength points
                 if (currentStrengthPoints == 2)
-                   currentStrengthPoints = 1;
+                   currentStrengthPoints = 1; //Set current strength points to 1
+	     //If user has zero or one strength points
                 else {
-                    currentStrengthPoints = 0;
-                }
+                    currentStrengthPoints = 0; //Set current strength points to 0
+                } //End if statement deciding how to set the points when the minus strength button is clicked
+
+	//If mouse is over plus intelligence button when mouse is clicked
             } else if (overPlusIntelligence) {
+	    //If the user has no strength points and no intelligence points
                 if (currentStrengthPoints == 0 && currentIntelligencePoints == 0)
-                    currentIntelligencePoints = 1;
+                    currentIntelligencePoints = 1; //Set current intelligence points to 1
+	    //If user has the maximum number of strength points
                 else if (currentStrengthPoints == 2) {
-                    currentStrengthPoints = 1;
-                    currentIntelligencePoints = 1;
+                    currentStrengthPoints = 1; //Set current strength points to 1
+                    currentIntelligencePoints = 1; //Set current intelligence points to 1
+	    //If user has no intelligence points and one strength point
                 } else if (currentIntelligencePoints == 0) 
-                    currentIntelligencePoints = 1;
+                    currentIntelligencePoints = 1; //Set current intelligence points to 1
+	    //If user has one strength point and one intelligence point
                 else if (currentStrengthPoints == 1 && currentIntelligencePoints == 1) {
-                    currentIntelligencePoints = 2;
-                    currentStrengthPoints = 0;
-                }
-                else {
-                    currentIntelligencePoints = 2;
-                }
+                    currentIntelligencePoints = 2; //Set current intelligence points to 2
+                    currentStrengthPoints = 0; //Set current strength points to 0
+	    //If the user has one intelligence point and no strength points
+                }  else {
+                    currentIntelligencePoints = 2; //Set current intelligence points to 2
+                } //End if statement deciding how to set the points when the plus intelligence button is clicked
+
+	//If mouse is over minus intelligence button when mouse is clicked
             } else if (overMinusIntelligence) {
+	    //If user has maximum intelligence points
                 if (currentIntelligencePoints == 2)
-                   currentIntelligencePoints = 1;
+                   currentIntelligencePoints = 1; //Set current intelligence points to 1
+	    //If user has zero or one intelligence points
                 else {
-                    currentIntelligencePoints = 0;
-                }
-            }
+                    currentIntelligencePoints = 0; //Set current intelligence points to 0
+                } //End if statement deciding how to set the points when the minus intelligence button is clicked
+            } ////might need to remove this
                 
                     
+	//Stage 5 (Boar Fight Minigame)
             } else if (stage == 5) {
-                currentGame.mousePressed();
+                currentGame.mousePressed(); //Call mouse pressed method for boar fight minigame
                 
             //Stage 7 (Meet Hermit)
             } else if (stage == 7) {
+	    //If user is deciding on whether to help or ignore the hermit
                 if (currentScreen7 == 2) {
                     //If mouse is over help hermit button when mouse is clicked
                     if (overHelpHermit)
                         playerHelpsHermit = true; //Indicate that player helped hermit, determines the next screen
+	        //If mouse is over ignore hermit button when mouse is clicked
                     else if (overIgnoreHermit)
                         playerHelpsHermit = false; //Indicate that player didn't help hermit, determines the next screen
-                    currentScreen7 = 3;
-                }
+                    currentScreen7 = 3; //Set current screen of Stage 7 to the leaving the hermit
+                } //End if statement checking for screen 2 of Stage 7
                     
+	//Stage 9 (Adarna Bird)
             } else if (stage == 9) {
-                if (currentScreen9 == 2)
+	    //If user is deciding how to stay awake during the Adarna bird's songs
+                if (currentScreen9 == 2) {
+	        //If mouse is over sheer will button when mouse is clicked
                     if (overSheerWill) {
-                        sheerWill = true;
-                        currentScreen9 = 3;
+                        sheerWill = true; //Indicate that player decided on using sheer will
+                        currentScreen9 = 3; //Set current screen of Stage 9 to the rhythm game instructions
+	        //If mouse is over lime juice button when mouse is clicked and user has lime juice in their inventory
                     } else if (overLimeJuice && player.getInventory().hasItem("Lime Juice")) {
-                        sheerWill = false;
-                        currentScreen9 = 3;
-                    }
+                        sheerWill = false; //Indicate that player decided on using lime juice
+                        currentScreen9 = 3; //Set current screen of Stage 9 to the rhythm game instructions
+                    } //End if statement for if user's mouse is over sheer will button or lime juice button
+                } //End if statement checking for screen 2 of Stage 9
                         
                         
-            //Rhythm Game Minigame
+            //Rhythm Minigame
             } else if (stage == 10) {
-                currentGame.mousePressed();
+                currentGame.mousePressed(); //Call mouse pressed method for rhythm minigame
                 
                 
             //Stage 11 (Find Adarna)
@@ -920,23 +1132,45 @@ public class MySketch extends PApplet {
                 //If mouse is over golden cage when mouse is clicked
                 if (overCatchAdarnaCage) {
                     clickedCage = true; //Indicate that player clicked cage
-                    if (clickedRope) //If user already clicked rope as well
+                    if (clickedRope) { //If user already clicked rope as well
+                       player.moveTo(360, 255); //Set new player position
+                       adarnaBirdX = 320; //Set x position of Adarna bird in cage
+                       adarnaBirdY = 315; //Set x position of Adarna bird in cage
                        stage = 12; //Go to the next stage (Caught Bird) 
+                    } //End if statement checking if user already clicked rope as well
                 }
                 //If mouse is over rope when mouse is clicked
                 else if (overCatchAdarnaRope) {
                     clickedRope = true; //Indicate that player clicked rope
-                    if (clickedCage) //If user already clicked cage as well
+                    if (clickedCage) { //If user already clicked cage as well
+                       player.moveTo(360, 255); //Set new player position
+                       adarnaBirdX = 320; //Set x position of Adarna bird in cage
+                       adarnaBirdY = 315; //Set x position of Adarna bird in cage
                        stage = 12; //Go to the next stage (Caught Bird) 
+                    } //End if statement checking if user already clicked rope as well
                 }
                 //If mouse is over Adarna bird when mouse is clicked
                 if (overAdarnaBird) {
+                    player.moveTo(360, 225); //Set new player position
+                    adarnaBirdX = 335; //Set x position of Adarna bird 
+                    adarnaBirdY = 355; //Set x position of Adarna bird
                     stage = 12; //Go to the next stage (Caught Bird) 
                 }
                         
-                      
-                
-    
+            //Stage 12 (Find Brothers)          
+            } else if (stage == 13) {
+                //If user is deciding whether to save or leave brothers
+                if (currentScreen13 == 2) {
+                    //If mouse is over save them button when mouse is clicked
+                    if (overSaveThem) {
+                        player.setSavedBrothers(true); //Set variable to indicate player saved brothers
+                        currentScreen13 = 3; //Set current screen of Stage 12 to after saving the brothers
+                    //If mouse is leave them button when mouse is clicked
+                    } else if (overleaveThem) {
+                        player.setSavedBrothers(false); //Set variable to indicate player left brothers
+                        currentScreen13 = 4; //Set current screen of Stage 12 to after leaving the brothers
+                    } //End if statement checking if user's mouse is over save brothers button or leave brothers button
+                } //End if statement checking for screen 2 of Stage 13
             }
                 
                 
@@ -951,27 +1185,30 @@ public class MySketch extends PApplet {
       
     @Override
     public void keyPressed() {
+        //If the spacebar is pressed
         if (key == ' ') {
+	//Spacebar is pressed in Stage -3 (Custom Clothes)
             if (stage == -3) {
-                stage = -1;
+                stage = -1; //Go back to character setup screen
             //Spacebar is pressed in Stage 1 (Begin Story)
             } else if (stage == 1) {
                 if (currentScreen1 == 1) //If screen currently being shown is the first part of the story introduction
-                    currentScreen1 = 2;
+                    currentScreen1 = 2; //Go to next screen (second part of story introduction)
                 else if (currentScreen1 == 2) //If screen currently being shown is the second part of the story introduction
-                    currentScreen1 = 3;
+                    currentScreen1 = 3; //Go to next screen (character traits distribution)
                 else if (currentScreen1 == 3) { //If screen currently being shown is the character traits distrubution
                     pointsError = false; //Set error indicator for points distribution false in case it was set to true previously
+	         //If the user has not distributed both of their points
                     if ((currentStrengthPoints == 0 && currentIntelligencePoints == 0) || (currentStrengthPoints == 1 && currentIntelligencePoints == 0) || (currentStrengthPoints == 0 && currentIntelligencePoints == 1)) {
-                        pointsError = true;
-                    } else  
-                        currentScreen1 = 4;
+                        pointsError = true; //Set variable indicating there was an error with the points to true
+                    } else  //If user has distributed both of their points
+                        currentScreen1 = 4; //Go to next screen (first part of the game instructions)
                 } else  if (currentScreen1 == 4) //If screen currently being shown is the first part of the game instructions
-                    currentScreen1 = 5;
-                else {
-                    stage = 2;
+                    currentScreen1 = 5; //Go to next screen (second part of the game instructions)
+                else { //If screen currently being shown is the second part of the game instructions
+                    stage = 2; //Go to the next stage (Leaving Castle)
                     currentScreen1 = 1; //Reset screen to be shown for Stage 1 to the first part of the story introduction
-                }   
+                }   //End if statement for which screen of Stage 1 is being shown
             //Spacebar is pressed in Stage 2 (Leaving Castle)
             } else if (stage == 2) {
                 stage = 3; //Go to next stage (Fork in the Road)
@@ -984,61 +1221,110 @@ public class MySketch extends PApplet {
                     } else { //If user chose path without boar 
                         player.moveTo(85, 240); //Set new player position
                         stage = 7; //Go to the next stage (Meet Hermit)
-                    }
+                    } //End if statement for if user chose path with the boar
                 } else if (currentScreen4 == 2){ //If screen currently being shown is the boar fight minigame instructions
+	        //Create an instance of the Boar Fight Game class depending on the user's character image
+	        //If the user's character clothing is v1
                     if (chooseCharacter1)
+		//Create instance of boar fight minigame with character clothing image v1
                         currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter1.png", traitDistribution);
+	        //If the user's character clothing is v2
                     else if (chooseCharacter2)
+		//Create instance of boar fight minigame with character clothing image v2
                         currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter2.png", traitDistribution);
+	        //If the user's character clothing is v3
                     else
-                        currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter3.pn", traitDistribution);
+		//Create instance of boar fight minigame with character clothing image v3
+                        currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter3.png", traitDistribution);
                          
                     stage = 5; //Go to the boar fight minigame
-                }
+                } //If statement for which screen of Stage 4 is being shown
+
+
             //Meet Hermit
             } else if (stage == 7) {
-                if (currentScreen7 == 1) //meeting
-                    currentScreen7 = 2; //buttons
-                if (currentScreen7 == 3) { //response
+	    //If the user is meeting the hermit for the first time
+                if (currentScreen7 == 1)
+                    currentScreen7 = 2; //Go to the next screen (deciding on whether to help or ignore the hermit)
+	    //if the user is leaving the hermit
+                if (currentScreen7 == 3) { 
                     player.moveTo(-90, 255); //Set new player position
-                    stage = 8; //Walking in the Forest 2
-                }
+                    stage = 8; //Go on to the next stage (Walking in the Forest 2)
+                } //End if statement for if current screen of Stage 7 is leaving the hermit
             //Find Adarna Bird
             } else if (stage == 9) {
-                if (currentScreen9 == 1) //If screen currently being shown is the first sighting of the Adarna bird
+	    //If screen currently being shown is the first sighting of the Adarna bird
+                if (currentScreen9 == 1) 
                     currentScreen9 = 2; //Show button options to stay awake using sheer will or lime juice
-                else if (currentScreen9 == 3) { //If screen currently being shown is the rhythm minigame instructions
+	    //If screen currently being shown is the rhythm minigame instructions
+                else if (currentScreen9 == 3) { 
+	        //Create an instance of the Boar Fight Game class depending on the user's character image
+	        //If the user's character clothing is v1
                     if (chooseCharacter1)
+		//Create instance of rhythm minigame with character clothing image v1
                         currentGame = new RhythmGame(this, "Rhythm Game", 245, 1, "images/chosenCharacter1.png", traitDistribution, sheerWill);
+	          //If the user's character clothing is v1 
                      else if (chooseCharacter2)
+		//Create instance of rhythm minigame with character clothing image v2
                         currentGame = new RhythmGame(this, "Rhythm Game", 245, 1, "images/chosenCharacter2.png", traitDistribution, sheerWill);
+	        //If the user's character clothing is v1
                     else
+		//Create instance of rhythm minigame with character clothing image v3
                         currentGame = new RhythmGame(this, "Rhythm Game", 245, 1, "images/chosenCharacter3.png", traitDistribution, sheerWill);
                     
-                    stage = 10; //Go to the Rhythm Minigame
+                    //stage = 10; //Go to the Rhythm Minigame //////////skip minigame
+                    stage = 11;
+                } //If statement for which screen of Stage 9 is being shown
+                
+            //Caught the Adarna Bird
+            } else if (stage == 12) {
+                player.moveTo(595, 255); //Set new player position
+                //If player has golden cage in their inventory from the hermit
+                if (player.getInventory().hasItem("Golden Cage")) {
+                    adarnaBirdX = 550; //Set x position of Adarna bird in golden cage
+                    adarnaBirdY = 345; //Set y position of Adarna bird in golden cage
+                //If player does not jave golden cage in their inventory
+                } else {
+                    adarnaBirdX = 570; //Set x position of Adarna bird
+                    adarnaBirdY = 370; //Set y position of Adarna bird
                 }
+                stage = 13; //Go to the next stage (Find Brothers)
+                
+            //Find Brothers
+            } else if (stage == 13) {
+                //If the user is seeing their brothers turned to stone for the first time
+                if (currentScreen13 == 1)
+                    currentScreen13 = 2; //Go to the next screen (deciding to save or leave brothers)
+                //If user just decided to save or leave their brothers
+                else if (currentScreen13 == 3 || currentScreen13 == 4)
+                    stage = 14; //Go to the next stage (Betrayal)
+                
             }
             
         } 
         
+        //If key is pressed in Stage -2 (Choosing Name)
         if (stage == -2) {
-            if (keyCode == ENTER) { //If enter key is pressed
+	//If enter key is pressed
+            if (keyCode == ENTER) { 
                 nameError = false; //Set error indicator for name to false in case it was set to true previously
-                if (userInput.isEmpty() || userInput.length() > 10)
-                    nameError = true;
-                else {     
-                    enteredName = userInput;
+                if (userInput.isEmpty() || userInput.length() > 10) //If the user's input is not between 1 to 10 characters
+                    nameError = true; //Set error indicator for name to true
+                else {  //If the user's input matches the length requirements
+                    enteredName = userInput; //Set entered name variable to user input
                     stage = -1; //Return to character setup screen
-                }
+                } //End if statement checking if user’s input matches the length requirements
+	//If backspace key is pressed
             } else if (keyCode == BACKSPACE) {
-                if (userInput.length() > 0) 
+                if (userInput.length() > 0) //If user has typed in some letters on the screen
                     userInput = userInput.substring(0, userInput.length() - 1); //Remove last character from user input string
              
-            } else if (key != CODED) { // checks if it is an ASCII character
-                userInput += key; // add each keystroke to user input string
-            } // end nested if
+	//If user enters an ASCII character
+            } else if (key != CODED) { 
+                userInput += key; //Add each keystroke to user input string
+            } //End if statement for which key is pressed
             
-        //Fork in the Road
+        //If key is pressed in Stage 3 (Fork in the Road)
         } else if (stage == 3) {
             //If user presses left arrow key
             if (keyCode == LEFT) {
@@ -1050,23 +1336,29 @@ public class MySketch extends PApplet {
                 willFightBoar = true; //User will play boar fight minigame
                 stage = 4; //Go to the next stage (Encounter Boar)
                 player.moveTo(-90, 255); //Set new player position
-            }
-        //Boar Fight Minigame
+            } //End if statement for which key is pressed
+
+        //If key is pressed in Stage 5 (Boar Fight Minigame)
         } else if (stage == 5) {
-            currentGame.keyPressed();
-        //Rhythm Game Minigame
+            currentGame.keyPressed(); //Call key pressed method for boar fight game
+
+        //If key is pressed in Stage 10 (Rhythm Minigame)
         } else if (stage == 10) {
-            currentGame.keyPressed();
+            currentGame.keyPressed(); //Call key pressed method for rhythm game
         }
         
     }
      
    boolean overImage(PImage image, int x, int y)  {
+        //If mouse is over the specified image
         if (mouseX >= x && mouseX <= x+image.width && 
             mouseY >= y && mouseY <= y+image.height) {
-          return true;
-        } else {
-          return false;
-        }
+          return true; //Return true
+        //If mouse is not over the specified image
+        } else { 
+          return false; //Return false
+        } //End if statement checking if mouse is over image
     }
 }
+
+
