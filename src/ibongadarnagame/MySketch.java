@@ -52,6 +52,8 @@ public class MySketch extends PApplet {
     int donPedroY = 255; //Y position of Don Pedro
     int donDiegoX = 205; //X position of Don Diego
     int donDiegoY = 255; //Y position of Don Diego
+    //Variables for Stage 14 (Betrayal)
+    int currentScreen14 = 1; //Current screen being shown in Stage 14
     
     
     
@@ -231,6 +233,7 @@ public class MySketch extends PApplet {
     PImage betrayalBG1; //Background when brothers take the Adarna bird
     PImage betrayalBG2; //Background when player is thrown down a well
     PImage betrayalBG3; //Background when brothers leave
+    PImage wellGameInstructions; //Background displaying well game instructions
 
     
     
@@ -359,6 +362,7 @@ public class MySketch extends PApplet {
         betrayalBG1 = loadImage("images/betrayal1.jpg"); //Background when brothers take the Adarna bird
         betrayalBG2 = loadImage("images/betrayal2.jpg"); //Background when player is thrown down a well
         betrayalBG3 = loadImage("images/betrayal3.jpg"); //Background when brothers leave
+        wellGameInstructions = loadImage("images/wellescapeinstructions.jpg"); //Background displaying well game instructions
         
         
         
@@ -796,17 +800,99 @@ public class MySketch extends PApplet {
                 else
                     image(adarnaBird, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character without a cage
 
-                //Move character and Adarna bird to the left
-                player.move(-3, 0); //Move character to the left
-                adarnaBirdX -= 3; //Move Adarna bird to the left
+                //If character is still on the screen, keeping moving player to the left
+                if (player.x > -180) {
+                    //Move character and Adarna bird to the left
+                    player.move(-3, 0); //Move character to the left
+                    adarnaBirdX -= 3; //Move Adarna bird to the left
+                //Once player is off the screen
+                } else {
+                    stage = 16; //Go to the next stage (Returning Home) 
+                } //End if statement checking if player is still on the screen
+                
+                
+                
             } //End if statement checking which screen of Stage 13 to show
             
             
         //Betrayal
         } else if (stage == 14) {
-            background(betrayalBG1); //Set background to when brothers take the Adarna bird
-            background(betrayalBG2); //Set background to when player is thrown down a well
+	//Brothers take the Adarna bird from the player
+	if (currentScreen14 == 1) {
+
+                background(betrayalBG1); //Set background to when brothers take the Adarna bird
+	    player.draw(); //Draw character on the screen
+	    image(donPedro, donPedroX, donPedroY); //Draw brother 1 on the screen
+	    image(donDiego, donDiegoX, donDiegoY); //Draw brother 2 on the screen
+
+    //If player has golden cage in their inventory from the hermit
+                if (player.getInventory().hasItem("Golden Cage")) 
+                    image(adarnaInCage, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character in the golden cage
+                ///If player has golden cage in their inventory from the hermit
+                else
+                    image(adarnaBird, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character without a cage
+
+	//Brothers throw the player down a well
+	} else if (currentScreen14 == 2) {
+                background(betrayalBG2); //Set background to when player is thrown down a well
+	    //Keep moving player and brother 1 left until brother 1 pushes the player down the well
+	    //While player is right of a certain position (well)
+	    if (player.x > 170) { 
+	        player.move(-3, 0); //Keep moving player left
+	        player.draw(); //Draw character on the screen
+	    //Once player has reached the well
+	    } else {
+	        currentScreen14 = 3; //Go to the next screen (brothers leave player in well)
+                //Pause the scene for a bit
+                try {
+                // Pause the current thread for 1000 milliseconds (1 seconds)
+                    Thread.sleep(1000); 
+                } catch (InterruptedException e) {
+                    // Handle the case where the thread is interrupted while sleeping
+                    Thread.currentThread().interrupt(); // Restore the interrupted status
+                    System.err.println("Thread was interrupted while sleeping."); //Print error message
+                } //End try-catch to pause the scene
+            } //End if statement checking if player has not yet reached the well
+	    if (donPedroX > 285) //While brother 1 is right of a certain position (before pushing player into well)
+		donPedroX -= 3; //Keep moving brother 1 left
+	    image(donPedro, donPedroX, donPedroY); //Draw brother 1 on the screen
+	    image(donDiego, donDiegoX, donDiegoY); //Draw brother 2 on the screen
+
+    //If player has golden cage in their inventory from the hermit
+                if (player.getInventory().hasItem("Golden Cage")) 
+                    image(adarnaInCage, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character in the golden cage
+                ///If player has golden cage in their inventory from the hermit
+                else
+                    image(adarnaBird, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character without a cage
+
+	//Brothers leave player in well
+	} else if (currentScreen14 == 3) {
             background(betrayalBG3); //Set background to when brothers leave
+	    image(donPedro, donPedroX, donPedroY); //Draw brother 1 on the screen
+	    image(donDiego, donDiegoX, donDiegoY); //Draw brother 2 on the screen
+
+            //If player has golden cage in their inventory from the hermit
+            if (player.getInventory().hasItem("Golden Cage")) 
+                image(adarnaInCage, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character in the golden cage
+            ///If player has golden cage in their inventory from the hermit
+            else
+                image(adarnaBird, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character without a cage
+	    //Keep moving brothers and Adarna bird to the left
+	    donPedroX -= 2; //Move brother 1 to the left
+	    donDiegoX -= 2; //Move brother 2 to the left
+	    adarnaBirdX -= 2; //Move Adarna bird to the left
+
+	//Well Minigame Instructions
+	} else if (currentScreen14 == 4) {
+	    //Set background to well minigame instructions
+	    background(wellGameInstructions);
+
+	} //End if statement checking which screen to show for Stage 14
+            
+        //Escape Well Minigame
+        } else if (stage == 15) {
+            currentGame.update(); //Call update method for escape well minigame
+            currentGame.draw(); //Call draw method for escape well minigame
             
         }
         
@@ -836,7 +922,7 @@ public class MySketch extends PApplet {
         overPlusStrength = false; //Button to add one point to strength trait
         overMinusStrength = false; //Button to subtract one point from strength trait
         overPlusIntelligence = false; //Button to add one point to intelligence trait
-        overMinusIntelligence = false; //Button to subtract one point from inteeligence trait
+        overMinusIntelligence = false; //Button to subtract one point from intelligence trait
         //Variables for Stage 7 (Help Hermit)
         overHelpHermit = false; //Help hermit button
         overIgnoreHermit = false; //Ignore hermit button
@@ -865,7 +951,7 @@ public class MySketch extends PApplet {
             else if (overImage(leaderboard, leaderboardX, leaderboardY)) //Show leaderboard button
                 overLeaderboard = true; //Set variable indicating mouse is over leaderboard button to true
             else if (overImage(exitGame, exitGameX, exitGameY)) //Exit game button
-                overExitGame = true; //Set variable indicating mouse is over exit gamebutton to true
+                overExitGame = true; //Set variable indicating mouse is over exit game button to true
         //Stage -1 (Character Setup)
         } else if (stage == -1) {
             //Mouse is over a specific button in Stage 1 (Character Setup)
@@ -1171,6 +1257,11 @@ public class MySketch extends PApplet {
                         currentScreen13 = 4; //Set current screen of Stage 12 to after leaving the brothers
                     } //End if statement checking if user's mouse is over save brothers button or leave brothers button
                 } //End if statement checking for screen 2 of Stage 13
+                
+                
+            //Stage 15 (Escape Well Minigame)
+            } else if (stage == 15) {
+                currentGame.mousePressed(); //Call mouse pressed method for escape well minigame
             }
                 
                 
@@ -1283,11 +1374,11 @@ public class MySketch extends PApplet {
                 if (player.getInventory().hasItem("Golden Cage")) {
                     adarnaBirdX = 550; //Set x position of Adarna bird in golden cage
                     adarnaBirdY = 345; //Set y position of Adarna bird in golden cage
-                //If player does not jave golden cage in their inventory
+                //If player does not have golden cage in their inventory
                 } else {
                     adarnaBirdX = 570; //Set x position of Adarna bird
                     adarnaBirdY = 370; //Set y position of Adarna bird
-                }
+                } //End if statement checking if player has golden cage in their inventory
                 stage = 13; //Go to the next stage (Find Brothers)
                 
             //Find Brothers
@@ -1295,11 +1386,52 @@ public class MySketch extends PApplet {
                 //If the user is seeing their brothers turned to stone for the first time
                 if (currentScreen13 == 1)
                     currentScreen13 = 2; //Go to the next screen (deciding to save or leave brothers)
-                //If user just decided to save or leave their brothers
-                else if (currentScreen13 == 3 || currentScreen13 == 4)
+                //If user just decided to save their brothers
+                else if (currentScreen13 == 3) {
                     stage = 14; //Go to the next stage (Betrayal)
+                    player.moveTo(360, 260); //Set new player position
+                    donPedroX = 495; //Set x position of brother 1
+                    donPedroY = 260; //Set y position of brother 1
+                    donDiegoX = 615; //Set x position of brother 2
+                    donDiegoY = 260; //Set y position of brother 2
+                    //If player has golden cage in their inventory from the hermit
+                    if (player.getInventory().hasItem("Golden Cage")) {
+                        adarnaBirdX = 580; //Set x position of Adarna bird in golden cage
+                        adarnaBirdY = 330; //Set y position of Adarna bird in golden cage
+                    //If player does not have golden cage in their inventory
+                    } else {
+                        adarnaBirdX = 590; //Set x position of Adarna bird
+                        adarnaBirdY = 375; //Set y position of Adarna bird
+                    } //End if statement checking if player has golden cage in their inventory
+	    } //End if statement checking if current screen of Stage 13 is 3 or 4
                 
-            }
+	 //Spacebar is pressed in Stage 14 (Betrayal)
+            } else if (stage == 14) {
+                if (currentScreen14 == 1) //If screen currently being shown is when the brothers take the Adarna bird
+                    currentScreen14 = 2; //Go to next screen (push player down the wall)
+                else if (currentScreen14 == 3) //If screen currently being shown is the brothers leaving the player
+                    currentScreen14 = 4; //Go to next screen (well minigame instructions)
+                else if (currentScreen14 == 4){ //If screen currently being shown is the well minigame instructions
+                    //Create an instance of the Well Escape Game class depending on the user's character image
+                    //If the user's character clothing is v1
+                    if (chooseCharacter1)
+                    //Create instance of escape well minigame with character clothing image v1
+                        currentGame = new EscapeWellGame(this, "Escape Well", 50, 1, "images/chosenCharacter1.png", traitDistribution);
+                    //If the user's character clothing is v2
+                        else if (chooseCharacter2)
+                    //Create instance of escape well minigame with character clothing image v2
+                        currentGame = new EscapeWellGame(this, "Escape Well", 50, 1, "images/chosenCharacter2.png", traitDistribution);
+                    //If the user's character clothing is v3
+                        else
+                    //Create instance of escape well minigame with character clothing image v3
+                        currentGame = new EscapeWellGame(this, "Escape Well", 50, 1, "images/chosenCharacter3.png", traitDistribution);
+                         
+                   stage = 15; //Go to the next stage (Well Minigame)
+                }
+
+	}
+
+
             
         } 
         
@@ -1345,6 +1477,10 @@ public class MySketch extends PApplet {
         //If key is pressed in Stage 10 (Rhythm Minigame)
         } else if (stage == 10) {
             currentGame.keyPressed(); //Call key pressed method for rhythm game
+            
+        //If key is pressed in Stage 15 (Escape Well Minigame)    
+        } else if (stage == 15) {
+            currentGame.keyPressed(); //Call key pressed method for escape well game
         }
         
     }
@@ -1360,5 +1496,6 @@ public class MySketch extends PApplet {
         } //End if statement checking if mouse is over image
     }
 }
+
 
 
