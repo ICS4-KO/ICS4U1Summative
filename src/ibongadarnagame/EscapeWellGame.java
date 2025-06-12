@@ -13,7 +13,6 @@ import processing.core.PImage;
  */
 public class EscapeWellGame extends Game {
     //Instance variables
-    PApplet p;
     boolean rungDropping = false; //True if rung is dropping 
     private int wellHeight = 500; //Height of well that rung falls through
     private Rung currentRung; //Current rung that is falling
@@ -29,7 +28,7 @@ public class EscapeWellGame extends Game {
     public EscapeWellGame(PApplet p, String name, int maxScore, int gameIndex, String chosenCharacter, int traitsDistribution) {
         super(p, name, maxScore, gameIndex, chosenCharacter); //Call parent constructor
         assembledRungs = new ArrayList<>(); //Initialize array list of rungs that have been placed successfully
-        currentRung = new Rung(this.p, 250, 60); //Create first Rung object
+        currentRung = new Rung(p, 250, 60); //Create first Rung object
         
         if (traitsDistribution == 2) { //If player has high intelligence 
             totalNumRungs = 20; //Player gets advantage of having more rungs (more tries)
@@ -63,7 +62,7 @@ public class EscapeWellGame extends Game {
                         if (currentRung.isCollidingWith(previousRung)) {
                             assembledRungs.add(currentRung);
                             rungDropping = false;
-                            currentRung = new Rung(this.p, 250, 60); //Create new Rung object
+                            currentRung = new Rung(gameApp, 250, 60); //Create new Rung object
                             currentRungNumber += 1; //Incrememt number of current rung that is falling
                         }
                     }
@@ -76,7 +75,7 @@ public class EscapeWellGame extends Game {
                     //If any rung other than the first rung hits the ground, they were ot placed succesfully
                     } else {
                         rungDropping = false;
-                        currentRung = new Rung(this.p, 250, 60); //Create new Rung object
+                        currentRung = new Rung(gameApp, 250, 60); //Create new Rung object
                         currentRungNumber += 1; //Incrememt number of current rung that is falling
                     }
                 }

@@ -32,7 +32,7 @@ public class Rung {
         this.rungApp = p;
         this.x = x;
         this.y = y;
-        this.image = rungApp.loadImage("rung.png"); //Load and set image of the rung
+        this.image = rungApp.loadImage("images/rung.png"); //Load and set image of the rung
         this.width = image.width; //Set width of image
         this.height = image.height; //Set height of image
         
