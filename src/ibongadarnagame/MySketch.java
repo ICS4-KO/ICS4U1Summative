@@ -54,6 +54,8 @@ public class MySketch extends PApplet {
     int donDiegoY = 255; //Y position of Don Diego
     //Variables for Stage 14 (Betrayal)
     int currentScreen14 = 1; //Current screen being shown in Stage 14
+    //Variables for Stage 16 (Escaped Well)
+    int currentScreen16 = 1; //Current screen being shown in Stage 16
     
     
     
@@ -234,6 +236,12 @@ public class MySketch extends PApplet {
     PImage betrayalBG2; //Background when player is thrown down a well
     PImage betrayalBG3; //Background when brothers leave
     PImage wellGameInstructions; //Background displaying well game instructions
+    //Declare images for Stage 16 (Escaped Well)
+    PImage escapedWellBG1; //Background if player escapes well quickly (won well minigame)
+    PImage escapedWellBG2; //Background if player escapes well eventually (lost well minigame)
+    PImage escapedWellBG3; //Background when player exits scene with well
+    //Declare images for Stage 17 (Return Home)
+    PImage returnHomeBG; //Background when returning home
 
     
     
@@ -364,6 +372,13 @@ public class MySketch extends PApplet {
         betrayalBG3 = loadImage("images/betrayal3.jpg"); //Background when brothers leave
         wellGameInstructions = loadImage("images/wellescapeinstructions.jpg"); //Background displaying well game instructions
         
+        //Load images for Stage 16 (Escaped Well)
+        escapedWellBG1 = loadImage("images/escapedwellquickly.jpg"); //Background if player escapes well quickly (won well minigame)
+        escapedWellBG2 = loadImage("images/escapedwelleventually.jpg"); //Background if player escapes well eventually (lost well minigame)
+        escapedWellBG3 = loadImage("images/escapedwellbg.jpg"); //Background when player exits scene with well
+        
+        //oad images for Stage 17 (Return Home)
+        returnHomeBG = loadImage("images/returnhomebg.jpg"); //Background when player walks home through the forest
         
         
     }
@@ -807,7 +822,8 @@ public class MySketch extends PApplet {
                     adarnaBirdX -= 3; //Move Adarna bird to the left
                 //Once player is off the screen
                 } else {
-                    stage = 16; //Go to the next stage (Returning Home) 
+                    player.moveTo(800, 255); //Set new player position
+                    stage = 17; //Go to the next stage (Returning Home) 
                 } //End if statement checking if player is still on the screen
                 
                 
@@ -893,6 +909,41 @@ public class MySketch extends PApplet {
         } else if (stage == 15) {
             currentGame.update(); //Call update method for escape well minigame
             currentGame.draw(); //Call draw method for escape well minigame
+            
+        //Escaped Well
+        } else if (stage == 16) {
+            if (currentScreen16 == 1) {
+                //If player won the well escape game
+                if (currentGame.playerWonGame()) 
+                    background(escapedWellBG1); //Set background to if player escapes the well quickly
+                //If player lost the well escape game
+                else
+                    background(escapedWellBG2); //Set background to if player escapes the well eventually
+                
+                player.draw(); //Draw character on the screen
+            } else if (currentScreen16 == 2) {
+                background(escapedWellBG3); //Set background to when player exits scene with well
+                //If character is still on the screen, keeping moving player to the left
+                if (player.x > -180) {
+                    player.move(-3, 0); //Move character to the left
+                //Once player is off the screen
+                } else {
+                    player.moveTo(800, 255); //Set new player position
+                    stage = 17; //Go to the next stage (Returning Home) 
+                } //End if statement checking if player is still on the screen
+            }
+            
+        //Returnign Home   
+        } else if (stage == 17) {
+            //Set background to when player is walking home through the forest
+            background(returnHomeBG);
+            player.draw(); //Draw character on the screen
+            player.move(-3, 0); //Move character to the left
+            //Once player passes the left edge of the screen
+            if (player.x < -180) { 
+                player.moveTo(85, 240); //Set new player position
+                stage = 18; //Go to the next stage (Confront Brothers)
+            } //End if statement to check when user moves off the screen
             
         }
         
@@ -1405,7 +1456,7 @@ public class MySketch extends PApplet {
                     } //End if statement checking if player has golden cage in their inventory
 	    } //End if statement checking if current screen of Stage 13 is 3 or 4
                 
-	 //Spacebar is pressed in Stage 14 (Betrayal)
+	    //Spacebar is pressed in Stage 14 (Betrayal)
             } else if (stage == 14) {
                 if (currentScreen14 == 1) //If screen currently being shown is when the brothers take the Adarna bird
                     currentScreen14 = 2; //Go to next screen (push player down the wall)
@@ -1429,7 +1480,11 @@ public class MySketch extends PApplet {
                    stage = 15; //Go to the next stage (Well Minigame)
                 }
 
-	}
+            //Spacebar is pressed in Stage 16 (Escaped Well)
+            } else if (stage == 16) {
+                if (currentScreen16 == 1) //If screen currently being shown is when user just got out of the well
+                    currentScreen16 = 2; //Go to the next screen (leaving the well)
+            }
 
 
             

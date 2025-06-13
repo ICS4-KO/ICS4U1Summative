@@ -55,7 +55,7 @@ public class Rung {
         //boolean isRightofOtherLeft = x + width > rung.x;
         boolean isAboveOtherBottom = y < rung.y + rung.height;
         boolean isBelowOtherTop = y + height > rung.y;
-        boolean isWithinWidthLimit = (rung.x - 5) < x && x < (rung.x + 5);
+        boolean isWithinWidthLimit = (rung.x - 10) < x && x < (rung.x + 10);
 
         return isAboveOtherBottom && isBelowOtherTop && isWithinWidthLimit;
     }
