@@ -26,6 +26,7 @@ public class Player {
     private PImage image; //Image of the character
     
     private boolean savedBrothers; //True if player chose to save their brothers, who were turned to stone
+    private boolean forgaveBrothers = false; //True if player chose to forgive their brothers for their betrayal (after saving them)
     
     //Default Constants
     private static String DEFAULT_NAME = "Don Juan"; //Default player name
@@ -222,6 +223,24 @@ public class Player {
         return inventory;
     }
     
+    /**
+     * Getter method to return savedBrothers attribute of Player object
+     * 
+     * @return  True if player saved brothers
+     */
+    public boolean getSavedBrothers() {
+        return savedBrothers; //Return variable indicating whether player saved brothers
+    }
+    
+    /**
+     * Getter method to return forgaveBrothers attribute of Player object
+     * 
+     * @return  True if player forgave brothers
+     */
+    public boolean getForgaveBrothers() {
+        return forgaveBrothers; //Return variable indicating whether player forgave brothers
+    }
+    
     
     /**
      * Setter method to set savedBrothers attribute of Player object
@@ -231,7 +250,15 @@ public class Player {
     public void setSavedBrothers(boolean answer) {
         savedBrothers = answer; //Set variable indicating whether player saved brothers
     }
-            
+    
+    /**
+     * Setter method to set forgaveBrothers attribute of Player object
+     * 
+     * @param answer  True if player chose to forgive their brothers for their betrayal
+     */
+    public void setForgaveBrothers(boolean answer) {
+        forgaveBrothers = answer; //Set variable indicating whether player forgave brothers
+    }
             
     
     /**
@@ -303,6 +330,7 @@ public class Player {
         x = dx;
         y = dy;
     }
+
 
 
 }

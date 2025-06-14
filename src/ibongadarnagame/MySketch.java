@@ -56,6 +56,8 @@ public class MySketch extends PApplet {
     int currentScreen14 = 1; //Current screen being shown in Stage 14
     //Variables for Stage 16 (Escaped Well)
     int currentScreen16 = 1; //Current screen being shown in Stage 16
+    //Variables for Stage 18 (Heal King)
+    int currentScreen18 = 1; //Current screen being shown in Stage 18
     
     
     
@@ -141,6 +143,15 @@ public class MySketch extends PApplet {
     boolean overleaveThem = false; //Set variable indicating mouse is over leave them button to false
     int leaveThemX = 230; //Set x position of save them button
     int leaveThemY = 375; //Set y position of save them button
+    
+    //Buttons for Stage 18 (Heal King)
+    boolean overYes = false; //Set variable indicating mouse is over yes button to false
+    int yesX = 230; //Set x position of yes button
+    int yesY = 220; //Set y position of yes button
+    boolean overNo = false; //Set variable indicating mouse is over no button to false
+    int noX = 230; //Set x position of no button
+    int noY = 375; //Set y position of no button
+    
     
     
     
@@ -242,6 +253,19 @@ public class MySketch extends PApplet {
     PImage escapedWellBG3; //Background when player exits scene with well
     //Declare images for Stage 17 (Return Home)
     PImage returnHomeBG; //Background when returning home
+    //Declare images for Stage 18 (Heal King)
+    PImage healKingBG1; //Background when the player arrives home if they saved their brothers
+    PImage healKingBG2; //Background when the bird heals the king if the player saved their brothers
+    PImage healKingBG3; //Background when the player decides whether or not to forgive if the they saved their brothers
+    PImage healKingBG4; //Background when the player arrives home if they didn't save their brothers
+    PImage healKingBG5; //Background when the the bird healst the king if the player didn't save their brothers
+    PImage yesButton; //Button to forgive brothers
+    PImage noButton; //Button to not forgive brothers
+    //Declare images for Stage 19 (Ending)
+    PImage ending1; //Player saved brothers and forgave them
+    PImage ending2; //Player saved brothers and didn't forgive them
+    PImage ending3; //Player didn't save brothers
+    
 
     
     
@@ -377,9 +401,23 @@ public class MySketch extends PApplet {
         escapedWellBG2 = loadImage("images/escapedwelleventually.jpg"); //Background if player escapes well eventually (lost well minigame)
         escapedWellBG3 = loadImage("images/escapedwellbg.jpg"); //Background when player exits scene with well
         
-        //oad images for Stage 17 (Return Home)
+        //Load images for Stage 17 (Return Home)
         returnHomeBG = loadImage("images/returnhomebg.jpg"); //Background when player walks home through the forest
         
+        //Load images for Stage 18 (Heal King)
+        healKingBG1 = loadImage("images/healking1.jpg"); //Background when the player arrives home if they saved their brothers
+        healKingBG2 = loadImage("images/healking2.jpg"); //Background when the bird heals the king if the player saved their brothers
+        healKingBG3 = loadImage("images/healking3.jpg"); //Background when the player decides whether or not to forgive if the they saved their brothers
+        healKingBG4 = loadImage("images/healking4.jpg"); //Background when the player arrives home if they didn't save their brothers
+        healKingBG5 = loadImage("images/healking5.jpg"); //Background when the the bird healst the king if the player didn't save their brothers
+        yesButton = loadImage("images/yesbutton.jpg"); //Forgive brothers button
+        noButton = loadImage("images/nobutton.jpg"); //Don't forgive brothers button
+        
+        //Load images for Stage 19 (Ending)
+        ending1 = loadImage("images/ending1.jpg"); //Ending if player saved brothers and forgave them
+        ending2 = loadImage("images/ending2.jpg"); //Ending if player saved brothers and didn't forgive them
+        ending3 = loadImage("images/ending3.jpg"); //Ending if player didn't save brothers
+
         
     }
     
@@ -822,7 +860,18 @@ public class MySketch extends PApplet {
                     adarnaBirdX -= 3; //Move Adarna bird to the left
                 //Once player is off the screen
                 } else {
-                    player.moveTo(800, 255); //Set new player position
+                    player.moveTo(800, 255); //Set new player position 
+                    
+                    //If player has golden cage in their inventory from the hermit
+                    if (player.getInventory().hasItem("Golden Cage")) {
+                        adarnaBirdX = 755; //Set x position of Adarna bird in golden cage
+                        adarnaBirdY = 345; //Set y position of Adarna bird in golden cage
+                    //If player does not have golden cage in their inventory
+                    } else {
+                        adarnaBirdX = 775; //Set x position of Adarna bird
+                        adarnaBirdY = 370; //Set y position of Adarna bird
+                    } //End if statement checking if player has golden cage in their inventory
+                    
                     stage = 17; //Go to the next stage (Returning Home) 
                 } //End if statement checking if player is still on the screen
                 
@@ -926,6 +975,7 @@ public class MySketch extends PApplet {
                 //If character is still on the screen, keeping moving player to the left
                 if (player.x > -180) {
                     player.move(-3, 0); //Move character to the left
+                    player.draw(); //Draw character on the screen
                 //Once player is off the screen
                 } else {
                     player.moveTo(800, 255); //Set new player position
@@ -933,7 +983,7 @@ public class MySketch extends PApplet {
                 } //End if statement checking if player is still on the screen
             }
             
-        //Returnign Home   
+        //Returning Home   
         } else if (stage == 17) {
             //Set background to when player is walking home through the forest
             background(returnHomeBG);
@@ -941,9 +991,62 @@ public class MySketch extends PApplet {
             player.move(-3, 0); //Move character to the left
             //Once player passes the left edge of the screen
             if (player.x < -180) { 
-                player.moveTo(85, 240); //Set new player position
-                stage = 18; //Go to the next stage (Confront Brothers)
+                //player.moveTo(85, 240); //Set new player position ////
+                //If player decided not ot save their brothers
+                if (!player.getSavedBrothers())
+                    currentScreen18 = 4; //Set different screen when arriving at the palace
+                stage = 18; //Go to the next stage (Heal King)
             } //End if statement to check when user moves off the screen
+            
+            //Draw Adarna bird if player decided not to save their brothers
+            if (!player.getSavedBrothers()) {
+                //If player has golden cage in their inventory from the hermit
+                if (player.getInventory().hasItem("Golden Cage"))
+                    image(adarnaInCage, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character in the golden cage
+                //If player does not have golden cage in their inventory
+                else
+                    image(adarnaBird, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character without a cage
+                adarnaBirdX -= 3; //Move Adarna bird to the left with the player
+            } //End if statement checking if player saved their brothers
+            
+        //Heal King
+        } else if (stage == 18) {
+            //Player decided to save their brothers and just arrived back at the palace
+            if (currentScreen18  == 1) {
+                //Set background when the player arrives home if they saved their brothers
+                background(healKingBG1);
+            //Player decided to save their brothers and the bird heals the king
+            } else if (currentScreen18  == 2) {
+                //Set background when the bird heals the king if the player saved their brothers
+                background(healKingBG2);
+            //Player decided to save their brothers and is deciding whether to forgive them after saving the king
+            } else if (currentScreen18  == 3) {
+                //Set background when the bird heals the king if the player saved their brothers
+                background(healKingBG3);
+                image(yesButton, yesX, yesY); //Yes button
+                image(noButton, noX, noY); //No button
+            //Player decided to leave their brothers and just arrived back at the palace
+            } else if (currentScreen18  == 4) {
+                //Set background when the bird heals the king if the player saved their brothers
+                background(healKingBG4);
+            //Player decided to leave their brothers and the bird heals the king
+            } else if (currentScreen18  == 5) {
+                //Set background when the bird heals the king if the player saved their brothers
+                background(healKingBG5);
+            }
+            
+        } else if (stage == 19) {
+            //If player saved brothers and forgave them
+            if (player.getSavedBrothers() && player.getForgaveBrothers())
+                background(ending1); //Display best ending
+            //If player saved brothers and didn't forgive them
+            else if (player.getSavedBrothers())
+                background(ending2); //Display moderate ending
+            //If player didn't save brothers
+            else if (!player.getSavedBrothers())
+                background(ending3); //Display unhappy ending
+            
+            
             
         }
         
@@ -954,7 +1057,48 @@ public class MySketch extends PApplet {
     
     public static void gameOver() {
         ////unfinished
+        //playerDeath = false; //Reset marker for player death
     }
+    
+    public void resetGame() {
+            
+        //Reset Variables
+        enteredName = ""; //Player's name (based on user input, by default set to "Don Juan")
+        //Variables for Stage -1 (Start Game)
+        customName = false; //True if user enters their own name for the character
+        customCharacter = false; //True if user customizes clothing colors of the character
+        //Variables for Stage -3 (Customize Clothes)
+        chooseCharacter1 = true;  //True if character clothing v1 is currently displayed
+        chooseCharacter2 = false; //True if character clothing v2 is currently displayed
+        //Variables for Stage 1 (Begin Story)
+        currentScreen1 = 1; //Keeps track of the different screens being shown in the same stage
+        ////int traitDistribution; //0 means neutral, 1 means high strength, 2 means high intelligence
+        currentStrengthPoints = 0; //Current number of character trait points assigned to strength
+        currentIntelligencePoints = 0; //Current number of character trait points assigned to intelligence
+        //Variables for Stage 4 (Encounter Boar)
+        currentScreen4 = 1; //Current screen being shown in Stage 4
+        //Variables for Stage 7 (Meet Hermit)
+        currentScreen7 = 1; //Current screen being shown in Stage 7
+        //Variables for Stage 9 (Find Adarna bird)
+        currentScreen9 = 1; //Current screen being shown in Stage 9
+        //Variables for Stage 11 (Catch the Adarna Bird)
+        clickedCage = false; //True after user clicks on cage, after which it will disappear
+        clickedRope = false; //True after user clicks on rope, after which it will disappear
+        //Variables for Stage 13 (Find Brothers)
+        currentScreen13 = 1; //Current screen being shown in Stage 13
+        donPedroX = 390; //X position of Don Pedro
+        donPedroY = 255; //Y position of Don Pedro
+        donDiegoX = 205; //X position of Don Diego
+        donDiegoY = 255; //Y position of Don Diego
+        //Variables for Stage 14 (Betrayal)
+        currentScreen14 = 1; //Current screen being shown in Stage 14
+        //Variables for Stage 16 (Escaped Well)
+        currentScreen16 = 1; //Current screen being shown in Stage 16
+        //Variables for Stage 18 (Heal King)
+        currentScreen18 = 1; //Current screen being shown in Stage 18
+    }
+    
+    
     
     void update(int x, int y) {
         //Set all boolean variables indicating that mouse is over a specific button to false (reset)
@@ -987,6 +1131,9 @@ public class MySketch extends PApplet {
         //Variables for Stage 13 (Find Brothers)
         overSaveThem = false; //Button to save brothers
         overleaveThem = false; //Button to leave brothers
+        //Variables for Stage 18 (Heal King)
+        overYes = false; //Button to forgive brothers
+        overNo = false; //Button to not forgive brothers
         
         
     
@@ -1075,13 +1222,16 @@ public class MySketch extends PApplet {
                 overleaveThem = true; //Set variable indicating mouse is over leave them button to true
         
     
-            
+        //Stage 18 (Heal King)    
+        } else if (stage == 18) {
+            //Mouse is over a specific button in Stage 18 (Heal King)
+            if (overImage(yesButton, yesX, yesY)) //Button clicked to forgive brothers
+                overYes = true; //Set variable indicating mouse is over yes button to true
+            else if (overImage(noButton, noX, noY)) //Button clicked to not forgive brothers
+                overNo = true; //Set variable indicating mouse is over no button to true
         }
         
         
-        
-        
-    
         
         //If mouse is hovering over the the 
         if (overImage(testimg, testImgX, testImgY))
@@ -1313,9 +1463,25 @@ public class MySketch extends PApplet {
             //Stage 15 (Escape Well Minigame)
             } else if (stage == 15) {
                 currentGame.mousePressed(); //Call mouse pressed method for escape well minigame
+                
+                
+            //Stage 18 (Heal King)
+            } else if (stage == 18) {
+                //If user is deciding whether to forgive brothers
+                if (currentScreen18 == 3) {
+                    //If mouse is over yes button when mouse is clicked
+                    if (overYes) 
+                        player.setForgaveBrothers(true); //Set variable to indicate player forgave brothers
+                    //If mouse is no button when mouse is clicked
+                    else if (overNo)
+                        player.setForgaveBrothers(false); //Set variable to indicate player didn't forgive brothers
+                    //End if statement checking if user's mouse is over save brothers button or leave brothers button
+                    stage = 19; //Go to the next stage (ending)
+                } //End if statement checking for screen 2 of Stage 13
             }
                 
-                
+        
+       
                 
             }
             
@@ -1340,12 +1506,14 @@ public class MySketch extends PApplet {
                     currentScreen1 = 3; //Go to next screen (character traits distribution)
                 else if (currentScreen1 == 3) { //If screen currently being shown is the character traits distrubution
                     pointsError = false; //Set error indicator for points distribution false in case it was set to true previously
-	         //If the user has not distributed both of their points
+                    //If the user has not distributed both of their points
                     if ((currentStrengthPoints == 0 && currentIntelligencePoints == 0) || (currentStrengthPoints == 1 && currentIntelligencePoints == 0) || (currentStrengthPoints == 0 && currentIntelligencePoints == 1)) {
                         pointsError = true; //Set variable indicating there was an error with the points to true
-                    } else  //If user has distributed both of their points
+                    } else { //If user has distributed both of their points
+                        pointsError = false; //Reset boolean variable for points distribution error
                         currentScreen1 = 4; //Go to next screen (first part of the game instructions)
-                } else  if (currentScreen1 == 4) //If screen currently being shown is the first part of the game instructions
+                    }
+                } else if (currentScreen1 == 4) //If screen currently being shown is the first part of the game instructions
                     currentScreen1 = 5; //Go to next screen (second part of the game instructions)
                 else { //If screen currently being shown is the second part of the game instructions
                     stage = 2; //Go to the next stage (Leaving Castle)
@@ -1365,18 +1533,18 @@ public class MySketch extends PApplet {
                         stage = 7; //Go to the next stage (Meet Hermit)
                     } //End if statement for if user chose path with the boar
                 } else if (currentScreen4 == 2){ //If screen currently being shown is the boar fight minigame instructions
-	        //Create an instance of the Boar Fight Game class depending on the user's character image
-	        //If the user's character clothing is v1
+                    //Create an instance of the Boar Fight Game class depending on the user's character image
+                    //If the user's character clothing is v1
                     if (chooseCharacter1)
-		//Create instance of boar fight minigame with character clothing image v1
+                        //Create instance of boar fight minigame with character clothing image v1
                         currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter1.png", traitDistribution);
-	        //If the user's character clothing is v2
+                    //If the user's character clothing is v2
                     else if (chooseCharacter2)
-		//Create instance of boar fight minigame with character clothing image v2
+                        //Create instance of boar fight minigame with character clothing image v2
                         currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter2.png", traitDistribution);
-	        //If the user's character clothing is v3
+                    //If the user's character clothing is v3
                     else
-		//Create instance of boar fight minigame with character clothing image v3
+                        //Create instance of boar fight minigame with character clothing image v3
                         currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter3.png", traitDistribution);
                          
                     stage = 5; //Go to the boar fight minigame
@@ -1395,23 +1563,23 @@ public class MySketch extends PApplet {
                 } //End if statement for if current screen of Stage 7 is leaving the hermit
             //Find Adarna Bird
             } else if (stage == 9) {
-	    //If screen currently being shown is the first sighting of the Adarna bird
+                //If screen currently being shown is the first sighting of the Adarna bird
                 if (currentScreen9 == 1) 
                     currentScreen9 = 2; //Show button options to stay awake using sheer will or lime juice
-	    //If screen currently being shown is the rhythm minigame instructions
+                //If screen currently being shown is the rhythm minigame instructions
                 else if (currentScreen9 == 3) { 
-	        //Create an instance of the Boar Fight Game class depending on the user's character image
-	        //If the user's character clothing is v1
+                    //Create an instance of the Boar Fight Game class depending on the user's character image
+                    //If the user's character clothing is v1
                     if (chooseCharacter1)
-		//Create instance of rhythm minigame with character clothing image v1
+                        //Create instance of rhythm minigame with character clothing image v1
                         currentGame = new RhythmGame(this, "Rhythm Game", 245, 1, "images/chosenCharacter1.png", traitDistribution, sheerWill);
-	          //If the user's character clothing is v1 
+                    //If the user's character clothing is v1 
                      else if (chooseCharacter2)
-		//Create instance of rhythm minigame with character clothing image v2
+                        //Create instance of rhythm minigame with character clothing image v2
                         currentGame = new RhythmGame(this, "Rhythm Game", 245, 1, "images/chosenCharacter2.png", traitDistribution, sheerWill);
-	        //If the user's character clothing is v1
+                    //If the user's character clothing is v1
                     else
-		//Create instance of rhythm minigame with character clothing image v3
+                        //Create instance of rhythm minigame with character clothing image v3
                         currentGame = new RhythmGame(this, "Rhythm Game", 245, 1, "images/chosenCharacter3.png", traitDistribution, sheerWill);
                     
                     //stage = 10; //Go to the Rhythm Minigame //////////skip minigame
@@ -1484,29 +1652,52 @@ public class MySketch extends PApplet {
             } else if (stage == 16) {
                 if (currentScreen16 == 1) //If screen currently being shown is when user just got out of the well
                     currentScreen16 = 2; //Go to the next screen (leaving the well)
+                
+               
+            //Spacebar is pressed in Stage 18 (Heal King)
+            } else if (stage == 18) {
+                if (currentScreen18 == 1) //If screen currently being shown is when player decided to save their brothers and just arrived back at the palace
+                    currentScreen18 = 2; //Go to the next screen
+                else if (currentScreen18 == 2) //If screen currently being shown is when player decided to save their brothers and the bird heals the king
+                    currentScreen18 = 3; //Go to the next screen
+                else if (currentScreen18 == 4) //If screen currently being shown is when player decided to leave their brothers and just arrived back at the palace
+                    currentScreen18 = 5; //Go to the next screen
+                else if (currentScreen18 == 5) //If screen currently being shown is when player decided to leave their brothers and the bird heals the king
+                    stage = 19; //Go to the next stage (Ending)
+                
+            //Spacebar is pressed in Stage 19 (Ending)    
+            } else if (stage == 19) {
+                //Reset all variables for next game
+                resetGame();
+                //File IO, Write to file
+                stage = 0; //Return to main menu
             }
+                
 
 
-            
+                
+                
         } 
         
         //If key is pressed in Stage -2 (Choosing Name)
         if (stage == -2) {
-	//If enter key is pressed
+            //If enter key is pressed
             if (keyCode == ENTER) { 
                 nameError = false; //Set error indicator for name to false in case it was set to true previously
                 if (userInput.isEmpty() || userInput.length() > 10) //If the user's input is not between 1 to 10 characters
                     nameError = true; //Set error indicator for name to true
                 else {  //If the user's input matches the length requirements
                     enteredName = userInput; //Set entered name variable to user input
+                    userInput = ""; //Clear user input
+                    nameError = false; //Reset boolean variable for name length error
                     stage = -1; //Return to character setup screen
                 } //End if statement checking if user’s input matches the length requirements
-	//If backspace key is pressed
+            //If backspace key is pressed
             } else if (keyCode == BACKSPACE) {
                 if (userInput.length() > 0) //If user has typed in some letters on the screen
                     userInput = userInput.substring(0, userInput.length() - 1); //Remove last character from user input string
              
-	//If user enters an ASCII character
+            //If user enters an ASCII character
             } else if (key != CODED) { 
                 userInput += key; //Add each keystroke to user input string
             } //End if statement for which key is pressed
