@@ -211,6 +211,7 @@ public class EscapeWellGame extends Game {
         } else {
 	//If the spacebar is pressed
             if (gameApp.key == ' ') { 
+                ((MySketch) gameApp).player.setWellEscapePoints(score); //Set the points the player earned in the game
                 ((MySketch) gameApp).stage = 16; //Go to the next stage (Escaped Well)
                 ((MySketch) gameApp).player.moveTo(285, 255); //Set new player position
             } //End if statement for if the spacebar is pressed

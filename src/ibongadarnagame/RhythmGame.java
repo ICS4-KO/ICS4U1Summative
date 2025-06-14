@@ -100,11 +100,11 @@ public class RhythmGame extends Game {
                 if (timer >= roundInterval) {
                     //pastLetters[currentLetter][0] = expectedKey;
                     //pastLetters[currentLetter][1] = userInput.toUpperCase();
-	                //Loop through each row in the array of previous letters in the current round
+	            //Loop through each row in the array of previous letters in the current round
                     for (int i = 0; i < pastLetters.length; i++) {
 	                 //Loop through each column in the array of previous letters in the current round
                         for (int j = 0; j < pastLetters[i].length; j++) {
-		                    //If the element at the current index is not null
+		            //If the element at the current index is not null
                             if (pastLetters[i][j] != null)
                                 pastLetters[i][j] = null; //Set each filled value in the array to null to reset it for the next round
                         } //End for loop iterating through each column in the array of previous letters in the current round
@@ -242,12 +242,11 @@ public class RhythmGame extends Game {
                 //gameApp.text(sequence.get(currentLetter), 0, 0);
                 
                 
-                    //make (3d-7 - positions, pastletters-reset)
-	                //Iterate through each element in the array storing the letters the player has matched in the past to display them
+	            //Iterate through each element in the array storing the letters the player has matched in the past to display them
                     for (int i = 0; i < currentLetter; i++) {
-		                //Display all of the past letters the player had to match
+		        //Display all of the past letters the player had to match
                         gameApp.text(pastLetters[i][0], EXPECTED_X, positions[i]);
-		                //Display all of the past letters the player has entered to match
+		        //Display all of the past letters the player has entered to match
                         gameApp.text(pastLetters[i][1], PLAYER_X, positions[i]);
 	
                         gameApp.text(pastLetters[i][0], 0, 0); ////
@@ -324,8 +323,9 @@ public class RhythmGame extends Game {
         } else {
             //If spacebar is pressed
             if (gameApp.key == ' ') { 
-                ((MySketch) gameApp).adarnaBirdY = 215; //Set y position of Adarna bird
+                ((MySketch) gameApp).player.setRhythmGamePoints(score); //Set the points the player earned in the game
                 ((MySketch) gameApp).stage = 11; //Go to the next stage (Catching the Adarna Bird)
+                ((MySketch) gameApp).adarnaBirdY = 215; //Set y position of Adarna bird
                 ((MySketch) gameApp).player.moveTo(-90, 255); //Set new player position
             } //End if statement checking if the spacebar was pressed
         } //End if statement checking if the game is still running

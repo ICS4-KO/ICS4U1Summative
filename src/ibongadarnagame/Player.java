@@ -11,6 +11,7 @@ import processing.core.PImage;
  * @author 343330528
  */
 public class Player {
+
     //Instance Variables
     public int x, y; //Position of the character
     private String name; //Name of the player
@@ -18,6 +19,10 @@ public class Player {
     private int health; //Current health
     private int healthPerLife; //Health points per life
     private int virtuePoints = 0; //Virtue points earned, starting from 0
+    private int gamePoints = 0; //Total points player earns from the minigames they play
+    private int boarFightGamePoints = 0; //Points earned from boar fight minigame
+    private int rhythmGamePoints = 0; //Points earned from rhythm minigame
+    private int escapeWellGamePoints = 0; //Points earned from well escape minigame
     private int characterTraits; //0 means neutral, 1 means high strength, 2 means high intelligence
     private boolean playerDeath = false; //Marker for player death
     private Inventory inventory; //Player's inventory
@@ -27,6 +32,9 @@ public class Player {
     
     private boolean savedBrothers; //True if player chose to save their brothers, who were turned to stone
     private boolean forgaveBrothers = false; //True if player chose to forgive their brothers for their betrayal (after saving them)
+    
+    //Static Variables
+    private static int numPlayers = 0; //Number of users who have played the game
     
     //Default Constants
     private static String DEFAULT_NAME = "Don Juan"; //Default player name
@@ -65,6 +73,8 @@ public class Player {
         } //End if statement for assigning initial health points
         //Set player's initial health to full health
         health = healthPerLife;
+        
+        numPlayers++; //Add one to the number of players
     }
     
     /**
@@ -99,6 +109,8 @@ public class Player {
         } //End if statement for assigning initial health points
         //Set player's initial health to full health
         health = healthPerLife;
+        
+        numPlayers++; //Add one to the number of players
     }
     
    /**
@@ -134,6 +146,8 @@ public class Player {
         } //End if statement for assigning initial health points
         //Set player's initial health to full health
         health = healthPerLife;
+        
+        numPlayers++; //Add one to the number of players
     }
 
    /**
@@ -168,6 +182,8 @@ public class Player {
         } //End if statement for assigning initial health points
         //Set player's initial health to full health
         health = healthPerLife;
+        
+        numPlayers++; //Add one to the number of players
     }      
        
     
@@ -205,8 +221,17 @@ public class Player {
     * 
     * @return  Virtue points earned by the player so far
     */
-    public int getVP() {
+    public int getVirtuePoints() {
         return virtuePoints; //Return player's virtue points
+    }
+    
+    /**
+     * Getter method to return gamePoints attribute of Player object
+     * 
+     * @return  Total points earned across all minigames played by the player
+     */
+    public int getGamePoints() {
+        return gamePoints; //Return player's game points
     }
        
     
@@ -222,6 +247,7 @@ public class Player {
     public Inventory getInventory() {
         return inventory;
     }
+    
     
     /**
      * Getter method to return savedBrothers attribute of Player object
@@ -241,6 +267,14 @@ public class Player {
         return forgaveBrothers; //Return variable indicating whether player forgave brothers
     }
     
+    /**
+     * Getter method to return the static variable numPlayers shared across all Player objects
+     * 
+     * @return  Number of players that have been created (played the game)
+     */
+    public static int getNumPlayers() {
+        return numPlayers; //Return the number of Player objects that have been instantiated
+    }
     
     /**
      * Setter method to set savedBrothers attribute of Player object
@@ -284,13 +318,47 @@ public class Player {
     }    
     
     /**
-     * Adds the specified number of points to the user's virtue points
+     * Adds the specified number of points to the player's virtue points
      * 
      * @param points  Number of virtue points to add
      */
     public void addVirtue(int points) {
         virtuePoints += points; //Add amount to user's virtue points
     }
+
+    
+    /**
+     * Sets the player's boar fight game points to the specified value
+     * 
+     * @param points  Points earned in the boar fight game
+     */
+    public void setBoarFightGamePoints(int points) {
+        boarFightGamePoints = points; //Set amount of points
+        gamePoints += points; //Add points to total number of game points the player has
+    }
+    
+    /**
+     * Sets the player's rhythm game points to the specified value
+     * 
+     * @param points  Points earned in the rhythm game
+     */
+    public void setRhythmGamePoints(int points) {
+        rhythmGamePoints = points; //Set amount of points
+        gamePoints += points; //Add points to total number of game points the player has
+    }
+    
+        
+    /**
+     * Sets the player's well escape game points to the specified value
+     * 
+     * @param points  Points earned in the well escape game
+     */
+    public void setWellEscapePoints(int points) {
+        escapeWellGamePoints = points; //Set amount of points
+        gamePoints += points; //Add points to total number of game points the player has
+    }
+    
+    
     
     /**
      * Adds specified number of health points to the user's health in the current life, and transfers any surplus into the next life

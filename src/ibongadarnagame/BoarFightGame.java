@@ -239,6 +239,7 @@ gameApp.background(gameBG); //Set background to light background
         } else {
 	//If the spacebar is pressed
             if (gameApp.key == ' ') { 
+                ((MySketch) gameApp).player.setBoarFightGamePoints(score); //Set the points the player earned in the game
                 ((MySketch) gameApp).stage = 6; //Go to the next stage (Walking in the Forest)
                 ((MySketch) gameApp).player.moveTo(-90, 255); //Set new player position
             } //End if statement for if the spacebar is pressed

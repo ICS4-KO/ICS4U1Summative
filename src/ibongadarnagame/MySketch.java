@@ -3,6 +3,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package ibongadarnagame;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Scanner;
 import processing.core.PApplet;
 import processing.core.PImage;
 /**
@@ -27,6 +32,32 @@ public class MySketch extends PApplet {
     //Variables for Stage -3 (Customize Clothes)
     boolean chooseCharacter1 = true;  //True if character clothing v1 is currently displayed
     boolean chooseCharacter2 = false; //True if character clothing v2 is currently displayed
+    //Variables for Stage -4 (Leaderboard)
+    String[] names; //Declare array of player names
+    String[] virtuePoints; //Declare array of player virtue points
+    String[] gamePoints; //Declare array of player game points
+    String[] totalPoints; //Declare array of total points each player has
+    int[][] leaderboardPositions = {{293, 209}, //Names
+                                    {293, 249},
+                                    {293, 289},
+                                    {293, 329},
+                                    {293, 369},
+                                    {419, 209}, //Virtue Points
+                                    {419, 249},
+                                    {419, 289},
+                                    {419, 329},
+                                    {419, 369},
+                                    {533, 209}, //Game Points
+                                    {533, 249},
+                                    {533, 289},
+                                    {533, 329},
+                                    {533, 369},
+                                    {636, 209}, //Total Points
+                                    {636, 249},
+                                    {636, 289},
+                                    {636, 329},
+                                    {636, 369},
+                                                };
     //Variables for Stage 1 (Begin Story)
     int currentScreen1 = 1; //Keeps track of the different screens being shown in the same stage
     int traitDistribution; //0 means neutral, 1 means high strength, 2 means high intelligence
@@ -179,6 +210,8 @@ public class MySketch extends PApplet {
     PImage character3;     //Character clothes v3
     PImage leftButton;     //Left arrow button
     PImage rightButton;    //Right arrow button
+    //Declare images for Stage -4 (Leaderboard)
+    PImage leaderboardBG; //Leaderboard background
     //Declare images for Stage 1 (Begin Story)
     PImage tellStory1;     //Tell the player about the story before they begin (part 1)
     PImage tellStory2;     //Tell the player about the story before they begin (part 2)
@@ -279,6 +312,20 @@ public class MySketch extends PApplet {
         background(100, 100, 100); ////Set background
         textSize(20); //Set text size
         
+        //Clear information to flat-file of user data
+        try {
+            //Create FileWriter object to overwrite file, named "leadershipdata.txt"
+            FileWriter writer = new FileWriter("leadershipdata.txt");
+            //Clear file by overwriting with empty string
+            writer.write("");
+            //Close FileWriter
+            writer.close();
+        //Catch IO exceptions when writing to flat file
+        } catch (IOException e) {
+            System.err.println(e); //Error message for IO exceptions
+        } //End try-catch statement for clearing file
+            
+        
         //Load images
         //Load images for Stage 0 (Main Menu)
         testimg = loadImage("testimg.png"); ////
@@ -311,6 +358,9 @@ public class MySketch extends PApplet {
         character3 = loadImage("images/character3.png");    //Character clothes v3
         leftButton = loadImage("images/leftbutton.jpg");    //Left arrow button
         rightButton = loadImage("images/rightbutton.jpg");  //Right arrow button
+        
+        //Load images for Stage -4 (Leaderboard)
+        leaderboardBG = loadImage("images/leaderboardbg.jpg"); //Leaderboard background
         
         //Load images for Stage 1 (Begin Story)
         tellStory1 = loadImage("images/story1.jpg");    //Part 1 of story introduction
@@ -422,6 +472,7 @@ public class MySketch extends PApplet {
     }
     
     public void draw() {
+        System.out.println(stage);
         background(255); //Reset background
         update(mouseX, mouseY); //Update variables indicating button clicks
         
@@ -498,6 +549,120 @@ public class MySketch extends PApplet {
             //Display button options
             image(leftButton, leftArrowX, leftArrowY);     //Left arrow button
             image(rightButton, rightArrowX, rightArrowY);  //Right arrow button
+            
+            
+        //Stage -4 (Leaderboard)
+        } else if (stage == -4) {
+            //Set background to leaderboard table
+            background(leaderboardBG);
+            //If there has been at least one player that has played the game, the leaderboard can be sorted/displayed
+            if (Player.getNumPlayers() > 0) {
+                //Dynamically size arrays based on the number of players
+                names = new String[Player.getNumPlayers()]; //Set size of names array as the number of players
+                virtuePoints = new String[Player.getNumPlayers()]; //Set size of virtue points array as the number of players
+                gamePoints = new String[Player.getNumPlayers()]; //Set size of game points array as the number of players
+                totalPoints = new String[Player.getNumPlayers()]; //Set size of total points array as the number of players
+                
+                
+                
+                int lineCount = 0; //Initalize counter for keeping track of which line the Scanner is currently reading
+
+                // Read the flat file of player data and the store the values in the arrays
+                try {
+                    //Create Scanner object to read from the file of player data, named "leadershipdata.txt"
+                    Scanner reader = new Scanner(new File("leadershipdata.txt")); 
+
+                    //Go through each line of the file with the Scanner
+                    while (reader.hasNext()){ 
+                        String[] info = reader.nextLine().split(","); //Split each line into an array, using comma as the delimiter
+
+                        names[lineCount] = info[0].trim(); //Adds first element of array to array of last names, removes white space
+                        virtuePoints[lineCount] = info[1].trim(); //Adds second element of array to array of first names, removes white space
+                        gamePoints[lineCount] = info[2].trim();  //Adds third element of array to array of dates of birth, removes white space
+                        totalPoints[lineCount] = info[3].trim(); //Adds fourth element of array to array of student numbers, removes white space
+
+                        lineCount++; //Increment counter for current line in flat file of player data
+                    } //End while loop going through player data in flat file
+                    reader.close(); //Close Scanner object
+                //Catch IO exceptions when writing to flat file
+                } catch (IOException ioException) { 
+                    System.err.println("Java Exception: " + ioException); //Error message for IO exceptions
+                } //End try-catch statement for writing to file
+                
+                
+                
+                
+                //Sort player data using Bubble Sort
+                bubbleSort(names, virtuePoints, gamePoints, totalPoints);
+                
+                
+                //Display player data on the screen
+                fill(0); //Set fill colour to black
+                textSize(24); //Set text size
+                textAlign(CENTER, CENTER); //Align text at the center of its specified coordinates
+
+
+             // Loop through each player (row)
+            for (int playerIndex = 0; playerIndex < Player.getNumPlayers(); playerIndex++) {
+                // Display name (first column)
+                text(names[playerIndex], leaderboardPositions[playerIndex][0], leaderboardPositions[playerIndex][1]);
+
+                // Display virtue points (second column)
+                text(virtuePoints[playerIndex], leaderboardPositions[playerIndex + 5][0], leaderboardPositions[playerIndex + 5][1]);
+
+                // Display game points (third column)
+                text(gamePoints[playerIndex], leaderboardPositions[playerIndex + 2 * 5][0], leaderboardPositions[playerIndex + 2 * 5][1]);
+
+                // Display total points (fourth column)
+                text(totalPoints[playerIndex], leaderboardPositions[playerIndex + 3 * 5][0], leaderboardPositions[playerIndex + 3 * 5][1]);
+            }
+            
+            /**
+                String[][] array = {names, virtuePoints, gamePoints, totalPoints};
+                int category = 0;
+                int playerIndex = 0;
+                
+                //Loop through each column in the array of previous letters in the current round
+                for (int i = 0; i < leaderboardPositions.length; i++) {
+                    //if (playerIndex < Player.getNumPlayers()) {
+                    if (category < 4) {
+                        
+                        
+                        text(array[category][playerIndex], leaderboardPositions[i][0], leaderboardPositions[i][1]);
+                        playerIndex++;
+                        
+                        if (playerIndex > Player.getNumPlayers() - 1) //3
+                            playerIndex = 0;
+                        
+                        if ((i != 0) && (i % Player.getNumPlayers() == 0)) //%4
+                            category++;
+                    }
+                     
+                } //End for loop iterating through each row in the array of previous letters in the current round
+                * */
+
+                /**
+                //Loop through each row in the array of previous letters in the current round
+                for (int i = 0; i < pastLetters.length; i++) {
+                     //Loop through each column in the array of previous letters in the current round
+                    for (int j = 0; j < pastLetters[i].length; j++) {
+                        if (i == 0) 
+                            text(names[j], )
+                    } //End for loop iterating through each column in the array of previous letters in the current round
+                } //End for loop iterating through each row in the array of previous letters in the current round
+                **/
+            
+            } //End if statement checking if there is at least one player that has been created
+            
+            
+            
+        
+
+        
+        
+        
+            //Set background
+            
             
         
         //Begin Story
@@ -1252,7 +1417,7 @@ public class MySketch extends PApplet {
                 stage = -1; //Go to game/character setup screen
             //If user is over leaderboard button when mouse is clicked
             } else if (overLeaderboard) {
-                stage = -3; //Go to leaderboard screen
+                stage = -4; //Go to leaderboard screen
             //If user is over exit game button when mouse is clicked
             } else if (overExitGame) {
                 System.exit(0); //Exit game
@@ -1310,6 +1475,12 @@ public class MySketch extends PApplet {
                     chooseCharacter1 = true; //Set variable indicating character v1 is showing to true
                 } //End if statement deciding which character clothing version to show when right button is clicked
 
+            
+        //Stage -4 (Leaderboard)
+        } else if (stage == -4) {
+            
+            
+            
         //Stage 1 (Begin Story)
         } else if (stage == 1) {
 	//If mouse is over plus strength button when mouse is clicked
@@ -1495,9 +1666,12 @@ public class MySketch extends PApplet {
     public void keyPressed() {
         //If the spacebar is pressed
         if (key == ' ') {
-	//Spacebar is pressed in Stage -3 (Custom Clothes)
+            //Spacebar is pressed in Stage -3 (Custom Clothes)
             if (stage == -3) {
                 stage = -1; //Go back to character setup screen
+            //Spacebar is pressed in Stage -4 (Leaderboard)
+            } else if (stage == -4) {
+                stage = 0; //Go back to main menu
             //Spacebar is pressed in Stage 1 (Begin Story)
             } else if (stage == 1) {
                 if (currentScreen1 == 1) //If screen currently being shown is the first part of the story introduction
@@ -1669,9 +1843,26 @@ public class MySketch extends PApplet {
             } else if (stage == 19) {
                 //Reset all variables for next game
                 resetGame();
-                //File IO, Write to file
+                
+                //Write player data to flat file (name, virtue points, game points, total points)
+                 try {
+                     //Create FileWriter object to append to the file of player data, named "leadershipdata.txt"
+                     FileWriter w = new FileWriter("leadershipdata.txt", true);
+                     //Create new PrintWriter to write formatted output to the file of player data
+                     PrintWriter writer = new PrintWriter(w);
+                     //Write name, virtue points, game points, and total points to the file
+                     writer.printf(player.getName() + "," + player.getVirtuePoints() + "," + player.getGamePoints() + "," + (player.getVirtuePoints() + player.getGamePoints()) + "\n");
+                     //Close PrintWriter
+                     writer.close();
+                 //Catch IO exceptions when writing to flat file
+                 } catch (IOException e) {
+                     System.err.println(e); //Error message for IO exceptions
+                 } //End try-catch statement for player data writing to flat file
+                
                 stage = 0; //Return to main menu
-            }
+                
+                
+            } 
                 
 
 
@@ -1701,6 +1892,15 @@ public class MySketch extends PApplet {
             } else if (key != CODED) { 
                 userInput += key; //Add each keystroke to user input string
             } //End if statement for which key is pressed
+        //If key is pressed in Stage -4 (Leaderboard)
+        } else if (stage == -4) {
+            //If player presses A
+            if (key == 'A' || key == 'a')
+                stage = -5; //Go to Stage -5 (Boar Fight Game Leaderboard)
+            else if (key == 'B' || key == 'b')
+                stage = -6; //Go to Stage -6 (Rhythm Game Leaderboard)
+            else if (key == 'C' || key == 'c')
+                stage = -7; //Go to Stage -7 (Well Escape Game Leaderboard)
             
         //If key is pressed in Stage 3 (Fork in the Road)
         } else if (stage == 3) {
@@ -1727,6 +1927,7 @@ public class MySketch extends PApplet {
         //If key is pressed in Stage 15 (Escape Well Minigame)    
         } else if (stage == 15) {
             currentGame.keyPressed(); //Call key pressed method for escape well game
+            
         }
         
     }
@@ -1741,6 +1942,51 @@ public class MySketch extends PApplet {
           return false; //Return false
         } //End if statement checking if mouse is over image
     }
+   
+    /**
+     * Sorts players' total points in ascending order using the Bubble Sort algorithm, also sorts the associated player data (names, 
+     * virtue points, game points) to maintain their correct order after ordering the total points
+     *
+     * @param names  The array of player names corresponding to the sorted total points
+     * @param virtuePoints  The array of virtue points corresponding to the sorted total points
+     * @param gamePoints  The array of game points corresponding to the sorted total points
+     * @param totalPoints  The array of total points to be sorted
+     */
+    public static void bubbleSort(String[] names, String[] virtuePoints, String[] gamePoints, String[] totalPoints) {
+        int n = totalPoints.length; //Get length of array of total points
+
+        //Outer loop to traverse the array
+        for (int i = 0; i < n - 1; i++) {
+            //Inner loop to perform the comparisons and swaps
+            for (int j = 0; j < n - i - 1; j++) {
+                //If the current element is greater than the next element, swap them
+                if (Integer.parseInt(totalPoints[j]) > Integer.parseInt(totalPoints[j + 1])) {
+                    //Swap arr[j] and arr[j + 1]
+                    //Swap elements for total points
+                    String temp = totalPoints[j]; //Initialize the temporary variable for storing the first element
+                    totalPoints[j] = totalPoints[j + 1]; //Assigns first element the value of the second element
+                    totalPoints[j + 1] = temp; //Assigns the second element the value of the first element stored in the temporary variable
+                    
+                    //Swap elements for plaer names
+                    temp = names[j]; //Store first element in temporary variable
+                    names[j] = names[j + 1]; //Assigns first element the value of the second element
+                    names[j + 1] = temp; //Assigns the second element the value of the first element stored in the temporary variable
+                    
+                    //Swap elements for virtue points
+                    temp = virtuePoints[j];//initializing the temporary variable for comparision
+                    virtuePoints[j] = virtuePoints[j + 1]; //Assigns first element the value of the second element
+                    virtuePoints[j + 1] = temp; //Assigns the second element the value of the first element stored in the temporary variable
+                    
+                    //Swap elements for game points
+                    temp = gamePoints[j]; //initializing the temporary variable for comparision
+                    gamePoints[j] = gamePoints[j + 1]; //Assigns first element the value of the second element
+                    gamePoints[j + 1] = temp; //Assigns the second element the value of the first element stored in the temporary variable
+                } //End if statement checking if a swap should be made
+            } //End for loop for comparison and swaps
+        } //End for loop to traverse the array
+    } 
+    
+    
 }
 
 
