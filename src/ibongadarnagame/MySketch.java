@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Scanner;
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -18,12 +19,14 @@ public class MySketch extends PApplet {
     PApplet app;
     Player player; //Player object representing character
     Game currentGame; //Current minigame being played
-    boolean playerDeath = false; //True if player runs out of lives
+    boolean playerDeath = false; //True if player runs out of health
+    ArrayList<Game> gameResults; //Array list of all player game results
     
     //Variables
     int stage = 0; //Current stage of the game starts at 0
     String userInput = ""; //Stores user input text
     String enteredName = ""; //Player's name (based on user input, by default set to "Don Juan")
+    boolean reachedMaxPlayers = false; //True if the maximum number of players have played the game (5 players)
     //Variables for Stage -1 (Start Game)
     boolean customName = false; //True if user enters their own name for the character
     boolean customCharacter = false; //True if user customizes clothing colors of the character
@@ -58,6 +61,22 @@ public class MySketch extends PApplet {
                                     {636, 329},
                                     {636, 369},
                                                 };
+    int[][] gamePositions = {{279, 229}, //Names
+                             {279, 269},
+                             {279, 309},
+                             {279, 349},
+                             {279, 389},
+                             {414, 229}, //Score
+                             {414, 269},
+                             {414, 309},
+                             {414, 349},
+                             {414, 389},
+                             {553, 229}, //Attribute specific to game
+                             {553, 269},
+                             {553, 309},
+                             {553, 349},
+                             {553, 389},
+                                        };
     //Variables for Stage 1 (Begin Story)
     int currentScreen1 = 1; //Keeps track of the different screens being shown in the same stage
     int traitDistribution; //0 means neutral, 1 means high strength, 2 means high intelligence
@@ -188,12 +207,15 @@ public class MySketch extends PApplet {
     
     
     //Declare images
+    //Declare image for Game Over screen
+    PImage gameOverScreen;  //Game Over screen
     //Declare images for Stage 0 (Main Menu)
     PImage testimg; ////
     PImage homeScreen;     //Homescreen background
     PImage startGame;      //Start game button
     PImage leaderboard;    //Leaderboard button
     PImage exitGame;       //Exit game button
+    PImage maxPlayersMesssage;  //Message telling the user that the maximum number of players has been reached
     //Declare images for Stage -1 (Character Setup)
     PImage characterSetup;  //Character setup background
     PImage chooseNameButton;  //Custom name button
@@ -212,6 +234,12 @@ public class MySketch extends PApplet {
     PImage rightButton;    //Right arrow button
     //Declare images for Stage -4 (Leaderboard)
     PImage leaderboardBG; //Leaderboard background
+    //Declare images for Stage -5 (Boar Fight Game Results)
+    PImage boarGameResultsBG; //Background for boar fight minigame results
+    //Declare images for Stage -6 (Rhythm Game Results)
+    PImage rhythmGameResultsBG; //Background for rhythm minigame results
+    //Declare images for Stage -7 (Well Escape Game Results)
+    PImage wellGameResultsBG; //Background for well escape minigame results
     //Declare images for Stage 1 (Begin Story)
     PImage tellStory1;     //Tell the player about the story before they begin (part 1)
     PImage tellStory2;     //Tell the player about the story before they begin (part 2)
@@ -325,14 +353,21 @@ public class MySketch extends PApplet {
             System.err.println(e); //Error message for IO exceptions
         } //End try-catch statement for clearing file
             
-        
+        //Declare array list containing results of all the games played by each player created
+        gameResults = new ArrayList<Game>();
+                
         //Load images
+        //Load image for Game Over screen
+        gameOverScreen = loadImage("images/gameoverscreen.jpg"); //Game Over screen
+        
         //Load images for Stage 0 (Main Menu)
         testimg = loadImage("testimg.png"); ////
         homeScreen = loadImage("images/homescreen.jpg");         //Homescreen background
         startGame = loadImage("images/startgamebutton.jpg");     //Start game button
         leaderboard = loadImage("images/leaderboardbutton.jpg"); //Leaderboard button
         exitGame = loadImage("images/exitbutton.jpg");           //Exit game button
+        maxPlayersMesssage = loadImage("images/maxplayersmessage.jpg");   //Message telling the user that the maximum number of players has been reached
+        
         /*
         //Load images for Stage 1 (Start Game Screen)
         character = loadImage("images/player.jpg");            //Character
@@ -361,6 +396,16 @@ public class MySketch extends PApplet {
         
         //Load images for Stage -4 (Leaderboard)
         leaderboardBG = loadImage("images/leaderboardbg.jpg"); //Leaderboard background
+        
+        //Load images for Stage -5 (Boar Fight Game Results)
+        boarGameResultsBG = loadImage("images/boargameresults.jpg"); //Background for boar fight minigame results
+        
+        //Load images for Stage -6 (Rhythm Game Results)
+        rhythmGameResultsBG = loadImage("images/rhythmgameresults.jpg"); //Background for rhythm minigame results
+        
+        //Load images for Stage -7 (Well Escape Game Results)
+        wellGameResultsBG = loadImage("images/wellgameresults.jpg"); //Background for well escape minigame results
+        
         
         //Load images for Stage 1 (Begin Story)
         tellStory1 = loadImage("images/story1.jpg");    //Part 1 of story introduction
@@ -472,12 +517,18 @@ public class MySketch extends PApplet {
     }
     
     public void draw() {
-        System.out.println(stage);
+        System.out.println("Stage: " + stage);
+        System.out.println("Players: " + Player.getNumPlayers());
+        System.out.println("");
+        
         background(255); //Reset background
         update(mouseX, mouseY); //Update variables indicating button clicks
         
         if (playerDeath) {
-            text("Game Over", 0, 0);
+            background(gameOverScreen); //Game over background
+            
+            
+            
         } else {
         
         //Main menu
@@ -489,6 +540,14 @@ public class MySketch extends PApplet {
             image(startGame, startGameX, startGameY);        //Start game button
             image(leaderboard, leaderboardX, leaderboardY);  //Show leaderboard button
             image(exitGame, exitGameX, exitGameY);           //Exit button
+            
+            //If the maximum number of players have played the game (5 players)
+            if (reachedMaxPlayers)
+                //Message telling the user that the maximum number of players has been reached
+                image(maxPlayersMesssage, startGameX, startGameY);
+                         
+
+                
             
         //Character Setup
         } else if (stage == -1) {
@@ -510,6 +569,8 @@ public class MySketch extends PApplet {
             background(chooseNameBG);
             //Set fill colour to black for user input text
             fill(0);
+            //Align text to the left
+            textAlign(LEFT, LEFT);
             //Display user input text
             text(userInput, 450, 125);
             
@@ -573,7 +634,8 @@ public class MySketch extends PApplet {
                     Scanner reader = new Scanner(new File("leadershipdata.txt")); 
 
                     //Go through each line of the file with the Scanner
-                    while (reader.hasNext()){ 
+                    while (reader.hasNext() && lineCount < Player.getNumPlayers()){ 
+                        System.out.println("Line Count: " + lineCount);
                         String[] info = reader.nextLine().split(","); //Split each line into an array, using comma as the delimiter
 
                         names[lineCount] = info[0].trim(); //Adds first element of array to array of last names, removes white space
@@ -591,7 +653,7 @@ public class MySketch extends PApplet {
                 
                 
                 
-                
+                System.out.println("Players: " + Player.getNumPlayers());
                 //Sort player data using Bubble Sort
                 bubbleSort(names, virtuePoints, gamePoints, totalPoints);
                 
@@ -602,67 +664,38 @@ public class MySketch extends PApplet {
                 textAlign(CENTER, CENTER); //Align text at the center of its specified coordinates
 
 
-             // Loop through each player (row)
-            for (int playerIndex = 0; playerIndex < Player.getNumPlayers(); playerIndex++) {
-                // Display name (first column)
-                text(names[playerIndex], leaderboardPositions[playerIndex][0], leaderboardPositions[playerIndex][1]);
+                // Loop through each player (row)
+                for (int playerIndex = 0; playerIndex < Player.getNumPlayers(); playerIndex++) {
+                   // Display name (first column)
+                   text(names[playerIndex], leaderboardPositions[playerIndex][0], leaderboardPositions[playerIndex][1]);
 
-                // Display virtue points (second column)
-                text(virtuePoints[playerIndex], leaderboardPositions[playerIndex + 5][0], leaderboardPositions[playerIndex + 5][1]);
+                   // Display virtue points (second column)
+                   text(virtuePoints[playerIndex], leaderboardPositions[playerIndex + 5][0], leaderboardPositions[playerIndex + 5][1]);
 
-                // Display game points (third column)
-                text(gamePoints[playerIndex], leaderboardPositions[playerIndex + 2 * 5][0], leaderboardPositions[playerIndex + 2 * 5][1]);
+                   // Display game points (third column)
+                   text(gamePoints[playerIndex], leaderboardPositions[playerIndex + 2 * 5][0], leaderboardPositions[playerIndex + 2 * 5][1]);
 
-                // Display total points (fourth column)
-                text(totalPoints[playerIndex], leaderboardPositions[playerIndex + 3 * 5][0], leaderboardPositions[playerIndex + 3 * 5][1]);
-            }
-            
-            /**
-                String[][] array = {names, virtuePoints, gamePoints, totalPoints};
-                int category = 0;
-                int playerIndex = 0;
-                
-                //Loop through each column in the array of previous letters in the current round
-                for (int i = 0; i < leaderboardPositions.length; i++) {
-                    //if (playerIndex < Player.getNumPlayers()) {
-                    if (category < 4) {
-                        
-                        
-                        text(array[category][playerIndex], leaderboardPositions[i][0], leaderboardPositions[i][1]);
-                        playerIndex++;
-                        
-                        if (playerIndex > Player.getNumPlayers() - 1) //3
-                            playerIndex = 0;
-                        
-                        if ((i != 0) && (i % Player.getNumPlayers() == 0)) //%4
-                            category++;
-                    }
-                     
-                } //End for loop iterating through each row in the array of previous letters in the current round
-                * */
-
-                /**
-                //Loop through each row in the array of previous letters in the current round
-                for (int i = 0; i < pastLetters.length; i++) {
-                     //Loop through each column in the array of previous letters in the current round
-                    for (int j = 0; j < pastLetters[i].length; j++) {
-                        if (i == 0) 
-                            text(names[j], )
-                    } //End for loop iterating through each column in the array of previous letters in the current round
-                } //End for loop iterating through each row in the array of previous letters in the current round
-                **/
+                   // Display total points (fourth column)
+                   text(totalPoints[playerIndex], leaderboardPositions[playerIndex + 3 * 5][0], leaderboardPositions[playerIndex + 3 * 5][1]);
+               }
             
             } //End if statement checking if there is at least one player that has been created
             
             
+         //Boar Fight Game Results
+        } else if (stage == -5) {
+            background(boarGameResultsBG); //Set background to boar fight game results
+            displayBoarGameResults(gameResults); //Display all player results of Boar Fight minigame
             
-        
-
-        
-        
-        
-            //Set background
+        //Rhythm Game Results
+        } else if (stage == -6) {
+            background(rhythmGameResultsBG); //Set background to rhythm game results
+            displayRhythmGameResults(gameResults); //Display all player results of Rhythm minigame
             
+       //Well Escape Game Results
+        } else if (stage == -7) {
+            background(wellGameResultsBG); //Set background to well escape game results
+            displayWellGameResults(gameResults); //Display all player results of Well Escape minigame
             
         
         //Begin Story
@@ -736,38 +769,6 @@ public class MySketch extends PApplet {
             //Display text instructions telling the user to press space to continue
             image(pressSpaceToContinue, 280, 450);
             
-            //Create an instance of the Player class to represent the character the user will be playing as
-//If the user entered their own name and character clothing
-            if (customName && customCharacter) {
-                if (chooseCharacter1) //If the player chose character option 1
-	        //Create new Player with parameters for name and character image, using the image of character 1
-                    player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter1.png");
-                else if (chooseCharacter2) //If the player chose character option 2
-                    //Create new Player with parameters for name and character image, using the image of character 2
-                    player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter2.png");
-                else //If the player chose character option 3
-	        //Create new Player with parameters for name and character image, using the image of character 3
-                    player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter3.png");
-	//If user entered their own name but did not customize the character clothing
-            } else if (customName) {
-	    //Create new Player with parameter for the name
-                player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3));
-	//If user did not enter their own name but customized the character clothing
-            } else if (customCharacter) {
-                if (chooseCharacter1) //If the player chose character option 1
-	       //Create new Player with parameter for the character image, using image of character 1
-                   player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter1.png");
-                else if (chooseCharacter2) //If the player chose character option 2
-	       //Create new Player with parameter for the character image, using image of character 2
-                   player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter2.png");
-                else //If the player chose character option 3
-	       //Create new Player with parameter for the charcter image, using image of character 3
-                   player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter3.png");
-	//If user did not enter their own name and did not customize the character clothing
-            } else {
-	     //Create new Player using constructor with no extra parameters to set default values for name and character image
-                player = new Player(this, 155, 255, traitDistribution, new Inventory(3));
-            } //End if statement deciding which Player constructor to call depending on the custom values entered by the user
            
         //Leaving Castle
         } else if (stage == 2) {
@@ -817,7 +818,7 @@ public class MySketch extends PApplet {
             
         //Walking in the Forest 1
         } else if (stage == 6) {
-	//Set background to filler forest scene 1
+            //Set background to filler forest scene 1
             background(fillerForest1);
             player.draw(); //Draw character on the screen
             player.move(3, 0); //Move character to the right
@@ -1220,7 +1221,27 @@ public class MySketch extends PApplet {
     }
     
     
-    public static void gameOver() {
+    public void gameOver() {
+        //Reset all variables for next game
+        resetGame();
+        
+        //Write player data to flat file (name, virtue points, game points, total points)
+        try {
+            //Create FileWriter object to append to the file of player data, named "leadershipdata.txt"
+            FileWriter w = new FileWriter("leadershipdata.txt", true);
+            //Create new PrintWriter to write formatted output to the file of player data
+            PrintWriter writer = new PrintWriter(w);
+            player.calculateTotalPoints(); //Calculate player's total points
+            //Write name, virtue points, game points, and total points to the file
+            writer.printf(player.getName() + "," + player.getVirtuePoints() + "," + player.getGamePoints() + "," + player.getTotalPoints() + "\n");
+            //Close PrintWriter
+            writer.close();
+        //Catch IO exceptions when writing to flat file
+        } catch (IOException e) {
+            System.err.println(e); //Error message for IO exceptions
+        } //End try-catch statement for player data writing to flat file
+                 
+        stage = 0;
         ////unfinished
         //playerDeath = false; //Reset marker for player death
     }
@@ -1228,6 +1249,7 @@ public class MySketch extends PApplet {
     public void resetGame() {
             
         //Reset Variables
+        playerDeath = false;
         enteredName = ""; //Player's name (based on user input, by default set to "Don Juan")
         //Variables for Stage -1 (Start Game)
         customName = false; //True if user enters their own name for the character
@@ -1414,7 +1436,9 @@ public class MySketch extends PApplet {
         if (stage == 0) {
             //If mouse is over start game button when mouse is clicked
             if (overStartGame) {
-                stage = -1; //Go to game/character setup screen
+                //Check if the game hasn't reached the maximum number of players yet
+                if (Player.getNumPlayers() < 5)
+                    stage = -1; //Continue to game/character setup screen if there are less than 5 players
             //If user is over leaderboard button when mouse is clicked
             } else if (overLeaderboard) {
                 stage = -4; //Go to leaderboard screen
@@ -1475,9 +1499,6 @@ public class MySketch extends PApplet {
                     chooseCharacter1 = true; //Set variable indicating character v1 is showing to true
                 } //End if statement deciding which character clothing version to show when right button is clicked
 
-            
-        //Stage -4 (Leaderboard)
-        } else if (stage == -4) {
             
             
             
@@ -1666,6 +1687,11 @@ public class MySketch extends PApplet {
     public void keyPressed() {
         //If the spacebar is pressed
         if (key == ' ') {
+            //If player ran out of health and game is over
+            if (playerDeath)
+                gameOver(); //Call game over method
+            
+            
             //Spacebar is pressed in Stage -3 (Custom Clothes)
             if (stage == -3) {
                 stage = -1; //Go back to character setup screen
@@ -1690,6 +1716,44 @@ public class MySketch extends PApplet {
                 } else if (currentScreen1 == 4) //If screen currently being shown is the first part of the game instructions
                     currentScreen1 = 5; //Go to next screen (second part of the game instructions)
                 else { //If screen currently being shown is the second part of the game instructions
+                    
+                    //Create an instance of the Player class to represent the character the user will be playing as
+                    //If the user entered their own name and character clothing
+                    if (customName && customCharacter) {
+                        if (chooseCharacter1) //If the player chose character option 1
+                        //Create new Player with parameters for name and character image, using the image of character 1
+                            player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter1.png");
+                        else if (chooseCharacter2) //If the player chose character option 2
+                            //Create new Player with parameters for name and character image, using the image of character 2
+                            player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter2.png");
+                        else //If the player chose character option 3
+                        //Create new Player with parameters for name and character image, using the image of character 3
+                            player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter3.png");
+                    //If user entered their own name but did not customize the character clothing
+                    } else if (customName) {
+                    //Create new Player with parameter for the name
+                        player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3));
+                    //If user did not enter their own name but customized the character clothing
+                    } else if (customCharacter) {
+                        if (chooseCharacter1) //If the player chose character option 1
+                       //Create new Player with parameter for the character image, using image of character 1
+                           player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter1.png");
+                        else if (chooseCharacter2) //If the player chose character option 2
+                       //Create new Player with parameter for the character image, using image of character 2
+                           player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter2.png");
+                        else //If the player chose character option 3
+                       //Create new Player with parameter for the charcter image, using image of character 3
+                           player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter3.png");
+                    //If user did not enter their own name and did not customize the character clothing
+                    } else {
+                     //Create new Player using constructor with no extra parameters to set default values for name and character image
+                        player = new Player(this, 155, 255, traitDistribution, new Inventory(3));
+                    } //End if statement deciding which Player constructor to call depending on the custom values entered by the user
+                    
+                    //If the maximum number of players has been reached after creating this player (maximum 5 players)
+                    if (Player.getNumPlayers() >= 5)
+                        //Set message telling the user that the maximum number of players has been reached to true
+                        reachedMaxPlayers = true;
                     stage = 2; //Go to the next stage (Leaving Castle)
                     currentScreen1 = 1; //Reset screen to be shown for Stage 1 to the first part of the story introduction
                 }   //End if statement for which screen of Stage 1 is being shown
@@ -1711,26 +1775,26 @@ public class MySketch extends PApplet {
                     //If the user's character clothing is v1
                     if (chooseCharacter1)
                         //Create instance of boar fight minigame with character clothing image v1
-                        currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter1.png", traitDistribution);
+                        currentGame = new BoarFightGame(this, player.getName(), 100, 0, "images/chosenCharacter1.png", traitDistribution);
                     //If the user's character clothing is v2
                     else if (chooseCharacter2)
                         //Create instance of boar fight minigame with character clothing image v2
-                        currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter2.png", traitDistribution);
+                        currentGame = new BoarFightGame(this, player.getName(), 100, 0, "images/chosenCharacter2.png", traitDistribution);
                     //If the user's character clothing is v3
                     else
                         //Create instance of boar fight minigame with character clothing image v3
-                        currentGame = new BoarFightGame(this, "Boar Fight", 100, 0, "images/chosenCharacter3.png", traitDistribution);
-                         
+                        currentGame = new BoarFightGame(this, player.getName(), 100, 0, "images/chosenCharacter3.png", traitDistribution);
+    
                     stage = 5; //Go to the boar fight minigame
                 } //If statement for which screen of Stage 4 is being shown
 
 
             //Meet Hermit
             } else if (stage == 7) {
-	    //If the user is meeting the hermit for the first time
+                //If the user is meeting the hermit for the first time
                 if (currentScreen7 == 1)
                     currentScreen7 = 2; //Go to the next screen (deciding on whether to help or ignore the hermit)
-	    //if the user is leaving the hermit
+                //if the user is leaving the hermit
                 if (currentScreen7 == 3) { 
                     player.moveTo(-90, 255); //Set new player position
                     stage = 8; //Go on to the next stage (Walking in the Forest 2)
@@ -1746,15 +1810,18 @@ public class MySketch extends PApplet {
                     //If the user's character clothing is v1
                     if (chooseCharacter1)
                         //Create instance of rhythm minigame with character clothing image v1
-                        currentGame = new RhythmGame(this, "Rhythm Game", 245, 1, "images/chosenCharacter1.png", traitDistribution, sheerWill);
+                        currentGame = new RhythmGame(this, player.getName(), 245, 1, "images/chosenCharacter1.png", traitDistribution, sheerWill);
                     //If the user's character clothing is v1 
                      else if (chooseCharacter2)
                         //Create instance of rhythm minigame with character clothing image v2
-                        currentGame = new RhythmGame(this, "Rhythm Game", 245, 1, "images/chosenCharacter2.png", traitDistribution, sheerWill);
+                        currentGame = new RhythmGame(this, player.getName(), 245, 1, "images/chosenCharacter2.png", traitDistribution, sheerWill);
                     //If the user's character clothing is v1
                     else
                         //Create instance of rhythm minigame with character clothing image v3
-                        currentGame = new RhythmGame(this, "Rhythm Game", 245, 1, "images/chosenCharacter3.png", traitDistribution, sheerWill);
+                        currentGame = new RhythmGame(this, player.getName(), 245, 1, "images/chosenCharacter3.png", traitDistribution, sheerWill);
+
+                    adarnaBirdX = -100; //Set x position of Adarna bird
+                    adarnaBirdY = 225; //Set y position of Adarna bird
                     
                     //stage = 10; //Go to the Rhythm Minigame //////////skip minigame
                     stage = 11;
@@ -1808,18 +1875,18 @@ public class MySketch extends PApplet {
                     //Create an instance of the Well Escape Game class depending on the user's character image
                     //If the user's character clothing is v1
                     if (chooseCharacter1)
-                    //Create instance of escape well minigame with character clothing image v1
-                        currentGame = new EscapeWellGame(this, "Escape Well", 50, 1, "images/chosenCharacter1.png", traitDistribution);
+                        //Create instance of escape well minigame with character clothing image v1
+                        currentGame = new EscapeWellGame(this, player.getName(), 50, 1, "images/chosenCharacter1.png", traitDistribution);
                     //If the user's character clothing is v2
-                        else if (chooseCharacter2)
-                    //Create instance of escape well minigame with character clothing image v2
-                        currentGame = new EscapeWellGame(this, "Escape Well", 50, 1, "images/chosenCharacter2.png", traitDistribution);
+                    else if (chooseCharacter2)
+                        //Create instance of escape well minigame with character clothing image v2
+                        currentGame = new EscapeWellGame(this, player.getName(), 50, 1, "images/chosenCharacter2.png", traitDistribution);
                     //If the user's character clothing is v3
-                        else
-                    //Create instance of escape well minigame with character clothing image v3
-                        currentGame = new EscapeWellGame(this, "Escape Well", 50, 1, "images/chosenCharacter3.png", traitDistribution);
-                         
-                   stage = 15; //Go to the next stage (Well Minigame)
+                    else
+                        //Create instance of escape well minigame with character clothing image v3
+                        currentGame = new EscapeWellGame(this, player.getName(), 50, 1, "images/chosenCharacter3.png", traitDistribution);
+  
+                    stage = 15; //Go to the next stage (Well Minigame)
                 }
 
             //Spacebar is pressed in Stage 16 (Escaped Well)
@@ -1850,8 +1917,9 @@ public class MySketch extends PApplet {
                      FileWriter w = new FileWriter("leadershipdata.txt", true);
                      //Create new PrintWriter to write formatted output to the file of player data
                      PrintWriter writer = new PrintWriter(w);
+                     player.calculateTotalPoints(); //Calculate player's total points
                      //Write name, virtue points, game points, and total points to the file
-                     writer.printf(player.getName() + "," + player.getVirtuePoints() + "," + player.getGamePoints() + "," + (player.getVirtuePoints() + player.getGamePoints()) + "\n");
+                     writer.printf(player.getName() + "," + player.getVirtuePoints() + "," + player.getGamePoints() + "," + player.getTotalPoints() + "\n");
                      //Close PrintWriter
                      writer.close();
                  //Catch IO exceptions when writing to flat file
@@ -1861,8 +1929,10 @@ public class MySketch extends PApplet {
                 
                 stage = 0; //Return to main menu
                 
-                
-            } 
+            //Spacebar is pressed in Stage -5/-6/-7 (Displaying Boar/Rhythm/Well Minigame Results)    
+            } else if (stage == -5 || stage == -6 || stage == -7) {
+                stage = -4; //Return to leaderboard
+            }
                 
 
 
@@ -1943,6 +2013,93 @@ public class MySketch extends PApplet {
         } //End if statement checking if mouse is over image
     }
    
+ 
+   /**
+    * This method iterates through all of the previously set Game objects (Boar/Rhythm/Well) from all of the times and adds each game settings object to the game settings history combo box
+     * 
+    * @param gamesPlayed 
+    */
+   public void displayBoarGameResults(ArrayList<Game> gamesPlayed) {
+       BoarFightGame currentBoarGame; //Current Boar Fight Game object whose information is being displayed
+       int playerIndex = 0; //Row that the information will be displayed at
+       
+        //Iterate through each Game object in the array list of games
+        for (Game game : gamesPlayed) {
+            //Check if the Game object's instance type is BoarFightGame so that it can be downcast
+            if (game instanceof BoarFightGame) {
+                //Downcast Game object to BoarFightGame object
+                currentBoarGame = ((BoarFightGame) game);
+                
+                //Display information for (attributes of this object) in one row
+                //Display player name (first column)
+                text(currentBoarGame.getName(), gamePositions[playerIndex][0], gamePositions[playerIndex][1]);
+                //Display score (second column)
+                text(currentBoarGame.getScore(), gamePositions[playerIndex + 5][0], gamePositions[playerIndex + 5][1]);
+                //Display total time (third column)
+                text(currentBoarGame.getTotalTime() + " s", gamePositions[playerIndex + 2 * 5][0], gamePositions[playerIndex + 2 * 5][1]);
+                
+                //Go to next row for the next BoarFightGame object that is found
+                playerIndex++;
+            } //End if statement checking if the Game object is an instance of BoarFightGame
+        } //End for loop iterating through array list of settings Game objects
+   }
+   
+    public void displayRhythmGameResults(ArrayList<Game> gamesPlayed) {
+       RhythmGame currentRhythmGame; //Current Rhythm Game object whose information is being displayed
+       int playerIndex = 0; //Row that the information will be displayed at
+       
+        //Iterate through each Game object in the array list of games
+        for (Game game : gamesPlayed) {
+            //Check if the Game object's instance type is RhythmGame so that it can be downcast
+            if (game instanceof RhythmGame) {
+                //Downcast Game object to RhythmGame object
+                currentRhythmGame = ((RhythmGame) game);
+                
+                //Display information for (attributes of this object) in one row
+                //Display player name (first column)
+                text(currentRhythmGame.getName(), gamePositions[playerIndex][0], gamePositions[playerIndex][1]);
+                //Display score (second column)
+                text(currentRhythmGame.getScore(), gamePositions[playerIndex + 5][0], gamePositions[playerIndex + 5][1]);
+                //Display number of letters matched (third column)
+                text(currentRhythmGame.getLettersMatched(), gamePositions[playerIndex + 2 * 5][0], gamePositions[playerIndex + 2 * 5][1]);
+                
+                //Go to next row for the next RhythmGame object that is found
+                playerIndex++;
+            } //End if statement checking if the Game object is an instance of RhythmGame
+        } //End for loop iterating through array list of settings Game objects
+   }
+    
+    public void displayWellGameResults(ArrayList<Game> gamesPlayed) {
+       EscapeWellGame currentWellGame; //Current Escape Well object whose information is being displayed
+       int playerIndex = 0; //Row that the information will be displayed at
+       String winOrLose = " (Lost)"; //Says whether the player won or lost the game
+       
+        //Iterate through each Game object in the array list of games
+        for (Game game : gamesPlayed) {
+            //Check if the Game object's instance type is EscapeWellGame so that it can be downcast
+            if (game instanceof EscapeWellGame) {
+                //Downcast Game object to EscapeWellGame object
+                currentWellGame = ((EscapeWellGame) game);
+                
+                //Display information for (attributes of this object) in one row
+                //Display player name (first column)
+                text(currentWellGame.getName(), gamePositions[playerIndex][0], gamePositions[playerIndex][1]);
+                //Display score (second column)
+                text(currentWellGame.getScore(), gamePositions[playerIndex + 5][0], gamePositions[playerIndex + 5][1]);
+                //Check if player won this game
+                if (currentWellGame.playerWonGame())
+                    winOrLose = " (Won)"; //If player won the current game, set win or lose text to display "Won"
+                //Display number of letters matched (third column)
+                text(currentWellGame.getRungsUsed() + winOrLose, gamePositions[playerIndex + 2 * 5][0], gamePositions[playerIndex + 2 * 5][1]);
+                
+                //Go to next row for the next RhythmGame object that is found
+                playerIndex++;
+            } //End if statement checking if the Game object is an instance of RhythmGame
+        } //End for loop iterating through array list of settings Game objects
+   }
+   
+   
+   
     /**
      * Sorts players' total points in ascending order using the Bubble Sort algorithm, also sorts the associated player data (names, 
      * virtue points, game points) to maintain their correct order after ordering the total points
@@ -1959,15 +2116,15 @@ public class MySketch extends PApplet {
         for (int i = 0; i < n - 1; i++) {
             //Inner loop to perform the comparisons and swaps
             for (int j = 0; j < n - i - 1; j++) {
-                //If the current element is greater than the next element, swap them
-                if (Integer.parseInt(totalPoints[j]) > Integer.parseInt(totalPoints[j + 1])) {
+                //If the current element is less than the next element, swap them
+                if (Integer.parseInt(totalPoints[j]) < Integer.parseInt(totalPoints[j + 1])) {
                     //Swap arr[j] and arr[j + 1]
                     //Swap elements for total points
                     String temp = totalPoints[j]; //Initialize the temporary variable for storing the first element
                     totalPoints[j] = totalPoints[j + 1]; //Assigns first element the value of the second element
                     totalPoints[j + 1] = temp; //Assigns the second element the value of the first element stored in the temporary variable
                     
-                    //Swap elements for plaer names
+                    //Swap elements for player names
                     temp = names[j]; //Store first element in temporary variable
                     names[j] = names[j + 1]; //Assigns first element the value of the second element
                     names[j + 1] = temp; //Assigns the second element the value of the first element stored in the temporary variable

@@ -186,7 +186,8 @@ gameApp.background(gameBG); //Set background to light background
             // Display game over message
             gameApp.textAlign(gameApp.LEFT, gameApp.LEFT); //Align text to the left
             gameApp.textSize(24); //Set text size
-            gameApp.text(returnGameResults(), 245, 250); //Display game results
+            gameApp.text(returnGameResults(), 235, 250); //Display game results
+            //245, 250
             /**
             gameApp.text("Total Time:  " + Math.round(totalTime), gameApp.width / 2, 230);
             gameApp.text("Points Earned:  " + score, gameApp.width / 2, 280);
@@ -240,6 +241,8 @@ gameApp.background(gameBG); //Set background to light background
 	//If the spacebar is pressed
             if (gameApp.key == ' ') { 
                 ((MySketch) gameApp).player.setBoarFightGamePoints(score); //Set the points the player earned in the game
+                ((MySketch) gameApp).gameResults.add(this); //Add game to array list of games that have been played
+                ((MySketch) gameApp).player.takeDamage(damageTaken); //Transfer damage taken to player
                 ((MySketch) gameApp).stage = 6; //Go to the next stage (Walking in the Forest)
                 ((MySketch) gameApp).player.moveTo(-90, 255); //Set new player position
             } //End if statement for if the spacebar is pressed
@@ -317,12 +320,15 @@ gameApp.background(gameBG); //Set background to light background
             score -= 5; //Deduct an amount from the points they earned
     }
     
-    
+    public int getTotalTime() {
+        return (totalTime / 60);
+    }
     
     @Override
     public String returnGameResults() {
         //Call parent method that returns game results shared across all games, add the total time from this game to the String that will be returned
-        return super.returnGameResults() + "Total Time: " + totalTime;
+        return super.returnGameResults() + "Total Time: " + (totalTime / 60) + " seconds";
     }
+
 }
 

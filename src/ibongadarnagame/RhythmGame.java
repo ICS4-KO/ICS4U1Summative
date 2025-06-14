@@ -278,8 +278,8 @@ public class RhythmGame extends Game {
 
         //If game is over
         } else {
-            //Player loses 10 HP for each letter they didn't get
-            damageTaken = 10 * (49 - (score/5)); //Dividing by 5 because each letter is worth 5 points
+            //Player loses 3 HP for each letter they didn't get
+            damageTaken = 3 * (49 - (score/5)); //Dividing by 5 because each letter is worth 5 points
 
             //If thegame is over and the player won the game
             if (gameWon)
@@ -324,8 +324,10 @@ public class RhythmGame extends Game {
             //If spacebar is pressed
             if (gameApp.key == ' ') { 
                 ((MySketch) gameApp).player.setRhythmGamePoints(score); //Set the points the player earned in the game
+                ((MySketch) gameApp).gameResults.add(this); //Add game to array list of games that have been played
+                ((MySketch) gameApp).player.takeDamage(damageTaken); //Transfer damage taken to player
                 ((MySketch) gameApp).stage = 11; //Go to the next stage (Catching the Adarna Bird)
-                ((MySketch) gameApp).adarnaBirdY = 215; //Set y position of Adarna bird
+                //((MySketch) gameApp).adarnaBirdY = 215; //Set y position of Adarna bird
                 ((MySketch) gameApp).player.moveTo(-90, 255); //Set new player position
             } //End if statement checking if the spacebar was pressed
         } //End if statement checking if the game is still running
@@ -386,6 +388,10 @@ public class RhythmGame extends Game {
             Thread.currentThread().interrupt(); // Restore the interrupted status
             System.err.println("Thread was interrupted while sleeping.");
         }
+    }
+    
+    public int getLettersMatched() {
+        return (score / 5);
     }
     
     

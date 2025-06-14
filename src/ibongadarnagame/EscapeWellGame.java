@@ -66,7 +66,7 @@ public class EscapeWellGame extends Game {
             //}
             
             //If the number of rungs the user has left is less than the rungs they need to complete the ladder (player loses the game)
-            if (totalNumRungs - currentRungNumber <  12 - assembledRungs.size()) {
+            if (totalNumRungs - currentRungNumber + 1 <  12 - assembledRungs.size()) {
                 gameWon = false; //Set game won to false
                 gameOver = true; //Set game over to true
             } //End if statement checking if the user no longer has enough rungs to complete the ladder
@@ -212,6 +212,8 @@ public class EscapeWellGame extends Game {
 	//If the spacebar is pressed
             if (gameApp.key == ' ') { 
                 ((MySketch) gameApp).player.setWellEscapePoints(score); //Set the points the player earned in the game
+                ((MySketch) gameApp).gameResults.add(this); //Add game to array list of games that have been played
+                ((MySketch) gameApp).player.takeDamage(damageTaken); //Transfer damage taken to player
                 ((MySketch) gameApp).stage = 16; //Go to the next stage (Escaped Well)
                 ((MySketch) gameApp).player.moveTo(285, 255); //Set new player position
             } //End if statement for if the spacebar is pressed
@@ -244,6 +246,10 @@ public class EscapeWellGame extends Game {
             score -= (score/2); //Deduct an amount from the points they earned
     }
     
+    
+    public int getRungsUsed() {
+        return (currentRungNumber - 1);
+    }
     
     @Override
     public String returnGameResults() {

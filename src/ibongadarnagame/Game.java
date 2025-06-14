@@ -12,7 +12,7 @@ import processing.core.PApplet;
 public abstract class Game {
     //Instance variables
     PApplet gameApp;
-    String name; //Name of the game
+    String name; //Name of the player
     int maxScore; //Maximum amount of points user can earn from playing the game
     int gameIndex; //Index number of game in user's 2D array of game scores
     int score = 0; //Current player's score
@@ -67,6 +67,13 @@ public abstract class Game {
         return "Points Earned: " + score + "\n\nDamage Taken: " + damageTaken + "\n\n";
     }
     
+    public String getName() {
+        return name; //Return name of player that played the game
+    }
+    
+    public int getScore() {
+        return score;
+    }
     
     public boolean playerWonGame() {
         return gameWon;
@@ -74,6 +81,15 @@ public abstract class Game {
     public int getNumTries() {
         return numTries;
     }
+    
+    /**
+     * Getter method for damageTaken attribute of Game object
+     * 
+     * @return  Amount of damage player takes in the minigame
+     */
+    public int getDamageTaken() {
+        return damageTaken; //Return the amount of damage taken from the current game
+    } /////may be unneeded
     
     abstract void update();
     abstract void draw();

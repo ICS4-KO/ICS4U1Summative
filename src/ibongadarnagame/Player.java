@@ -20,6 +20,7 @@ public class Player {
     private int healthPerLife; //Health points per life
     private int virtuePoints = 0; //Virtue points earned, starting from 0
     private int gamePoints = 0; //Total points player earns from the minigames they play
+    private int totalPoints = 0; //Combined virtue points and game points
     private int boarFightGamePoints = 0; //Points earned from boar fight minigame
     private int rhythmGamePoints = 0; //Points earned from rhythm minigame
     private int escapeWellGamePoints = 0; //Points earned from well escape minigame
@@ -32,6 +33,7 @@ public class Player {
     
     private boolean savedBrothers; //True if player chose to save their brothers, who were turned to stone
     private boolean forgaveBrothers = false; //True if player chose to forgive their brothers for their betrayal (after saving them)
+
     
     //Static Variables
     private static int numPlayers = 0; //Number of users who have played the game
@@ -74,7 +76,7 @@ public class Player {
         //Set player's initial health to full health
         health = healthPerLife;
         
-        numPlayers++; //Add one to the number of players
+        numPlayers += 1; //Add one to the number of players
     }
     
     /**
@@ -110,7 +112,7 @@ public class Player {
         //Set player's initial health to full health
         health = healthPerLife;
         
-        numPlayers++; //Add one to the number of players
+        numPlayers += 1; //Add one to the number of players
     }
     
    /**
@@ -147,7 +149,7 @@ public class Player {
         //Set player's initial health to full health
         health = healthPerLife;
         
-        numPlayers++; //Add one to the number of players
+        numPlayers += 1; //Add one to the number of players
     }
 
    /**
@@ -183,7 +185,7 @@ public class Player {
         //Set player's initial health to full health
         health = healthPerLife;
         
-        numPlayers++; //Add one to the number of players
+        numPlayers += 1; //Add one to the number of players
     }      
        
     
@@ -234,6 +236,22 @@ public class Player {
         return gamePoints; //Return player's game points
     }
        
+    /**
+     * Method to calculate and set totalPoints attribute of Player object
+     */
+    public void calculateTotalPoints() {
+        totalPoints = virtuePoints + gamePoints; //Add virtue points and game points together for the total points
+    }
+    
+    /**
+     * Getter method to return totalPoints attribute of Player object
+     * 
+     * @return  Total points virtue and game points earned by the player
+     */
+    public int getTotalPoints() {
+        return totalPoints; //Return sum of player's virtue points and game points
+    }
+    
     
     /**
      * Getter method to return gameScores attribute of Player object
@@ -267,6 +285,8 @@ public class Player {
         return forgaveBrothers; //Return variable indicating whether player forgave brothers
     }
     
+    
+
     /**
      * Getter method to return the static variable numPlayers shared across all Player objects
      * 
@@ -301,6 +321,15 @@ public class Player {
      * @param amount  Amount of damage taken
      */
     public void takeDamage(int amount) {
+        //Check if the amount of damage is greater than the user's health 
+        if (amount > health) {
+            ((MySketch) app).playerDeath = true; //Set variable to indicate that player ran out of health
+        //If the amount of damage is less than the user's health 
+        } else {
+            health -= amount; //Subtract damage from the user's HP 
+        } //End if statement checking if damage is greater/less than user's health
+        
+        /**
         //Check if the amount of damage is greater than the user's health in the current life
         if (amount > health) {
             //If health is depleted and the user has at least one life left, go to the next life
@@ -309,12 +338,13 @@ public class Player {
                 health = healthPerLife; //Reset next life to full health
             //If health is depleted and the user has no more lives left, game over
             } else {
-                MySketch.gameOver(); //Call game over method
+                ((MySketch) app).gameOver(); //Call game over method
             } //End if statement checking if user has lives left
         //If the amount of damage is less than the user's health in the current life
         } else {
             health -= amount; //Subtract damage from the user's HP in the current life
         } //End if statement checking if damage is greater/less than HP in current life
+        * */
     }    
     
     /**
