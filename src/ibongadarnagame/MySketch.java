@@ -20,6 +20,7 @@ public class MySketch extends PApplet {
     Player player; //Player object representing character
     Game currentGame; //Current minigame being played
     boolean playerDeath = false; //True if player runs out of health
+    boolean gamePaused = false; //True if player pauses game to eat food to regain health
     ArrayList<Game> gameResults; //Array list of all player game results
     
     //Variables
@@ -112,6 +113,16 @@ public class MySketch extends PApplet {
     
     
     //Buttons
+    //Buttons for game pause feature
+    boolean overHeart = false; //Set variable indicating mouse is over heart/pause/healing button to false
+    int heartX = 728; //Set x position of heart/pause/healing button
+    int heartY = 538; //Set y position of heart/pause/healing button
+    boolean overEatFood = false; //Set variable indicating mouse is over eat food button to false
+    int eatFoodX = 237; //Set x position of eat food button
+    int eatFoodY = 341; //Set y position of eat food button
+    
+
+    
     //Buttons for Stage 0 (Main Menu)
     boolean overTestImg = false; ////Set variable indicating mouse is over button to false
     int testImgX = 0; ////Set x position of button
@@ -209,6 +220,12 @@ public class MySketch extends PApplet {
     //Declare images
     //Declare image for Game Over screen
     PImage gameOverScreen;  //Game Over screen
+    //Declare image for paused game feature
+    PImage heartButton; //Heart/pause/healing button to pause game and eat food to gain health
+    PImage eatFoodButton; //Button to consume 1 food item
+    PImage fullHealthErrorMessage; //Error message saying health is already full when player eats food
+    PImage noFoodErrorMessage; //Error message saying player has no food items left
+    PImage gamePausedBG; //Background when game is paused to eat food to gain health
     //Declare images for Stage 0 (Main Menu)
     PImage testimg; ////
     PImage homeScreen;     //Homescreen background
@@ -359,6 +376,13 @@ public class MySketch extends PApplet {
         //Load images
         //Load image for Game Over screen
         gameOverScreen = loadImage("images/gameoverscreen.jpg"); //Game Over screen
+        
+        //Load image for paused game
+        heartButton = loadImage("images/heartbutton.png"); //Heart/pause/healing button to pause game and eat food to gain health
+        eatFoodButton = loadImage("images/eatfoodbutton.png"); //Button to consume 1 food item
+        fullHealthErrorMessage = loadImage("images/fullhealtherror.png"); //Error message saying health is already full when player eats food
+        noFoodErrorMessage = loadImage("images/nofooderror.png"); //Error message saying player has no food items left
+        gamePausedBG = loadImage("images/gamepausedbg.jpg"); //Background when game is paused to eat food to gain health
         
         //Load images for Stage 0 (Main Menu)
         testimg = loadImage("testimg.png"); ////
@@ -527,7 +551,29 @@ public class MySketch extends PApplet {
         if (playerDeath) {
             background(gameOverScreen); //Game over background
             
+        } else if (gamePaused) {
+            //Set background to when game is paused to eat food to gain health
+            background(gamePausedBG);
+            //If player does not have full health and still has food in their inventory
+            if (player.getHealth() < player.getFullHealth() && player.getInventory().getNumFood() > 0)
+                image(eatFoodButton, eatFoodX, eatFoodY); //Draw button to eat food
+            //If player does not have full health and has no more food in their inventory
+            else if (player.getHealth() < player.getFullHealth() && player.getInventory().getNumFood() <= 0)
+                image(noFoodErrorMessage, 265, 364); //Draw error message saying the player has no food items left
+            //If player has full health and still has food in their inventory
+            else if (player.getHealth() >= player.getFullHealth() && player.getInventory().getNumFood() > 0)
+                image(fullHealthErrorMessage, 263, 354); //Draw error message saying the player is at full health
+            //If player has full health and has no more food in their inventory
+            else if (player.getHealth() >= player.getFullHealth() && player.getInventory().getNumFood() <= 0)
+                image(noFoodErrorMessage, 265, 364); //Draw error message saying the player has no food items left
+                        
+            fill(0); //Set text colour to black;
+            textAlign(LEFT, LEFT); //Align text to the left
+            textSize(24); //Set text size
             
+            text(player.getHealth() + " / " + player.getFullHealth(), 371, 242);
+            text(player.getInventory().getNumFood(), 460, 280);
+            text(Player.getHealthPerFood(), 447, 315);
             
         } else {
         
@@ -1056,7 +1102,7 @@ public class MySketch extends PApplet {
 	    image(donPedro, donPedroX, donPedroY); //Draw brother 1 on the screen
 	    image(donDiego, donDiegoX, donDiegoY); //Draw brother 2 on the screen
 
-    //If player has golden cage in their inventory from the hermit
+                //If player has golden cage in their inventory from the hermit
                 if (player.getInventory().hasItem("Golden Cage")) 
                     image(adarnaInCage, adarnaBirdX, adarnaBirdY); //Draw Adarna bird beside the character in the golden cage
                 ///If player has golden cage in their inventory from the hermit
@@ -1212,9 +1258,13 @@ public class MySketch extends PApplet {
             else if (!player.getSavedBrothers())
                 background(ending3); //Display unhappy ending
             
-            
-            
+        } //End if statement checking which stage of the game it is
+        
+        //Display heart/pause/healing button on certain screens to allow the user to eat food to regain health
+        if (stage == 2 || stage == 3 || stage == 4 || stage == 6 || stage == 7 || stage == 8 || stage == 9 || stage == 12 || stage == 13 || stage == 14 || stage == 16 || stage == 17) {
+            image(heartButton, heartX, heartY); //Draw heart/pause/healing button on the screen
         }
+            
         
         
         } //End else player death ////
@@ -1289,6 +1339,9 @@ public class MySketch extends PApplet {
     
     void update(int x, int y) {
         //Set all boolean variables indicating that mouse is over a specific button to false (reset)
+        //Variables for pause game feature
+        overHeart = false;  //Heart/pause/healing button to pause game and eat food to gain health
+        overEatFood = false;  //Eat food button to consume 1 food item in exchange for health points
         //Variables for Stage 0 (Main Menu)
         overStartGame = false;   //Start game button
         overLeaderboard = false; //Show leaderboard button
@@ -1323,101 +1376,115 @@ public class MySketch extends PApplet {
         overNo = false; //Button to not forgive brothers
         
         
-    
-           //// int adarnaBirdX = -100; //X position of Adarna bird
-   //// int adarnaBirdY = 225; //Y position of Adarna bird
         
-        //Stage 0 (Main Menu)
-        if (stage == 0) {
+        if (stage == 2 || stage == 3 || stage == 4 || stage == 6 || stage == 7 || stage == 8 || stage == 9 || stage == 12 || stage == 13 || stage == 14 || stage == 16 || stage == 17) {
             //Set boolean variable of a button to true if the mouse if over it (used for button clicks)
-            //Mouse is over a specific button in Stage 0 (Main Menu)
-            if (overImage(startGame, startGameX, startGameY)) //Start game button
-                overStartGame = true; //Set variable indicating mouse is over start game button to true
-            else if (overImage(leaderboard, leaderboardX, leaderboardY)) //Show leaderboard button
-                overLeaderboard = true; //Set variable indicating mouse is over leaderboard button to true
-            else if (overImage(exitGame, exitGameX, exitGameY)) //Exit game button
-                overExitGame = true; //Set variable indicating mouse is over exit game button to true
-        //Stage -1 (Character Setup)
-        } else if (stage == -1) {
-            //Mouse is over a specific button in Stage 1 (Character Setup)
-            if (overImage(chooseNameButton, chooseNameX, chooseNameY)) //Choose name button
-                overChooseName = true; //Set variable indicating mouse is over choose name button to true
-            else if (overImage(customizeButton, customizeX, customizeY)) //Customize clothes button
-                overCustomize = true; //Set variable indicating mouse is over customize clothes button to true
-            else if (overImage(startButton, startX, startY)) //Start button
-                overStart = true; //Set variable indicating mouse is over start button to true 
-        //Stage -3 (Customize Clothes)
-        } else if (stage == -3) {
-            //Mouse is over a specific button in Stage -3 (Customize Clothes)
-            if (overImage(leftButton, leftArrowX, leftArrowY)) //Left arrow button
-                overLeftArrow = true; //Set variable indicating mouse is over left arrow button to true
-            else if (overImage(rightButton, rightArrowX, rightArrowY)) //Right arrow button
-                overRightArrow = true; //Set variable indicating mouse is over right arrow button to true
-        //Stage 1 (Begin Story)
-        } else if (stage == 1) {
-            //Mouse is over a specific button in Stage 1 (Begin Story)
-            if (overImage(plusStrengthButton, plusStrengthX, plusStrengthY)) //Button to add one point to strength trait
-                overPlusStrength = true; //Set variable indicating mouse is over add strength button to true
-            else if (overImage(minusStrengthButton, minusStrengthX, minusStrengthY)) //Button to subtract one point to strength trait
-                overMinusStrength = true; //Set variable indicating mouse is over minus strength button to true
-            if (overImage(plusInteligenceButton, plusIntelligenceX, plusIntelligenceY)) //Button to add one point to intelligence trait
-                overPlusIntelligence = true; //Set variable indicating mouse is over add intelligence button to true
-            else if (overImage(minusIntelligenceButton, minusIntelligenceX, minusIntelligenceY)) //Button to subtract one point to intelligence trait
-                overMinusIntelligence = true; //Set variable indicating mouse is over minus intelligence button to true
-           
-        //Stage 7 (Meet Hermit)
-        } else if (stage == 7) {
-            //Mouse is over a specific button in Stage 7 (Meet Hermit)
-            if (overImage(helpHermitButton, helpHermitX, helpHermitY)) //Button to help hermit
-                overHelpHermit = true; //Set variable indicating mouse is over help hermit button to true
-            //Mouse is over a specific button in Stage 7 (Meet Hermit)
-            if (overImage(ignoreHermitButton, ignoreHermitX, ignoreHermitY)) //Button to ignore hermit
-                overIgnoreHermit = true; //Set variable indicating mouse is over ignore hermit button to true
-            
-        //Stage 9 (Find Adarna Bird)
-        } else if (stage == 9) {
-            //Mouse is over a specific button in Stage 9 (Find Adarna Bird)
-            if (overImage(sheerWillButton, sheerWillX, sheerWillY)) //Button to use sheer will to stay awake
-                overSheerWill = true; //Set variable indicating mouse is over sheer will button to true
-            if (player.getInventory().hasItem("Lime Juice")) {
-                if (overImage(limeJuiceButton, limeJuiceX, limeJuiceY)) //Button to use lime juice to stay awake
-                overLimeJuice = true; //Set variable indicating mouse is over lime juice button to true
-            } //End if statement for if user has lime juice in their inventory
-            
-        //Stage 11 (Catch the Adarna Bird)
-        } else if (stage == 11) {
-            //If player has rope and golden cage in their inventory
-            if (player.getInventory().hasItem("Rope") && player.getInventory().hasItem("Golden Cage")) {
-                //Mouse is over a specific button in Stage 11 (Catch the Adarna Bird)
-                if (overImage(catchAdarnaCage, catchAdarnaCageX, catchAdarnaCageY)) //Image of golden cage
-                    overCatchAdarnaCage = true; //Set variable indicating mouse is over golden cage to true
-                else if (overImage(catchAdarnaRope, catchAdarnaRopeX, catchAdarnaRopeY)) //Image of rope
-                    overCatchAdarnaRope = true; //Set variable indicating mouse is over rope to true
-            //If player does not have rope and golden cage in their inventory
-            } else {
-                //Mouse is over a specific button in Stage 11 (Catch the Adarna Bird)
-                if (overImage(adarnaBird, adarnaBirdX, adarnaBirdY)) //Image of Adarna bird
-                    overAdarnaBird = true; //Set variable indicating mouse is over Adarna bird to true
+            if (overImage(heartButton, heartX, heartY)) {//Heart/pause/healing button
+                overHeart = true; //Set variable indicating mouse is over heart/pause/healing button to true
+                return;
             }
-            
-        //Stage 13 (Find Brothers)
-        } else if (stage == 13) {
-            //Mouse is over a specific button in Stage 13 (Find Brothers)
-            if (overImage(saveThemButton, saveThemX, saveThemY)) //Button clicked to save brothers
-                overSaveThem = true; //Set variable indicating mouse is over save them button to true
-            else if (overImage(leaveThemButton, leaveThemX, leaveThemY)) //Button clicked to elave brothers
-                overleaveThem = true; //Set variable indicating mouse is over leave them button to true
-        
-    
-        //Stage 18 (Heal King)    
-        } else if (stage == 18) {
-            //Mouse is over a specific button in Stage 18 (Heal King)
-            if (overImage(yesButton, yesX, yesY)) //Button clicked to forgive brothers
-                overYes = true; //Set variable indicating mouse is over yes button to true
-            else if (overImage(noButton, noX, noY)) //Button clicked to not forgive brothers
-                overNo = true; //Set variable indicating mouse is over no button to true
         }
+    
         
+        
+        
+                
+        if (gamePaused) {
+            //Set boolean variable of a button to true if the mouse if over it (used for button clicks)
+            //Mouse is over the eat food button in the pause game screen (shows up if the player doesn't have full health, player must have at least 1 food item)
+            if (player.getInventory().getNumFood() > 0 && player.getHealth() < player.getFullHealth() && overImage(eatFoodButton, eatFoodX, eatFoodY)) //Eat food button
+                overEatFood = true; //Set variable indicating mouse is over eat food button to true
+        } else {
+            //Stage 0 (Main Menu)
+            if (stage == 0) {
+                //Mouse is over a specific button in Stage 0 (Main Menu)
+                if (overImage(startGame, startGameX, startGameY)) //Start game button
+                    overStartGame = true; //Set variable indicating mouse is over start game button to true
+                else if (overImage(leaderboard, leaderboardX, leaderboardY)) //Show leaderboard button
+                    overLeaderboard = true; //Set variable indicating mouse is over leaderboard button to true
+                else if (overImage(exitGame, exitGameX, exitGameY)) //Exit game button
+                    overExitGame = true; //Set variable indicating mouse is over exit game button to true
+            //Stage -1 (Character Setup)
+            } else if (stage == -1) {
+                //Mouse is over a specific button in Stage 1 (Character Setup)
+                if (overImage(chooseNameButton, chooseNameX, chooseNameY)) //Choose name button
+                    overChooseName = true; //Set variable indicating mouse is over choose name button to true
+                else if (overImage(customizeButton, customizeX, customizeY)) //Customize clothes button
+                    overCustomize = true; //Set variable indicating mouse is over customize clothes button to true
+                else if (overImage(startButton, startX, startY)) //Start button
+                    overStart = true; //Set variable indicating mouse is over start button to true 
+            //Stage -3 (Customize Clothes)
+            } else if (stage == -3) {
+                //Mouse is over a specific button in Stage -3 (Customize Clothes)
+                if (overImage(leftButton, leftArrowX, leftArrowY)) //Left arrow button
+                    overLeftArrow = true; //Set variable indicating mouse is over left arrow button to true
+                else if (overImage(rightButton, rightArrowX, rightArrowY)) //Right arrow button
+                    overRightArrow = true; //Set variable indicating mouse is over right arrow button to true
+            //Stage 1 (Begin Story)
+            } else if (stage == 1) {
+                //Mouse is over a specific button in Stage 1 (Begin Story)
+                if (overImage(plusStrengthButton, plusStrengthX, plusStrengthY)) //Button to add one point to strength trait
+                    overPlusStrength = true; //Set variable indicating mouse is over add strength button to true
+                else if (overImage(minusStrengthButton, minusStrengthX, minusStrengthY)) //Button to subtract one point to strength trait
+                    overMinusStrength = true; //Set variable indicating mouse is over minus strength button to true
+                if (overImage(plusInteligenceButton, plusIntelligenceX, plusIntelligenceY)) //Button to add one point to intelligence trait
+                    overPlusIntelligence = true; //Set variable indicating mouse is over add intelligence button to true
+                else if (overImage(minusIntelligenceButton, minusIntelligenceX, minusIntelligenceY)) //Button to subtract one point to intelligence trait
+                    overMinusIntelligence = true; //Set variable indicating mouse is over minus intelligence button to true
+
+            //Stage 7 (Meet Hermit)
+            } else if (stage == 7) {
+                //Mouse is over a specific button in Stage 7 (Meet Hermit)
+                if (overImage(helpHermitButton, helpHermitX, helpHermitY)) //Button to help hermit
+                    overHelpHermit = true; //Set variable indicating mouse is over help hermit button to true
+                //Mouse is over a specific button in Stage 7 (Meet Hermit)
+                if (overImage(ignoreHermitButton, ignoreHermitX, ignoreHermitY)) //Button to ignore hermit
+                    overIgnoreHermit = true; //Set variable indicating mouse is over ignore hermit button to true
+
+            //Stage 9 (Find Adarna Bird)
+            } else if (stage == 9) {
+                //Mouse is over a specific button in Stage 9 (Find Adarna Bird)
+                if (overImage(sheerWillButton, sheerWillX, sheerWillY)) //Button to use sheer will to stay awake
+                    overSheerWill = true; //Set variable indicating mouse is over sheer will button to true
+                if (player.getInventory().hasItem("Lime Juice")) {
+                    if (overImage(limeJuiceButton, limeJuiceX, limeJuiceY)) //Button to use lime juice to stay awake
+                    overLimeJuice = true; //Set variable indicating mouse is over lime juice button to true
+                } //End if statement for if user has lime juice in their inventory
+
+            //Stage 11 (Catch the Adarna Bird)
+            } else if (stage == 11) {
+                //If player has rope and golden cage in their inventory
+                if (player.getInventory().hasItem("Rope") && player.getInventory().hasItem("Golden Cage")) {
+                    //Mouse is over a specific button in Stage 11 (Catch the Adarna Bird)
+                    if (overImage(catchAdarnaCage, catchAdarnaCageX, catchAdarnaCageY)) //Image of golden cage
+                        overCatchAdarnaCage = true; //Set variable indicating mouse is over golden cage to true
+                    else if (overImage(catchAdarnaRope, catchAdarnaRopeX, catchAdarnaRopeY)) //Image of rope
+                        overCatchAdarnaRope = true; //Set variable indicating mouse is over rope to true
+                //If player does not have rope and golden cage in their inventory
+                } else {
+                    //Mouse is over a specific button in Stage 11 (Catch the Adarna Bird)
+                    if (overImage(adarnaBird, adarnaBirdX, adarnaBirdY)) //Image of Adarna bird
+                        overAdarnaBird = true; //Set variable indicating mouse is over Adarna bird to true
+                }
+
+            //Stage 13 (Find Brothers)
+            } else if (stage == 13) {
+                //Mouse is over a specific button in Stage 13 (Find Brothers)
+                if (overImage(saveThemButton, saveThemX, saveThemY)) //Button clicked to save brothers
+                    overSaveThem = true; //Set variable indicating mouse is over save them button to true
+                else if (overImage(leaveThemButton, leaveThemX, leaveThemY)) //Button clicked to elave brothers
+                    overleaveThem = true; //Set variable indicating mouse is over leave them button to true
+
+
+            //Stage 18 (Heal King)    
+            } else if (stage == 18) {
+                //Mouse is over a specific button in Stage 18 (Heal King)
+                if (overImage(yesButton, yesX, yesY)) //Button clicked to forgive brothers
+                    overYes = true; //Set variable indicating mouse is over yes button to true
+                else if (overImage(noButton, noX, noY)) //Button clicked to not forgive brothers
+                    overNo = true; //Set variable indicating mouse is over no button to true
+            }
+        } //End if statement checking if game is paused
         
         
         //If mouse is hovering over the the 
@@ -1432,248 +1499,270 @@ public class MySketch extends PApplet {
     
     @Override
     public void mousePressed() {
-        //Stage 0 (Main Menu)
-        if (stage == 0) {
-            //If mouse is over start game button when mouse is clicked
-            if (overStartGame) {
-                //Check if the game hasn't reached the maximum number of players yet
-                if (Player.getNumPlayers() < 5)
-                    stage = -1; //Continue to game/character setup screen if there are less than 5 players
-            //If user is over leaderboard button when mouse is clicked
-            } else if (overLeaderboard) {
-                stage = -4; //Go to leaderboard screen
-            //If user is over exit game button when mouse is clicked
-            } else if (overExitGame) {
-                System.exit(0); //Exit game
-            ////
-        /**} else if (stage == -1) {
-            if (overImage(customname)) {
-              customName = true;
-            } 
-            if (overImage(customcharacter)) {
-              customCharacter = true;
-            } 
-*////
-            }
-        //Stage -1 (Character Setup)
-        } else if (stage == -1) {
-            //If mouse is over choose name button when mouse is clicked
-            if (overChooseName) 
-                stage = -2; //Go to choose name screen
-            //If mouse is over customize clothes button when mouse is clicked
-            else if (overCustomize) 
-                stage = -3; //Go to customize character screen
-            //If mouse is over start button when mouse is clicked
-            else if (overStart) 
-                stage = 1; //Begin story
-            
-    
-    
-        //Stage -3 (Customize Clothes)
-        } else if (stage == -3) {
-            //If mouse is over left arrow button when mouse is clicked
-            if (overLeftArrow)
-                //If character clothing v1 is currently being shown, show v3 (v1 is false and v2 is false)
-                if (chooseCharacter1) {
-                    chooseCharacter1 = false; //Set variable indicating character v1 is showing to false
-                //If character clothing v2 is currently being shown, show v1
-                } else if (chooseCharacter2) {
-                    chooseCharacter2 = false; //Set variable indicating character v2 is showing to false
-                    chooseCharacter1 = true; //Set variable indicating character v1 is showing to true
-	    //If character clothing v3 is currently being shown, show v2
-                } else { 
-                    chooseCharacter2 = true; //Set variable indicating character v2 is showing to true
-                } //End if statement deciding which character clothing version to show when left button is clicked
-                            
-            //If mouse is over right arrow button when mouse is clicked
-            else if (overRightArrow)
-	    //If character clothing v1 is currently being shown, show v3 (v1 is false and v2 is false)
-                if (chooseCharacter1) {
-                    chooseCharacter1 = false; //Set variable indicating character v1 is showing to false
-                    chooseCharacter2 = true; //Set variable indicating character v2 is showing to true
-	    //If character clothing v2 is currently being shown, show v3 (v1 is false and v2 is false)
-                } else if (chooseCharacter2) {
-                    chooseCharacter2 = false; //Set variable indicating character v2 is showing to false
-	    //If character clothing v3 is currently being shown, show v1 (v1 is false and v2 is false)
-                } else {
-                    chooseCharacter1 = true; //Set variable indicating character v1 is showing to true
-                } //End if statement deciding which character clothing version to show when right button is clicked
-
-            
-            
-            
-        //Stage 1 (Begin Story)
-        } else if (stage == 1) {
-	//If mouse is over plus strength button when mouse is clicked
-            if (overPlusStrength) {
-	    //If the user has no strength points and no intelligence points
-                if (currentStrengthPoints == 0 && currentIntelligencePoints == 0)
-                    currentStrengthPoints = 1; //Set current strength points to 1
-	    //If user has the maximum number of intelligence points
-                else if (currentIntelligencePoints == 2) {
-                    currentStrengthPoints = 1; //Set current strength points to 1
-                    currentIntelligencePoints = 1; //Set current intelligence points to 1
-	    //If user has no strength points and one intelligence point
-                } else if (currentStrengthPoints == 0) 
-                    currentStrengthPoints = 1; //Set current strength points to 1
-	    //If user has one strength point and one intelligence point
-                else if (currentStrengthPoints == 1 && currentIntelligencePoints == 1) {
-                    currentStrengthPoints = 2; //Set current strength points to 2
-                    currentIntelligencePoints = 0; //Set current intelligence points to 0
-	    //If the user has one strength point and no intelligence points
-                } else {
-                    currentStrengthPoints = 2; //Set current strength points to 2
-                } //End if statement deciding how to set the points when the plus strength button is clicked
-
-	//If mouse is over minus strength button when mouse is clicked
-            } else if (overMinusStrength) {
-	    //If user has maximum strength points
-                if (currentStrengthPoints == 2)
-                   currentStrengthPoints = 1; //Set current strength points to 1
-	     //If user has zero or one strength points
-                else {
-                    currentStrengthPoints = 0; //Set current strength points to 0
-                } //End if statement deciding how to set the points when the minus strength button is clicked
-
-	//If mouse is over plus intelligence button when mouse is clicked
-            } else if (overPlusIntelligence) {
-	    //If the user has no strength points and no intelligence points
-                if (currentStrengthPoints == 0 && currentIntelligencePoints == 0)
-                    currentIntelligencePoints = 1; //Set current intelligence points to 1
-	    //If user has the maximum number of strength points
-                else if (currentStrengthPoints == 2) {
-                    currentStrengthPoints = 1; //Set current strength points to 1
-                    currentIntelligencePoints = 1; //Set current intelligence points to 1
-	    //If user has no intelligence points and one strength point
-                } else if (currentIntelligencePoints == 0) 
-                    currentIntelligencePoints = 1; //Set current intelligence points to 1
-	    //If user has one strength point and one intelligence point
-                else if (currentStrengthPoints == 1 && currentIntelligencePoints == 1) {
-                    currentIntelligencePoints = 2; //Set current intelligence points to 2
-                    currentStrengthPoints = 0; //Set current strength points to 0
-	    //If the user has one intelligence point and no strength points
-                }  else {
-                    currentIntelligencePoints = 2; //Set current intelligence points to 2
-                } //End if statement deciding how to set the points when the plus intelligence button is clicked
-
-	//If mouse is over minus intelligence button when mouse is clicked
-            } else if (overMinusIntelligence) {
-	    //If user has maximum intelligence points
-                if (currentIntelligencePoints == 2)
-                   currentIntelligencePoints = 1; //Set current intelligence points to 1
-	    //If user has zero or one intelligence points
-                else {
-                    currentIntelligencePoints = 0; //Set current intelligence points to 0
-                } //End if statement deciding how to set the points when the minus intelligence button is clicked
-            } ////might need to remove this
-                
-                    
-	//Stage 5 (Boar Fight Minigame)
-            } else if (stage == 5) {
-                currentGame.mousePressed(); //Call mouse pressed method for boar fight minigame
-                
-            //Stage 7 (Meet Hermit)
-            } else if (stage == 7) {
-	    //If user is deciding on whether to help or ignore the hermit
-                if (currentScreen7 == 2) {
-                    //If mouse is over help hermit button when mouse is clicked
-                    if (overHelpHermit)
-                        playerHelpsHermit = true; //Indicate that player helped hermit, determines the next screen
-	        //If mouse is over ignore hermit button when mouse is clicked
-                    else if (overIgnoreHermit)
-                        playerHelpsHermit = false; //Indicate that player didn't help hermit, determines the next screen
-                    currentScreen7 = 3; //Set current screen of Stage 7 to the leaving the hermit
-                } //End if statement checking for screen 2 of Stage 7
-                    
-	//Stage 9 (Adarna Bird)
-            } else if (stage == 9) {
-	    //If user is deciding how to stay awake during the Adarna bird's songs
-                if (currentScreen9 == 2) {
-	        //If mouse is over sheer will button when mouse is clicked
-                    if (overSheerWill) {
-                        sheerWill = true; //Indicate that player decided on using sheer will
-                        currentScreen9 = 3; //Set current screen of Stage 9 to the rhythm game instructions
-	        //If mouse is over lime juice button when mouse is clicked and user has lime juice in their inventory
-                    } else if (overLimeJuice && player.getInventory().hasItem("Lime Juice")) {
-                        sheerWill = false; //Indicate that player decided on using lime juice
-                        currentScreen9 = 3; //Set current screen of Stage 9 to the rhythm game instructions
-                    } //End if statement for if user's mouse is over sheer will button or lime juice button
-                } //End if statement checking for screen 2 of Stage 9
-                        
-                        
-            //Rhythm Minigame
-            } else if (stage == 10) {
-                currentGame.mousePressed(); //Call mouse pressed method for rhythm minigame
-                
-                
-            //Stage 11 (Find Adarna)
-            } else if (stage == 11) {
-                //If mouse is over golden cage when mouse is clicked
-                if (overCatchAdarnaCage) {
-                    clickedCage = true; //Indicate that player clicked cage
-                    if (clickedRope) { //If user already clicked rope as well
-                       player.moveTo(360, 255); //Set new player position
-                       adarnaBirdX = 320; //Set x position of Adarna bird in cage
-                       adarnaBirdY = 315; //Set x position of Adarna bird in cage
-                       stage = 12; //Go to the next stage (Caught Bird) 
-                    } //End if statement checking if user already clicked rope as well
-                }
-                //If mouse is over rope when mouse is clicked
-                else if (overCatchAdarnaRope) {
-                    clickedRope = true; //Indicate that player clicked rope
-                    if (clickedCage) { //If user already clicked cage as well
-                       player.moveTo(360, 255); //Set new player position
-                       adarnaBirdX = 320; //Set x position of Adarna bird in cage
-                       adarnaBirdY = 315; //Set x position of Adarna bird in cage
-                       stage = 12; //Go to the next stage (Caught Bird) 
-                    } //End if statement checking if user already clicked rope as well
-                }
-                //If mouse is over Adarna bird when mouse is clicked
-                if (overAdarnaBird) {
-                    player.moveTo(360, 225); //Set new player position
-                    adarnaBirdX = 335; //Set x position of Adarna bird 
-                    adarnaBirdY = 355; //Set x position of Adarna bird
-                    stage = 12; //Go to the next stage (Caught Bird) 
-                }
-                        
-            //Stage 12 (Find Brothers)          
-            } else if (stage == 13) {
-                //If user is deciding whether to save or leave brothers
-                if (currentScreen13 == 2) {
-                    //If mouse is over save them button when mouse is clicked
-                    if (overSaveThem) {
-                        player.setSavedBrothers(true); //Set variable to indicate player saved brothers
-                        currentScreen13 = 3; //Set current screen of Stage 12 to after saving the brothers
-                    //If mouse is leave them button when mouse is clicked
-                    } else if (overleaveThem) {
-                        player.setSavedBrothers(false); //Set variable to indicate player left brothers
-                        currentScreen13 = 4; //Set current screen of Stage 12 to after leaving the brothers
-                    } //End if statement checking if user's mouse is over save brothers button or leave brothers button
-                } //End if statement checking for screen 2 of Stage 13
-                
-                
-            //Stage 15 (Escape Well Minigame)
-            } else if (stage == 15) {
-                currentGame.mousePressed(); //Call mouse pressed method for escape well minigame
-                
-                
-            //Stage 18 (Heal King)
-            } else if (stage == 18) {
-                //If user is deciding whether to forgive brothers
-                if (currentScreen18 == 3) {
-                    //If mouse is over yes button when mouse is clicked
-                    if (overYes) 
-                        player.setForgaveBrothers(true); //Set variable to indicate player forgave brothers
-                    //If mouse is no button when mouse is clicked
-                    else if (overNo)
-                        player.setForgaveBrothers(false); //Set variable to indicate player didn't forgive brothers
-                    //End if statement checking if user's mouse is over save brothers button or leave brothers button
-                    stage = 19; //Go to the next stage (ending)
-                } //End if statement checking for screen 2 of Stage 13
-            }
-                
         
-       
+        if (stage == 2 || stage == 3 || stage == 4 || stage == 6 || stage == 7 || stage == 8 || stage == 9 || stage == 12 || stage == 13 || stage == 14 || stage == 16 || stage == 17) {
+            //If mouse is over heart/pause/healing button when mouse is clicked
+            if (overHeart) {
+                gamePaused = true; //Pause game
+                return;
+            }
+        }
+        
+    
+        
+        
+        
+        //Pause Game Screen
+        if (gamePaused) {
+            //If mouse is over eat food button when mouse is clicked (shows up if the player doesn't have full health, player must have at least 1 food item)
+            if (player.getInventory().getNumFood() > 0 && player.getHealth() < player.getFullHealth() && overEatFood) 
+                player.eatFood(); //Call method to consume food and give player a health boost
+        } else {
+        
+    
+    
+            //Stage 0 (Main Menu)
+            if (stage == 0) {
+                //If mouse is over start game button when mouse is clicked
+                if (overStartGame) {
+                    //Check if the game hasn't reached the maximum number of players yet
+                    if (Player.getNumPlayers() < 5)
+                        stage = -1; //Continue to game/character setup screen if there are less than 5 players
+                //If mouse is over leaderboard button when mouse is clicked
+                } else if (overLeaderboard) {
+                    stage = -4; //Go to leaderboard screen
+                //If mouse is over exit game button when mouse is clicked
+                } else if (overExitGame) {
+                    System.exit(0); //Exit game
+                ////
+            /**} else if (stage == -1) {
+                if (overImage(customname)) {
+                  customName = true;
+                } 
+                if (overImage(customcharacter)) {
+                  customCharacter = true;
+                } 
+    *////
+                }
+            //Stage -1 (Character Setup)
+            } else if (stage == -1) {
+                //If mouse is over choose name button when mouse is clicked
+                if (overChooseName) 
+                    stage = -2; //Go to choose name screen
+                //If mouse is over customize clothes button when mouse is clicked
+                else if (overCustomize) 
+                    stage = -3; //Go to customize character screen
+                //If mouse is over start button when mouse is clicked
+                else if (overStart) 
+                    stage = 1; //Begin story
+
+
+
+            //Stage -3 (Customize Clothes)
+            } else if (stage == -3) {
+                //If mouse is over left arrow button when mouse is clicked
+                if (overLeftArrow)
+                    //If character clothing v1 is currently being shown, show v3 (v1 is false and v2 is false)
+                    if (chooseCharacter1) {
+                        chooseCharacter1 = false; //Set variable indicating character v1 is showing to false
+                    //If character clothing v2 is currently being shown, show v1
+                    } else if (chooseCharacter2) {
+                        chooseCharacter2 = false; //Set variable indicating character v2 is showing to false
+                        chooseCharacter1 = true; //Set variable indicating character v1 is showing to true
+                //If character clothing v3 is currently being shown, show v2
+                    } else { 
+                        chooseCharacter2 = true; //Set variable indicating character v2 is showing to true
+                    } //End if statement deciding which character clothing version to show when left button is clicked
+
+                //If mouse is over right arrow button when mouse is clicked
+                else if (overRightArrow)
+                //If character clothing v1 is currently being shown, show v3 (v1 is false and v2 is false)
+                    if (chooseCharacter1) {
+                        chooseCharacter1 = false; //Set variable indicating character v1 is showing to false
+                        chooseCharacter2 = true; //Set variable indicating character v2 is showing to true
+                //If character clothing v2 is currently being shown, show v3 (v1 is false and v2 is false)
+                    } else if (chooseCharacter2) {
+                        chooseCharacter2 = false; //Set variable indicating character v2 is showing to false
+                //If character clothing v3 is currently being shown, show v1 (v1 is false and v2 is false)
+                    } else {
+                        chooseCharacter1 = true; //Set variable indicating character v1 is showing to true
+                    } //End if statement deciding which character clothing version to show when right button is clicked
+
+
+
+
+            //Stage 1 (Begin Story)
+            } else if (stage == 1) {
+            //If mouse is over plus strength button when mouse is clicked
+                if (overPlusStrength) {
+                //If the user has no strength points and no intelligence points
+                    if (currentStrengthPoints == 0 && currentIntelligencePoints == 0)
+                        currentStrengthPoints = 1; //Set current strength points to 1
+                //If user has the maximum number of intelligence points
+                    else if (currentIntelligencePoints == 2) {
+                        currentStrengthPoints = 1; //Set current strength points to 1
+                        currentIntelligencePoints = 1; //Set current intelligence points to 1
+                //If user has no strength points and one intelligence point
+                    } else if (currentStrengthPoints == 0) 
+                        currentStrengthPoints = 1; //Set current strength points to 1
+                //If user has one strength point and one intelligence point
+                    else if (currentStrengthPoints == 1 && currentIntelligencePoints == 1) {
+                        currentStrengthPoints = 2; //Set current strength points to 2
+                        currentIntelligencePoints = 0; //Set current intelligence points to 0
+                //If the user has one strength point and no intelligence points
+                    } else {
+                        currentStrengthPoints = 2; //Set current strength points to 2
+                    } //End if statement deciding how to set the points when the plus strength button is clicked
+
+            //If mouse is over minus strength button when mouse is clicked
+                } else if (overMinusStrength) {
+                //If user has maximum strength points
+                    if (currentStrengthPoints == 2)
+                       currentStrengthPoints = 1; //Set current strength points to 1
+                 //If user has zero or one strength points
+                    else {
+                        currentStrengthPoints = 0; //Set current strength points to 0
+                    } //End if statement deciding how to set the points when the minus strength button is clicked
+
+            //If mouse is over plus intelligence button when mouse is clicked
+                } else if (overPlusIntelligence) {
+                //If the user has no strength points and no intelligence points
+                    if (currentStrengthPoints == 0 && currentIntelligencePoints == 0)
+                        currentIntelligencePoints = 1; //Set current intelligence points to 1
+                //If user has the maximum number of strength points
+                    else if (currentStrengthPoints == 2) {
+                        currentStrengthPoints = 1; //Set current strength points to 1
+                        currentIntelligencePoints = 1; //Set current intelligence points to 1
+                //If user has no intelligence points and one strength point
+                    } else if (currentIntelligencePoints == 0) 
+                        currentIntelligencePoints = 1; //Set current intelligence points to 1
+                //If user has one strength point and one intelligence point
+                    else if (currentStrengthPoints == 1 && currentIntelligencePoints == 1) {
+                        currentIntelligencePoints = 2; //Set current intelligence points to 2
+                        currentStrengthPoints = 0; //Set current strength points to 0
+                //If the user has one intelligence point and no strength points
+                    }  else {
+                        currentIntelligencePoints = 2; //Set current intelligence points to 2
+                    } //End if statement deciding how to set the points when the plus intelligence button is clicked
+
+            //If mouse is over minus intelligence button when mouse is clicked
+                } else if (overMinusIntelligence) {
+                //If user has maximum intelligence points
+                    if (currentIntelligencePoints == 2)
+                       currentIntelligencePoints = 1; //Set current intelligence points to 1
+                //If user has zero or one intelligence points
+                    else {
+                        currentIntelligencePoints = 0; //Set current intelligence points to 0
+                    } //End if statement deciding how to set the points when the minus intelligence button is clicked
+                } ////might need to remove this
+
+
+            //Stage 5 (Boar Fight Minigame)
+                } else if (stage == 5) {
+                    currentGame.mousePressed(); //Call mouse pressed method for boar fight minigame
+
+                //Stage 7 (Meet Hermit)
+                } else if (stage == 7) {
+                //If user is deciding on whether to help or ignore the hermit
+                    if (currentScreen7 == 2) {
+                        //If mouse is over help hermit button when mouse is clicked
+                        if (overHelpHermit)
+                            playerHelpsHermit = true; //Indicate that player helped hermit, determines the next screen
+                    //If mouse is over ignore hermit button when mouse is clicked
+                        else if (overIgnoreHermit)
+                            playerHelpsHermit = false; //Indicate that player didn't help hermit, determines the next screen
+                        currentScreen7 = 3; //Set current screen of Stage 7 to the leaving the hermit
+                    } //End if statement checking for screen 2 of Stage 7
+
+            //Stage 9 (Adarna Bird)
+                } else if (stage == 9) {
+                //If user is deciding how to stay awake during the Adarna bird's songs
+                    if (currentScreen9 == 2) {
+                    //If mouse is over sheer will button when mouse is clicked
+                        if (overSheerWill) {
+                            sheerWill = true; //Indicate that player decided on using sheer will
+                            currentScreen9 = 3; //Set current screen of Stage 9 to the rhythm game instructions
+                    //If mouse is over lime juice button when mouse is clicked and user has lime juice in their inventory
+                        } else if (overLimeJuice && player.getInventory().hasItem("Lime Juice")) {
+                            sheerWill = false; //Indicate that player decided on using lime juice
+                            currentScreen9 = 3; //Set current screen of Stage 9 to the rhythm game instructions
+                        } //End if statement for if user's mouse is over sheer will button or lime juice button
+                    } //End if statement checking for screen 2 of Stage 9
+
+
+                //Rhythm Minigame
+                } else if (stage == 10) {
+                    currentGame.mousePressed(); //Call mouse pressed method for rhythm minigame
+
+
+                //Stage 11 (Find Adarna)
+                } else if (stage == 11) {
+                    //If mouse is over golden cage when mouse is clicked
+                    if (overCatchAdarnaCage) {
+                        clickedCage = true; //Indicate that player clicked cage
+                        if (clickedRope) { //If user already clicked rope as well
+                           player.moveTo(360, 255); //Set new player position
+                           adarnaBirdX = 320; //Set x position of Adarna bird in cage
+                           adarnaBirdY = 315; //Set x position of Adarna bird in cage
+                           stage = 12; //Go to the next stage (Caught Bird) 
+                        } //End if statement checking if user already clicked rope as well
+                    }
+                    //If mouse is over rope when mouse is clicked
+                    else if (overCatchAdarnaRope) {
+                        clickedRope = true; //Indicate that player clicked rope
+                        if (clickedCage) { //If user already clicked cage as well
+                           player.moveTo(360, 255); //Set new player position
+                           adarnaBirdX = 320; //Set x position of Adarna bird in cage
+                           adarnaBirdY = 315; //Set x position of Adarna bird in cage
+                           stage = 12; //Go to the next stage (Caught Bird) 
+                        } //End if statement checking if user already clicked rope as well
+                    }
+                    //If mouse is over Adarna bird when mouse is clicked
+                    if (overAdarnaBird) {
+                        player.moveTo(360, 225); //Set new player position
+                        adarnaBirdX = 335; //Set x position of Adarna bird 
+                        adarnaBirdY = 355; //Set x position of Adarna bird
+                        stage = 12; //Go to the next stage (Caught Bird) 
+                    }
+
+                //Stage 12 (Find Brothers)          
+                } else if (stage == 13) {
+                    //If user is deciding whether to save or leave brothers
+                    if (currentScreen13 == 2) {
+                        //If mouse is over save them button when mouse is clicked
+                        if (overSaveThem) {
+                            player.setSavedBrothers(true); //Set variable to indicate player saved brothers
+                            currentScreen13 = 3; //Set current screen of Stage 12 to after saving the brothers
+                        //If mouse is leave them button when mouse is clicked
+                        } else if (overleaveThem) {
+                            player.setSavedBrothers(false); //Set variable to indicate player left brothers
+                            currentScreen13 = 4; //Set current screen of Stage 12 to after leaving the brothers
+                        } //End if statement checking if user's mouse is over save brothers button or leave brothers button
+                    } //End if statement checking for screen 2 of Stage 13
+
+
+                //Stage 15 (Escape Well Minigame)
+                } else if (stage == 15) {
+                    currentGame.mousePressed(); //Call mouse pressed method for escape well minigame
+
+
+                //Stage 18 (Heal King)
+                } else if (stage == 18) {
+                    //If user is deciding whether to forgive brothers
+                    if (currentScreen18 == 3) {
+                        //If mouse is over yes button when mouse is clicked
+                        if (overYes) 
+                            player.setForgaveBrothers(true); //Set variable to indicate player forgave brothers
+                        //If mouse is no button when mouse is clicked
+                        else if (overNo)
+                            player.setForgaveBrothers(false); //Set variable to indicate player didn't forgive brothers
+                        //End if statement checking if user's mouse is over save brothers button or leave brothers button
+                        stage = 19; //Go to the next stage (ending)
+                    } //End if statement checking for screen 2 of Stage 13
+                }
+
+        
+            } //End if statement checking if game is paused
                 
             }
             
@@ -1691,250 +1780,256 @@ public class MySketch extends PApplet {
             if (playerDeath)
                 gameOver(); //Call game over method
             
-            
-            //Spacebar is pressed in Stage -3 (Custom Clothes)
-            if (stage == -3) {
-                stage = -1; //Go back to character setup screen
-            //Spacebar is pressed in Stage -4 (Leaderboard)
-            } else if (stage == -4) {
-                stage = 0; //Go back to main menu
-            //Spacebar is pressed in Stage 1 (Begin Story)
-            } else if (stage == 1) {
-                if (currentScreen1 == 1) //If screen currently being shown is the first part of the story introduction
-                    currentScreen1 = 2; //Go to next screen (second part of story introduction)
-                else if (currentScreen1 == 2) //If screen currently being shown is the second part of the story introduction
-                    currentScreen1 = 3; //Go to next screen (character traits distribution)
-                else if (currentScreen1 == 3) { //If screen currently being shown is the character traits distrubution
-                    pointsError = false; //Set error indicator for points distribution false in case it was set to true previously
-                    //If the user has not distributed both of their points
-                    if ((currentStrengthPoints == 0 && currentIntelligencePoints == 0) || (currentStrengthPoints == 1 && currentIntelligencePoints == 0) || (currentStrengthPoints == 0 && currentIntelligencePoints == 1)) {
-                        pointsError = true; //Set variable indicating there was an error with the points to true
-                    } else { //If user has distributed both of their points
-                        pointsError = false; //Reset boolean variable for points distribution error
-                        currentScreen1 = 4; //Go to next screen (first part of the game instructions)
-                    }
-                } else if (currentScreen1 == 4) //If screen currently being shown is the first part of the game instructions
-                    currentScreen1 = 5; //Go to next screen (second part of the game instructions)
-                else { //If screen currently being shown is the second part of the game instructions
-                    
-                    //Create an instance of the Player class to represent the character the user will be playing as
-                    //If the user entered their own name and character clothing
-                    if (customName && customCharacter) {
-                        if (chooseCharacter1) //If the player chose character option 1
-                        //Create new Player with parameters for name and character image, using the image of character 1
-                            player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter1.png");
-                        else if (chooseCharacter2) //If the player chose character option 2
-                            //Create new Player with parameters for name and character image, using the image of character 2
-                            player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter2.png");
-                        else //If the player chose character option 3
-                        //Create new Player with parameters for name and character image, using the image of character 3
-                            player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter3.png");
-                    //If user entered their own name but did not customize the character clothing
-                    } else if (customName) {
-                    //Create new Player with parameter for the name
-                        player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3));
-                    //If user did not enter their own name but customized the character clothing
-                    } else if (customCharacter) {
-                        if (chooseCharacter1) //If the player chose character option 1
-                       //Create new Player with parameter for the character image, using image of character 1
-                           player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter1.png");
-                        else if (chooseCharacter2) //If the player chose character option 2
-                       //Create new Player with parameter for the character image, using image of character 2
-                           player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter2.png");
-                        else //If the player chose character option 3
-                       //Create new Player with parameter for the charcter image, using image of character 3
-                           player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter3.png");
-                    //If user did not enter their own name and did not customize the character clothing
-                    } else {
-                     //Create new Player using constructor with no extra parameters to set default values for name and character image
-                        player = new Player(this, 155, 255, traitDistribution, new Inventory(3));
-                    } //End if statement deciding which Player constructor to call depending on the custom values entered by the user
-                    
-                    //If the maximum number of players has been reached after creating this player (maximum 5 players)
-                    if (Player.getNumPlayers() >= 5)
-                        //Set message telling the user that the maximum number of players has been reached to true
-                        reachedMaxPlayers = true;
-                    stage = 2; //Go to the next stage (Leaving Castle)
-                    currentScreen1 = 1; //Reset screen to be shown for Stage 1 to the first part of the story introduction
-                }   //End if statement for which screen of Stage 1 is being shown
-            //Spacebar is pressed in Stage 2 (Leaving Castle)
-            } else if (stage == 2) {
-                stage = 3; //Go to next stage (Fork in the Road)
-                player.moveTo(-90, 255); //Set new player position
-            //Spacebar is pressed in Stage 4 (Encounter boar)
-            } else if (stage == 4) {    
-                if (currentScreen4 == 1) { //If screen currently being shown is the encounter with the boar
-                    if (willFightBoar) { //If user chose path with boar
-                        currentScreen4 = 2; //Display boar fight minigame instructions
-                    } else { //If user chose path without boar 
-                        player.moveTo(85, 240); //Set new player position
-                        stage = 7; //Go to the next stage (Meet Hermit)
-                    } //End if statement for if user chose path with the boar
-                } else if (currentScreen4 == 2){ //If screen currently being shown is the boar fight minigame instructions
-                    //Create an instance of the Boar Fight Game class depending on the user's character image
-                    //If the user's character clothing is v1
-                    if (chooseCharacter1)
-                        //Create instance of boar fight minigame with character clothing image v1
-                        currentGame = new BoarFightGame(this, player.getName(), 100, 0, "images/chosenCharacter1.png", traitDistribution);
-                    //If the user's character clothing is v2
-                    else if (chooseCharacter2)
-                        //Create instance of boar fight minigame with character clothing image v2
-                        currentGame = new BoarFightGame(this, player.getName(), 100, 0, "images/chosenCharacter2.png", traitDistribution);
-                    //If the user's character clothing is v3
-                    else
-                        //Create instance of boar fight minigame with character clothing image v3
-                        currentGame = new BoarFightGame(this, player.getName(), 100, 0, "images/chosenCharacter3.png", traitDistribution);
-    
-                    stage = 5; //Go to the boar fight minigame
-                } //If statement for which screen of Stage 4 is being shown
+            //Spacebar is pressed when game is paused
+            if (gamePaused) {
+                gamePaused = false; //Resume game
+                
+            //Spacebar is pressed when game is not paused
+            } else {
 
+                //Spacebar is pressed in Stage -3 (Custom Clothes)
+                if (stage == -3) {
+                    stage = -1; //Go back to character setup screen
+                //Spacebar is pressed in Stage -4 (Leaderboard)
+                } else if (stage == -4) {
+                    stage = 0; //Go back to main menu
+                //Spacebar is pressed in Stage 1 (Begin Story)
+                } else if (stage == 1) {
+                    if (currentScreen1 == 1) //If screen currently being shown is the first part of the story introduction
+                        currentScreen1 = 2; //Go to next screen (second part of story introduction)
+                    else if (currentScreen1 == 2) //If screen currently being shown is the second part of the story introduction
+                        currentScreen1 = 3; //Go to next screen (character traits distribution)
+                    else if (currentScreen1 == 3) { //If screen currently being shown is the character traits distrubution
+                        pointsError = false; //Set error indicator for points distribution false in case it was set to true previously
+                        //If the user has not distributed both of their points
+                        if ((currentStrengthPoints == 0 && currentIntelligencePoints == 0) || (currentStrengthPoints == 1 && currentIntelligencePoints == 0) || (currentStrengthPoints == 0 && currentIntelligencePoints == 1)) {
+                            pointsError = true; //Set variable indicating there was an error with the points to true
+                        } else { //If user has distributed both of their points
+                            pointsError = false; //Reset boolean variable for points distribution error
+                            currentScreen1 = 4; //Go to next screen (first part of the game instructions)
+                        }
+                    } else if (currentScreen1 == 4) //If screen currently being shown is the first part of the game instructions
+                        currentScreen1 = 5; //Go to next screen (second part of the game instructions)
+                    else { //If screen currently being shown is the second part of the game instructions
 
-            //Meet Hermit
-            } else if (stage == 7) {
-                //If the user is meeting the hermit for the first time
-                if (currentScreen7 == 1)
-                    currentScreen7 = 2; //Go to the next screen (deciding on whether to help or ignore the hermit)
-                //if the user is leaving the hermit
-                if (currentScreen7 == 3) { 
+                        //Create an instance of the Player class to represent the character the user will be playing as
+                        //If the user entered their own name and character clothing
+                        if (customName && customCharacter) {
+                            if (chooseCharacter1) //If the player chose character option 1
+                            //Create new Player with parameters for name and character image, using the image of character 1
+                                player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter1.png");
+                            else if (chooseCharacter2) //If the player chose character option 2
+                                //Create new Player with parameters for name and character image, using the image of character 2
+                                player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter2.png");
+                            else //If the player chose character option 3
+                            //Create new Player with parameters for name and character image, using the image of character 3
+                                player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3), "images/chosenCharacter3.png");
+                        //If user entered their own name but did not customize the character clothing
+                        } else if (customName) {
+                        //Create new Player with parameter for the name
+                            player = new Player(this, 155, 255, enteredName, traitDistribution, new Inventory(3));
+                        //If user did not enter their own name but customized the character clothing
+                        } else if (customCharacter) {
+                            if (chooseCharacter1) //If the player chose character option 1
+                           //Create new Player with parameter for the character image, using image of character 1
+                               player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter1.png");
+                            else if (chooseCharacter2) //If the player chose character option 2
+                           //Create new Player with parameter for the character image, using image of character 2
+                               player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter2.png");
+                            else //If the player chose character option 3
+                           //Create new Player with parameter for the charcter image, using image of character 3
+                               player = new Player(this, 155, 255, traitDistribution, new Inventory(3), "images/chosenCharacter3.png");
+                        //If user did not enter their own name and did not customize the character clothing
+                        } else {
+                         //Create new Player using constructor with no extra parameters to set default values for name and character image
+                            player = new Player(this, 155, 255, traitDistribution, new Inventory(3));
+                        } //End if statement deciding which Player constructor to call depending on the custom values entered by the user
+
+                        //If the maximum number of players has been reached after creating this player (maximum 5 players)
+                        if (Player.getNumPlayers() >= 5)
+                            //Set message telling the user that the maximum number of players has been reached to true
+                            reachedMaxPlayers = true;
+                        stage = 2; //Go to the next stage (Leaving Castle)
+                        currentScreen1 = 1; //Reset screen to be shown for Stage 1 to the first part of the story introduction
+                    }   //End if statement for which screen of Stage 1 is being shown
+                //Spacebar is pressed in Stage 2 (Leaving Castle)
+                } else if (stage == 2) {
+                    stage = 3; //Go to next stage (Fork in the Road)
                     player.moveTo(-90, 255); //Set new player position
-                    stage = 8; //Go on to the next stage (Walking in the Forest 2)
-                } //End if statement for if current screen of Stage 7 is leaving the hermit
-            //Find Adarna Bird
-            } else if (stage == 9) {
-                //If screen currently being shown is the first sighting of the Adarna bird
-                if (currentScreen9 == 1) 
-                    currentScreen9 = 2; //Show button options to stay awake using sheer will or lime juice
-                //If screen currently being shown is the rhythm minigame instructions
-                else if (currentScreen9 == 3) { 
-                    //Create an instance of the Boar Fight Game class depending on the user's character image
-                    //If the user's character clothing is v1
-                    if (chooseCharacter1)
-                        //Create instance of rhythm minigame with character clothing image v1
-                        currentGame = new RhythmGame(this, player.getName(), 245, 1, "images/chosenCharacter1.png", traitDistribution, sheerWill);
-                    //If the user's character clothing is v1 
-                     else if (chooseCharacter2)
-                        //Create instance of rhythm minigame with character clothing image v2
-                        currentGame = new RhythmGame(this, player.getName(), 245, 1, "images/chosenCharacter2.png", traitDistribution, sheerWill);
-                    //If the user's character clothing is v1
-                    else
-                        //Create instance of rhythm minigame with character clothing image v3
-                        currentGame = new RhythmGame(this, player.getName(), 245, 1, "images/chosenCharacter3.png", traitDistribution, sheerWill);
+                //Spacebar is pressed in Stage 4 (Encounter boar)
+                } else if (stage == 4) {    
+                    if (currentScreen4 == 1) { //If screen currently being shown is the encounter with the boar
+                        if (willFightBoar) { //If user chose path with boar
+                            currentScreen4 = 2; //Display boar fight minigame instructions
+                        } else { //If user chose path without boar 
+                            player.moveTo(85, 240); //Set new player position
+                            stage = 7; //Go to the next stage (Meet Hermit)
+                        } //End if statement for if user chose path with the boar
+                    } else if (currentScreen4 == 2){ //If screen currently being shown is the boar fight minigame instructions
+                        //Create an instance of the Boar Fight Game class depending on the user's character image
+                        //If the user's character clothing is v1
+                        if (chooseCharacter1)
+                            //Create instance of boar fight minigame with character clothing image v1
+                            currentGame = new BoarFightGame(this, player.getName(), 100, 0, "images/chosenCharacter1.png", traitDistribution);
+                        //If the user's character clothing is v2
+                        else if (chooseCharacter2)
+                            //Create instance of boar fight minigame with character clothing image v2
+                            currentGame = new BoarFightGame(this, player.getName(), 100, 0, "images/chosenCharacter2.png", traitDistribution);
+                        //If the user's character clothing is v3
+                        else
+                            //Create instance of boar fight minigame with character clothing image v3
+                            currentGame = new BoarFightGame(this, player.getName(), 100, 0, "images/chosenCharacter3.png", traitDistribution);
 
-                    adarnaBirdX = -100; //Set x position of Adarna bird
-                    adarnaBirdY = 225; //Set y position of Adarna bird
-                    
-                    //stage = 10; //Go to the Rhythm Minigame //////////skip minigame
-                    stage = 11;
-                } //If statement for which screen of Stage 9 is being shown
-                
-            //Caught the Adarna Bird
-            } else if (stage == 12) {
-                player.moveTo(595, 255); //Set new player position
-                //If player has golden cage in their inventory from the hermit
-                if (player.getInventory().hasItem("Golden Cage")) {
-                    adarnaBirdX = 550; //Set x position of Adarna bird in golden cage
-                    adarnaBirdY = 345; //Set y position of Adarna bird in golden cage
-                //If player does not have golden cage in their inventory
-                } else {
-                    adarnaBirdX = 570; //Set x position of Adarna bird
-                    adarnaBirdY = 370; //Set y position of Adarna bird
-                } //End if statement checking if player has golden cage in their inventory
-                stage = 13; //Go to the next stage (Find Brothers)
-                
-            //Find Brothers
-            } else if (stage == 13) {
-                //If the user is seeing their brothers turned to stone for the first time
-                if (currentScreen13 == 1)
-                    currentScreen13 = 2; //Go to the next screen (deciding to save or leave brothers)
-                //If user just decided to save their brothers
-                else if (currentScreen13 == 3) {
-                    stage = 14; //Go to the next stage (Betrayal)
-                    player.moveTo(360, 260); //Set new player position
-                    donPedroX = 495; //Set x position of brother 1
-                    donPedroY = 260; //Set y position of brother 1
-                    donDiegoX = 615; //Set x position of brother 2
-                    donDiegoY = 260; //Set y position of brother 2
+                        stage = 5; //Go to the boar fight minigame
+                    } //If statement for which screen of Stage 4 is being shown
+
+
+                //Meet Hermit
+                } else if (stage == 7) {
+                    //If the user is meeting the hermit for the first time
+                    if (currentScreen7 == 1)
+                        currentScreen7 = 2; //Go to the next screen (deciding on whether to help or ignore the hermit)
+                    //if the user is leaving the hermit
+                    if (currentScreen7 == 3) { 
+                        player.moveTo(-90, 255); //Set new player position
+                        stage = 8; //Go on to the next stage (Walking in the Forest 2)
+                    } //End if statement for if current screen of Stage 7 is leaving the hermit
+                //Find Adarna Bird
+                } else if (stage == 9) {
+                    //If screen currently being shown is the first sighting of the Adarna bird
+                    if (currentScreen9 == 1) 
+                        currentScreen9 = 2; //Show button options to stay awake using sheer will or lime juice
+                    //If screen currently being shown is the rhythm minigame instructions
+                    else if (currentScreen9 == 3) { 
+                        //Create an instance of the Boar Fight Game class depending on the user's character image
+                        //If the user's character clothing is v1
+                        if (chooseCharacter1)
+                            //Create instance of rhythm minigame with character clothing image v1
+                            currentGame = new RhythmGame(this, player.getName(), 245, 1, "images/chosenCharacter1.png", traitDistribution, sheerWill);
+                        //If the user's character clothing is v1 
+                         else if (chooseCharacter2)
+                            //Create instance of rhythm minigame with character clothing image v2
+                            currentGame = new RhythmGame(this, player.getName(), 245, 1, "images/chosenCharacter2.png", traitDistribution, sheerWill);
+                        //If the user's character clothing is v1
+                        else
+                            //Create instance of rhythm minigame with character clothing image v3
+                            currentGame = new RhythmGame(this, player.getName(), 245, 1, "images/chosenCharacter3.png", traitDistribution, sheerWill);
+
+                        adarnaBirdX = -100; //Set x position of Adarna bird
+                        adarnaBirdY = 225; //Set y position of Adarna bird
+
+                        //stage = 10; //Go to the Rhythm Minigame //////////skip minigame
+                        stage = 11;
+                    } //If statement for which screen of Stage 9 is being shown
+
+                //Caught the Adarna Bird
+                } else if (stage == 12) {
+                    player.moveTo(595, 255); //Set new player position
                     //If player has golden cage in their inventory from the hermit
                     if (player.getInventory().hasItem("Golden Cage")) {
-                        adarnaBirdX = 580; //Set x position of Adarna bird in golden cage
-                        adarnaBirdY = 330; //Set y position of Adarna bird in golden cage
+                        adarnaBirdX = 550; //Set x position of Adarna bird in golden cage
+                        adarnaBirdY = 345; //Set y position of Adarna bird in golden cage
                     //If player does not have golden cage in their inventory
                     } else {
-                        adarnaBirdX = 590; //Set x position of Adarna bird
-                        adarnaBirdY = 375; //Set y position of Adarna bird
+                        adarnaBirdX = 570; //Set x position of Adarna bird
+                        adarnaBirdY = 370; //Set y position of Adarna bird
                     } //End if statement checking if player has golden cage in their inventory
-	    } //End if statement checking if current screen of Stage 13 is 3 or 4
-                
-	    //Spacebar is pressed in Stage 14 (Betrayal)
-            } else if (stage == 14) {
-                if (currentScreen14 == 1) //If screen currently being shown is when the brothers take the Adarna bird
-                    currentScreen14 = 2; //Go to next screen (push player down the wall)
-                else if (currentScreen14 == 3) //If screen currently being shown is the brothers leaving the player
-                    currentScreen14 = 4; //Go to next screen (well minigame instructions)
-                else if (currentScreen14 == 4){ //If screen currently being shown is the well minigame instructions
-                    //Create an instance of the Well Escape Game class depending on the user's character image
-                    //If the user's character clothing is v1
-                    if (chooseCharacter1)
-                        //Create instance of escape well minigame with character clothing image v1
-                        currentGame = new EscapeWellGame(this, player.getName(), 50, 1, "images/chosenCharacter1.png", traitDistribution);
-                    //If the user's character clothing is v2
-                    else if (chooseCharacter2)
-                        //Create instance of escape well minigame with character clothing image v2
-                        currentGame = new EscapeWellGame(this, player.getName(), 50, 1, "images/chosenCharacter2.png", traitDistribution);
-                    //If the user's character clothing is v3
-                    else
-                        //Create instance of escape well minigame with character clothing image v3
-                        currentGame = new EscapeWellGame(this, player.getName(), 50, 1, "images/chosenCharacter3.png", traitDistribution);
-  
-                    stage = 15; //Go to the next stage (Well Minigame)
+                    stage = 13; //Go to the next stage (Find Brothers)
+
+                //Find Brothers
+                } else if (stage == 13) {
+                    //If the user is seeing their brothers turned to stone for the first time
+                    if (currentScreen13 == 1)
+                        currentScreen13 = 2; //Go to the next screen (deciding to save or leave brothers)
+                    //If user just decided to save their brothers
+                    else if (currentScreen13 == 3) {
+                        stage = 14; //Go to the next stage (Betrayal)
+                        player.moveTo(360, 260); //Set new player position
+                        donPedroX = 495; //Set x position of brother 1
+                        donPedroY = 260; //Set y position of brother 1
+                        donDiegoX = 615; //Set x position of brother 2
+                        donDiegoY = 260; //Set y position of brother 2
+                        //If player has golden cage in their inventory from the hermit
+                        if (player.getInventory().hasItem("Golden Cage")) {
+                            adarnaBirdX = 580; //Set x position of Adarna bird in golden cage
+                            adarnaBirdY = 330; //Set y position of Adarna bird in golden cage
+                        //If player does not have golden cage in their inventory
+                        } else {
+                            adarnaBirdX = 590; //Set x position of Adarna bird
+                            adarnaBirdY = 375; //Set y position of Adarna bird
+                        } //End if statement checking if player has golden cage in their inventory
+                } //End if statement checking if current screen of Stage 13 is 3 or 4
+
+                //Spacebar is pressed in Stage 14 (Betrayal)
+                } else if (stage == 14) {
+                    if (currentScreen14 == 1) //If screen currently being shown is when the brothers take the Adarna bird
+                        currentScreen14 = 2; //Go to next screen (push player down the wall)
+                    else if (currentScreen14 == 3) //If screen currently being shown is the brothers leaving the player
+                        currentScreen14 = 4; //Go to next screen (well minigame instructions)
+                    else if (currentScreen14 == 4){ //If screen currently being shown is the well minigame instructions
+                        //Create an instance of the Well Escape Game class depending on the user's character image
+                        //If the user's character clothing is v1
+                        if (chooseCharacter1)
+                            //Create instance of escape well minigame with character clothing image v1
+                            currentGame = new EscapeWellGame(this, player.getName(), 50, 1, "images/chosenCharacter1.png", traitDistribution);
+                        //If the user's character clothing is v2
+                        else if (chooseCharacter2)
+                            //Create instance of escape well minigame with character clothing image v2
+                            currentGame = new EscapeWellGame(this, player.getName(), 50, 1, "images/chosenCharacter2.png", traitDistribution);
+                        //If the user's character clothing is v3
+                        else
+                            //Create instance of escape well minigame with character clothing image v3
+                            currentGame = new EscapeWellGame(this, player.getName(), 50, 1, "images/chosenCharacter3.png", traitDistribution);
+
+                        stage = 15; //Go to the next stage (Well Minigame)
+                    }
+
+                //Spacebar is pressed in Stage 16 (Escaped Well)
+                } else if (stage == 16) {
+                    if (currentScreen16 == 1) //If screen currently being shown is when user just got out of the well
+                        currentScreen16 = 2; //Go to the next screen (leaving the well)
+
+
+                //Spacebar is pressed in Stage 18 (Heal King)
+                } else if (stage == 18) {
+                    if (currentScreen18 == 1) //If screen currently being shown is when player decided to save their brothers and just arrived back at the palace
+                        currentScreen18 = 2; //Go to the next screen
+                    else if (currentScreen18 == 2) //If screen currently being shown is when player decided to save their brothers and the bird heals the king
+                        currentScreen18 = 3; //Go to the next screen
+                    else if (currentScreen18 == 4) //If screen currently being shown is when player decided to leave their brothers and just arrived back at the palace
+                        currentScreen18 = 5; //Go to the next screen
+                    else if (currentScreen18 == 5) //If screen currently being shown is when player decided to leave their brothers and the bird heals the king
+                        stage = 19; //Go to the next stage (Ending)
+
+                //Spacebar is pressed in Stage 19 (Ending)    
+                } else if (stage == 19) {
+                    //Reset all variables for next game
+                    resetGame();
+
+                    //Write player data to flat file (name, virtue points, game points, total points)
+                     try {
+                         //Create FileWriter object to append to the file of player data, named "leadershipdata.txt"
+                         FileWriter w = new FileWriter("leadershipdata.txt", true);
+                         //Create new PrintWriter to write formatted output to the file of player data
+                         PrintWriter writer = new PrintWriter(w);
+                         player.calculateTotalPoints(); //Calculate player's total points
+                         //Write name, virtue points, game points, and total points to the file
+                         writer.printf(player.getName() + "," + player.getVirtuePoints() + "," + player.getGamePoints() + "," + player.getTotalPoints() + "\n");
+                         //Close PrintWriter
+                         writer.close();
+                     //Catch IO exceptions when writing to flat file
+                     } catch (IOException e) {
+                         System.err.println(e); //Error message for IO exceptions
+                     } //End try-catch statement for player data writing to flat file
+
+                    stage = 0; //Return to main menu
+
+                //Spacebar is pressed in Stage -5/-6/-7 (Displaying Boar/Rhythm/Well Minigame Results)    
+                } else if (stage == -5 || stage == -6 || stage == -7) {
+                    stage = -4; //Return to leaderboard
                 }
-
-            //Spacebar is pressed in Stage 16 (Escaped Well)
-            } else if (stage == 16) {
-                if (currentScreen16 == 1) //If screen currently being shown is when user just got out of the well
-                    currentScreen16 = 2; //Go to the next screen (leaving the well)
                 
-               
-            //Spacebar is pressed in Stage 18 (Heal King)
-            } else if (stage == 18) {
-                if (currentScreen18 == 1) //If screen currently being shown is when player decided to save their brothers and just arrived back at the palace
-                    currentScreen18 = 2; //Go to the next screen
-                else if (currentScreen18 == 2) //If screen currently being shown is when player decided to save their brothers and the bird heals the king
-                    currentScreen18 = 3; //Go to the next screen
-                else if (currentScreen18 == 4) //If screen currently being shown is when player decided to leave their brothers and just arrived back at the palace
-                    currentScreen18 = 5; //Go to the next screen
-                else if (currentScreen18 == 5) //If screen currently being shown is when player decided to leave their brothers and the bird heals the king
-                    stage = 19; //Go to the next stage (Ending)
-                
-            //Spacebar is pressed in Stage 19 (Ending)    
-            } else if (stage == 19) {
-                //Reset all variables for next game
-                resetGame();
-                
-                //Write player data to flat file (name, virtue points, game points, total points)
-                 try {
-                     //Create FileWriter object to append to the file of player data, named "leadershipdata.txt"
-                     FileWriter w = new FileWriter("leadershipdata.txt", true);
-                     //Create new PrintWriter to write formatted output to the file of player data
-                     PrintWriter writer = new PrintWriter(w);
-                     player.calculateTotalPoints(); //Calculate player's total points
-                     //Write name, virtue points, game points, and total points to the file
-                     writer.printf(player.getName() + "," + player.getVirtuePoints() + "," + player.getGamePoints() + "," + player.getTotalPoints() + "\n");
-                     //Close PrintWriter
-                     writer.close();
-                 //Catch IO exceptions when writing to flat file
-                 } catch (IOException e) {
-                     System.err.println(e); //Error message for IO exceptions
-                 } //End try-catch statement for player data writing to flat file
-                
-                stage = 0; //Return to main menu
-                
-            //Spacebar is pressed in Stage -5/-6/-7 (Displaying Boar/Rhythm/Well Minigame Results)    
-            } else if (stage == -5 || stage == -6 || stage == -7) {
-                stage = -4; //Return to leaderboard
-            }
-                
-
+            } //End if statement checking if game was paused
 
                 
                 

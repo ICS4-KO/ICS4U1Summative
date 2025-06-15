@@ -17,7 +17,7 @@ public class Player {
     private String name; //Name of the player
     private int lives = 3;  //Player has 3 lives
     private int health; //Current health
-    private int healthPerLife; //Health points per life
+    private int fullHealth; //Value of full health
     private int virtuePoints = 0; //Virtue points earned, starting from 0
     private int gamePoints = 0; //Total points player earns from the minigames they play
     private int totalPoints = 0; //Combined virtue points and game points
@@ -37,6 +37,7 @@ public class Player {
     
     //Static Variables
     private static int numPlayers = 0; //Number of users who have played the game
+    private static int healthPerFood = 15; //HP each food item is worth
     
     //Default Constants
     private static String DEFAULT_NAME = "Don Juan"; //Default player name
@@ -67,14 +68,14 @@ public class Player {
         //If characterTraits is equal to 1, character has high strengh
         if (characterTraits == 1) {
             //Set user HP to higher value if user has high strength
-            this.healthPerLife = HIGH_HEALTH;
+            this.fullHealth = HIGH_HEALTH;
         //Otherwise, characterTrait is equal to 0 or 2 and the character has low to medium strength
         } else {
             //Assign low to medium strength characterTrait distribution
-            this.healthPerLife = NORMAL_HEALTH;
+            this.fullHealth = NORMAL_HEALTH;
         } //End if statement for assigning initial health points
         //Set player's initial health to full health
-        health = healthPerLife;
+        health = fullHealth;
         
         numPlayers += 1; //Add one to the number of players
     }
@@ -103,14 +104,14 @@ public class Player {
         //If characterTraits is equal to 1, character has high strengh
         if (characterTraits == 1) {
             //Set user HP to higher value if user has high strength
-            this.healthPerLife = HIGH_HEALTH;
+            this.fullHealth = HIGH_HEALTH;
         //Otherwise, characterTrait is equal to 0 or 2 and the character has low to medium strength
         } else {
             //Assign low to medium strength characterTrait distribution
-            this.healthPerLife = NORMAL_HEALTH;
+            this.fullHealth = NORMAL_HEALTH;
         } //End if statement for assigning initial health points
         //Set player's initial health to full health
-        health = healthPerLife;
+        health = fullHealth;
         
         numPlayers += 1; //Add one to the number of players
     }
@@ -140,14 +141,14 @@ public class Player {
         //If characterTraits is equal to 1, character has high strengh
         if (characterTraits == 1) {
             //Set user HP to higher value if user has high strength
-            this.healthPerLife = HIGH_HEALTH;
+            this.fullHealth = HIGH_HEALTH;
         //Otherwise, characterTrait is equal to 0 or 2 and the character has low to medium strength
         } else {
             //Assign low to medium strength characterTrait distribution
-            this.healthPerLife = NORMAL_HEALTH;
+            this.fullHealth = NORMAL_HEALTH;
         } //End if statement for assigning initial health points
         //Set player's initial health to full health
-        health = healthPerLife;
+        health = fullHealth;
         
         numPlayers += 1; //Add one to the number of players
     }
@@ -176,14 +177,14 @@ public class Player {
         //If characterTraits is equal to 1, character has high strengh
         if (characterTraits == 1) {
             //Set user HP to higher value if user has high strength
-            this.healthPerLife = HIGH_HEALTH;
+            this.fullHealth = HIGH_HEALTH;
         //Otherwise, characterTrait is equal to 0 or 2 and the character has low to medium strength
         } else {
             //Assign low to medium strength characterTrait distribution
-            this.healthPerLife = NORMAL_HEALTH;
+            this.fullHealth = NORMAL_HEALTH;
         } //End if statement for assigning initial health points
         //Set player's initial health to full health
-        health = healthPerLife;
+        health = fullHealth;
         
         numPlayers += 1; //Add one to the number of players
     }      
@@ -216,6 +217,15 @@ public class Player {
      */
     public int getHealth() {
         return health; //Return HP of current life
+    }
+    
+    /**
+     * Getter method to return fullHealth attribute of Player object
+     * 
+     * @return  Number of health points player has at full health
+     */
+    public int getFullHealth() {
+        return fullHealth; //Return value of full health
     }
     
    /**
@@ -297,6 +307,15 @@ public class Player {
     }
     
     /**
+     * Getter method to return the static variable healthPerFood
+     * 
+     * @return  HP each food item is worth
+     */
+    public static int getHealthPerFood() { 
+        return healthPerFood; //Return the number of health points each food item is worth
+    }
+    
+    /**
      * Setter method to set savedBrothers attribute of Player object
      * 
      * @param answer  True if player chose to save their brothers, who were turned to stone
@@ -316,7 +335,15 @@ public class Player {
             
     
     /**
-     * Removes specified amount of HP from user's health and calls game over method if user has no more lives
+     * Removes 1 food item from player's inventory and gives player a health boost
+     */
+    public void eatFood() {
+        inventory.consumeFood(); //Remove 1 food item from the inventory
+        health += healthPerFood; //Increase player's health
+    }
+    
+    /**
+     * Removes specified amount of HP from player's health and calls game over method if user has no more lives
      * 
      * @param amount  Amount of damage taken
      */
@@ -399,18 +426,18 @@ public class Player {
     public void healthBoost(int points) {
         health += points; //Add points from health boost to health points
         //If the user's health in the current life after adding the points is greater than their health per life
-        if (health > healthPerLife) {
-            int surplus = health - healthPerLife; //Store the surplus health points
-            health = healthPerLife; //Set health points in current life to maximum amount (health per life)
+        if (health > fullHealth) {
+            int surplus = health - fullHealth; //Store the surplus health points
+            health = fullHealth; //Set health points in current life to maximum amount (health per life)
             //If user has less than 3 lives, surplus can go to the next life
             if (lives < 3) {
                 lives += 1; //Add back one of the user's lives if they had 1 or 2 lives before the health boost
                 //If the surplus is less than or equal to their health per life
-                if (surplus <= healthPerLife)
+                if (surplus <= fullHealth)
                     health = surplus; //Set health in new life to the surplus HP amount
                 //If the suprlus is greater than their health per life
                 else
-                    health = healthPerLife; //Set health in new life to maximum amount (health per life)
+                    health = fullHealth; //Set health in new life to maximum amount (health per life)
             } //End if statement checking if user has less than 3 lives and surplus HP can transfer into additional life
         } //End if statement checking if user has a surplus of HP after health boost   
     }
