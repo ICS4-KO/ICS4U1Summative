@@ -1944,7 +1944,6 @@ public class MySketch extends PApplet {
                     nameError = true; //Set error indicator for name to true
                 else {  //If the user's input matches the length requirements
                     enteredName = userInput; //Set entered name variable to user input
-                    userInput = ""; //Clear user input
                     nameError = false; //Reset boolean variable for name length error
                     stage = -1; //Return to character setup screen
                 } //End if statement checking if user’s input matches the length requirements
@@ -2054,6 +2053,7 @@ public class MySketch extends PApplet {
         //Reset Variables
         playerDeath = false; //True if player runs out of health
         enteredName = ""; //Player's name (based on user input, by default set to "Don Juan")
+        userInput = ""; //Clear user input
         //Reset variables for Stage -1 (Start Game)
         customName = false; //True if user enters their own name for the character
         customCharacter = false; //True if user customizes clothing colors of the character

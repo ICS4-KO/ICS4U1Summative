@@ -279,8 +279,8 @@ public class RhythmGame extends Game {
                 calculatePoints(); //Calculate the number of points the player earned 
                 calculatedPoints = true; //Indicate that points have been calculated
 
-                //Player loses 5 HP for each letter they didn't get
-                damageTaken = 5 * (49 - (score/2)); //Set damage taken, dividing by 2 because each letter is worth 2 points
+                //Player loses 3 HP for each letter they didn't get
+                damageTaken = 3 * (49 - (score/2)); //Set damage taken, dividing by 2 because each letter is worth 2 points
             } //End if statement checking if points have been calculated
             
             //If the game is over and the player won the game
