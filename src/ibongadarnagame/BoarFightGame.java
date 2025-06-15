@@ -7,8 +7,12 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 /**
- *
- * @author 343330528
+ * BoarFightGame class of interactive story game Ibong Adarna, a subclass of the Game class and representation of minigame #1.
+ * The player must defeat a boar by taking turns attacking using collisions and mouse clicks.
+ * 
+ * @author   Kimi Ong
+ * @version  1.0
+ * @since    2025-06-15
  */
 public class BoarFightGame extends Game {
     //Instance variables

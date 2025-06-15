@@ -8,8 +8,12 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 /**
- *
- * @author 343330528
+ * EscapeWellGame class of interactive story game Ibong Adarna, a subclass of the Game class and representation of minigame #3.
+ * The player uses the DOWN arrow key to drop ladder rungs and must form an aligned ladder to win the game.
+ * 
+ * @author   Kimi Ong
+ * @version  1.0
+ * @since    2025-06-15
  */
 public class EscapeWellGame extends Game {
     //Instance variables

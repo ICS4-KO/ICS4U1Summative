@@ -6,8 +6,12 @@ package ibongadarnagame;
 import processing.core.PApplet;
 
 /**
- *
- * @author 343330528
+ * Game class of interactive story game Ibong Adarna, superclass of the BoarFightGame, RhythmGame, and EscapeWellGame classes.
+ * This class represents the basic structure shared by all three minigames.
+ * 
+ * @author   Kimi Ong
+ * @version  1.0
+ * @since    2025-06-15
  */
 public abstract class Game {
     //Instance variables

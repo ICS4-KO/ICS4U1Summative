@@ -7,8 +7,12 @@ package ibongadarnagame;
 import java.util.ArrayList;
 
 /**
- *
- * @author 343330528
+ * Inventory class of interactive story game Ibong Adarna. Each Player has an Inventory that store food items and gifts from the
+ * old hermit.
+ * 
+ * @author   Kimi Ong
+ * @version  1.0
+ * @since    2025-06-15
  */
 public class Inventory {
     //Instance variables

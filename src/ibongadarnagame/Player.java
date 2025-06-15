@@ -7,8 +7,12 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 /**
- *
- * @author 343330528
+ * Player class of interactive story game Ibong Adarna, that represents the user and their game stats as they progress through
+ * the story.
+ * 
+ * @author   Kimi Ong
+ * @version  1.0
+ * @since    2025-06-15
  */
 public class Player {
 

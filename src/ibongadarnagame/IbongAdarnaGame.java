@@ -5,8 +5,12 @@
 package ibongadarnagame;
 
 /**
- *
- * @author Kimi Ong
+ * Main class of interactive story game Ibong Adarna, where the player can make decisions that change the final outcome and
+ * play minigames along the way.
+ * 
+ * @author   Kimi Ong
+ * @version  1.0
+ * @since    2025-06-15
  */
 public class IbongAdarnaGame {
 

@@ -9,8 +9,12 @@ import processing.core.PImage;
 import java.util.Random;
 
 /**
- *
- * @author 343330528
+ * Rhythm class of interactive story game Ibong Adarna, a subclass of the Game class and representation of minigame #2.
+ * The player must type in the letters that appear on the screen within the time limit.
+ * 
+ * @author   Kimi Ong
+ * @version  1.0
+ * @since    2025-06-15
  */
 public class RhythmGame extends Game {
     //Instance variables

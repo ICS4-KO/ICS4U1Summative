@@ -7,8 +7,12 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 /**
- *
- * @author 343330528
+ * Rung class of interactive story game Ibong Adarna. Each EscapeWellGame has a Rung object that represents each rung the player
+ * uses to create the ladder.
+ * 
+ * @author   Kimi Ong
+ * @version  1.0
+ * @since    2025-06-15
  */
 public class Rung {
     //Instance Variables
