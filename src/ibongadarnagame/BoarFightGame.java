@@ -55,7 +55,11 @@ public class BoarFightGame extends Game {
         if (traitsDistribution == 1) { 
             playerHealth = 120; //Set higher health points to start with
             fullHealth = 120; //Set higher value as the player’s full health
-        } //End if statement checking if player has high strength
+        //If player has neutral strength/intelligence
+        } else if (traitsDistribution == 0) {
+            playerHealth = 110; //Set slightly higher health points to start with
+            fullHealth = 110; //Set slightly higher value as the player’s full health
+        } //End if statement checking for traits distribution
         
         //Load Images
         gameBG = gameApp.loadImage("images/gamebg.jpg"); //Load minigame background
@@ -69,8 +73,6 @@ public class BoarFightGame extends Game {
         boar.resize(166, 122); //Make boar smaller for the minigame
         player.resize(118, 230); //Make character smaller for the minigame
         
-        gameOver = false; ////
-        gameWon = false; ////
     }
 
     @Override
@@ -78,7 +80,7 @@ public class BoarFightGame extends Game {
         //If the game is still running
         if (!gameOver) {
             timer++; //Increment the timer
-	//If the game is running and it is nobody’s attack turn
+            //If the game is running and it is nobody’s attack turn
             if (neutralTime) {
 	    //Check if the time that passed has surpassed the time interval when it is nobody’s attack turn (neutral period has ended)
                 if (timer >= neutralInterval) {
@@ -86,7 +88,7 @@ public class BoarFightGame extends Game {
                     neutralTime = false; //Set indicator that it is nobody’s attack turn to false
                 } //End if statement checking if the neutral period has ended
 
-	//If the game is running and it’s either the boar or the player’s attack turn
+            //If the game is running and it’s either the boar or the player’s attack turn
             } else {
 	    //If the time that passed has surpassed the time interval of an attack turn (attack turn is over)
                 if (timer >= attackInterval) {
@@ -97,7 +99,7 @@ public class BoarFightGame extends Game {
                     return; //Exit method before running collision check /////
                 } //End if statement checking if attack turn is over
             
-	    //Check if boar and player are colliding
+                //Check if boar and player are colliding
                 if (isColliding()) {
 	        //If they collide during the boar’s attack turn
                     if (boarAttackTurn) {
@@ -137,7 +139,7 @@ public class BoarFightGame extends Game {
             gameApp.background(darkGameBG); //Set background to dark background
         //If it is the player’s attack turn
         else 
-gameApp.background(gameBG); //Set background to light background
+            gameApp.background(gameBG); //Set background to light background
         
         //If the game is still running
         if (!gameOver) {
@@ -186,7 +188,7 @@ gameApp.background(gameBG); //Set background to light background
             // Display game over message
             gameApp.textAlign(gameApp.LEFT, gameApp.LEFT); //Align text to the left
             gameApp.textSize(24); //Set text size
-            gameApp.text(returnGameResults(), 235, 250); //Display game results
+            gameApp.text(returnGameResults(), 230, 250); //Display game results
             //245, 250
             /**
             gameApp.text("Total Time:  " + Math.round(totalTime), gameApp.width / 2, 230);
@@ -234,8 +236,8 @@ gameApp.background(gameBG); //Set background to light background
                 } //End if statement checking which arrow key the player pressed
 
                 // Keep player within window bounds
-                playerX = gameApp.constrain(playerX, 0, gameApp.width - 118); // Adjust for player image width 
-                playerY = gameApp.constrain(playerY, 0, gameApp.height - 230); // Adjust for player image height
+                playerX = gameApp.constrain(playerX, 0, gameApp.width - player.width); //X boundaries
+                playerY = gameApp.constrain(playerY, 0, gameApp.height - player.height); //Y boundaries
         //If the game is over
         } else {
 	//If the spacebar is pressed

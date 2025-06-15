@@ -379,7 +379,7 @@ public class MySketch extends PApplet {
         
         //Load image for paused game
         heartButton = loadImage("images/heartbutton.png"); //Heart/pause/healing button to pause game and eat food to gain health
-        eatFoodButton = loadImage("images/eatfoodbutton.png"); //Button to consume 1 food item
+        eatFoodButton = loadImage("images/eatfoodbutton.jpg"); //Button to consume 1 food item
         fullHealthErrorMessage = loadImage("images/fullhealtherror.png"); //Error message saying health is already full when player eats food
         noFoodErrorMessage = loadImage("images/nofooderror.png"); //Error message saying player has no food items left
         gamePausedBG = loadImage("images/gamepausedbg.jpg"); //Background when game is paused to eat food to gain health
@@ -573,7 +573,7 @@ public class MySketch extends PApplet {
             
             text(player.getHealth() + " / " + player.getFullHealth(), 371, 242);
             text(player.getInventory().getNumFood(), 460, 280);
-            text(Player.getHealthPerFood(), 447, 315);
+            text(Player.getHealthPerFood() + " HP", 447, 312);
             
         } else {
         
@@ -875,21 +875,21 @@ public class MySketch extends PApplet {
                 
         //Meet Hermit
         } else if (stage == 7) {
-	//If player is meeting hermit for the first time
+            //If player is meeting hermit for the first time
             if (currentScreen7 == 1) {
-	    //Set background to meeting the hermit for the first time
+                //Set background to meeting the hermit for the first time
                 background(meetHermitBG1);
                 player.draw(); //Draw character on the screen
                 image(hermit, 380, 220);  //Draw hermit on the screen
-	//If player is choosing how to stay awake
+            //If player is choosing how to stay awake
             } else if (currentScreen7 == 2) {
-	    //Set background to responding to the hermit
+                //Set background to responding to the hermit
                 background(meetHermitBG2);
                 player.draw(); //Draw character on the screen
                 image(hermit, 380, 220); //Draw hermit on the screen
                 image(helpHermitButton, helpHermitX, helpHermitY); //Draw button to help hermit
                 image(ignoreHermitButton, ignoreHermitX, ignoreHermitY); //Draw button to ignore hermit
-	//If player made their choice in response to the hermit
+            //If player made their choice in response to the hermit
             } else if (currentScreen7 == 3) {
 	    //If player chose to help hermit
                 if (playerHelpsHermit) {
@@ -902,7 +902,7 @@ public class MySketch extends PApplet {
                     player.getInventory().addItem("Rope"); //Add rope to player's inventory
                     player.getInventory().addItem("Golden Cage"); //Add golden cage to player's inventory
                     player.addVirtue(50); //Give player virtue points for helping the hermit
-	    //If player chose to ignore the hermit
+                //If player chose to ignore the hermit
                 } else {
 	        //Set background to leaving the hermit
                     background(meetHermitBG4); 
@@ -1291,9 +1291,8 @@ public class MySketch extends PApplet {
             System.err.println(e); //Error message for IO exceptions
         } //End try-catch statement for player data writing to flat file
                  
-        stage = 0;
-        ////unfinished
-        //playerDeath = false; //Reset marker for player death
+        stage = 0; //Return to main menu
+        
     }
     
     public void resetGame() {
@@ -1732,6 +1731,7 @@ public class MySketch extends PApplet {
                         //If mouse is over save them button when mouse is clicked
                         if (overSaveThem) {
                             player.setSavedBrothers(true); //Set variable to indicate player saved brothers
+                            player.addVirtue(50); //Give player virtue points for saving their brothers
                             currentScreen13 = 3; //Set current screen of Stage 12 to after saving the brothers
                         //If mouse is leave them button when mouse is clicked
                         } else if (overleaveThem) {
@@ -1751,10 +1751,11 @@ public class MySketch extends PApplet {
                     //If user is deciding whether to forgive brothers
                     if (currentScreen18 == 3) {
                         //If mouse is over yes button when mouse is clicked
-                        if (overYes) 
+                        if (overYes) {
                             player.setForgaveBrothers(true); //Set variable to indicate player forgave brothers
+                            player.addVirtue(50); //Give player virtue points for forgiving their brothers
                         //If mouse is no button when mouse is clicked
-                        else if (overNo)
+                        } else if (overNo)
                             player.setForgaveBrothers(false); //Set variable to indicate player didn't forgive brothers
                         //End if statement checking if user's mouse is over save brothers button or leave brothers button
                         stage = 19; //Go to the next stage (ending)
@@ -2003,26 +2004,8 @@ public class MySketch extends PApplet {
 
                 //Spacebar is pressed in Stage 19 (Ending)    
                 } else if (stage == 19) {
-                    //Reset all variables for next game
-                    resetGame();
-
-                    //Write player data to flat file (name, virtue points, game points, total points)
-                     try {
-                         //Create FileWriter object to append to the file of player data, named "leadershipdata.txt"
-                         FileWriter w = new FileWriter("leadershipdata.txt", true);
-                         //Create new PrintWriter to write formatted output to the file of player data
-                         PrintWriter writer = new PrintWriter(w);
-                         player.calculateTotalPoints(); //Calculate player's total points
-                         //Write name, virtue points, game points, and total points to the file
-                         writer.printf(player.getName() + "," + player.getVirtuePoints() + "," + player.getGamePoints() + "," + player.getTotalPoints() + "\n");
-                         //Close PrintWriter
-                         writer.close();
-                     //Catch IO exceptions when writing to flat file
-                     } catch (IOException e) {
-                         System.err.println(e); //Error message for IO exceptions
-                     } //End try-catch statement for player data writing to flat file
-
-                    stage = 0; //Return to main menu
+                    gameOver(); //Call game over method
+                    
 
                 //Spacebar is pressed in Stage -5/-6/-7 (Displaying Boar/Rhythm/Well Minigame Results)    
                 } else if (stage == -5 || stage == -6 || stage == -7) {
@@ -2167,7 +2150,7 @@ public class MySketch extends PApplet {
     public void displayWellGameResults(ArrayList<Game> gamesPlayed) {
        EscapeWellGame currentWellGame; //Current Escape Well object whose information is being displayed
        int playerIndex = 0; //Row that the information will be displayed at
-       String winOrLose = " (Lost)"; //Says whether the player won or lost the game
+       String winOrLose; //Says whether the player won or lost the game
        
         //Iterate through each Game object in the array list of games
         for (Game game : gamesPlayed) {
@@ -2175,6 +2158,8 @@ public class MySketch extends PApplet {
             if (game instanceof EscapeWellGame) {
                 //Downcast Game object to EscapeWellGame object
                 currentWellGame = ((EscapeWellGame) game);
+                //Set win or lose variable to "Lost" at first
+                winOrLose = " (Lost)";
                 
                 //Display information for (attributes of this object) in one row
                 //Display player name (first column)

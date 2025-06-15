@@ -55,8 +55,11 @@ public class RhythmGame extends Game {
     public RhythmGame(PApplet p, String name, int maxScore, int gameIndex, String chosenCharacter, int traitsDistribution, boolean sheerWill) {
         //Call parent constructor with parameters for variables that all the minigames have
         super(p, name, maxScore, gameIndex, chosenCharacter);
-        //If player has high intelligence, the game will be easier
+        //If player has high intelligence, they get the advantage of needing to pass less rounds to win
         if (traitsDistribution == 2)  
+            roundsToWin = 4; //Player only needs to win 4 rounds to win
+        //If player has neutral strength/intelligence, they get a slight advantage of needing to win less rounds
+        else if (traitsDistribution == 0)
             roundsToWin = 5; //Player only needs to win 5 rounds to win
             
         //If the player decided to stay awake using sher will, the game will be harder
@@ -84,8 +87,6 @@ public class RhythmGame extends Game {
             sequence.add(newKey); //Add letter to the 7-letter sequence 
         } //End for loop storing the first letter sequence the player has to match
         
-        gameOver = false; ////
-        gameWon = false; ////
     }
         
     @Override

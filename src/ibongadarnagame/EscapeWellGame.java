@@ -36,10 +36,13 @@ public class EscapeWellGame extends Game {
         assembledRungs = new ArrayList<>(); //Initialize array list of rungs that have been placed successfully
         currentRung = new Rung(p, 250, 130); //Create first Rung object
         
-        if (traitsDistribution == 2) { //If player has high intelligence, they get the advantage of having more rungs (more tries)
-            //originalNumRungs = 20; //Set higher original number of rungs the user start with
-            totalNumRungs = 20; //Set new current total number of rungs the user has
-        } //End if statement chekcing if player has high intelligence
+        //If player has high intelligence, they get the advantage of having more rungs (more tries)
+        if (traitsDistribution == 2) { 
+            totalNumRungs = 20; //Set higher current total number of rungs the user has
+        //If player has neutral strength/intelligence, they get a slight advantage of more rungs
+        } else if (traitsDistribution == 2) {
+            totalNumRungs = 17; //Set slightly higher current total number of rungs the user has
+        } //End if statement chekcing for traits distribution
         
         //Load Images
         wellGameBG = gameApp.loadImage("images/wellgamebg.jpg"); //Load background of well escape game
@@ -163,10 +166,10 @@ public class EscapeWellGame extends Game {
             calculatePoints(); //Calculate the number of points the player earned
             damageTaken = 5 * (currentRungNumber - assembledRungs.size()); //Set damage taken depending on the number of times the user missed
             
-	//If the game is over and the player won the game
+            //If the game is over and the player won the game
             if (gameWon) 
                 gameApp.background(wellGameVictory); //Set background to display victory screen
-	//If the game is over and the player lost the game
+            //If the game is over and the player lost the game
             else 
                 gameApp.background(wellGameDefeat); //Set background to display defeat screen
             

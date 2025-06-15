@@ -42,8 +42,9 @@ public class Player {
     //Default Constants
     private static String DEFAULT_NAME = "Don Juan"; //Default player name
     private static String DEFAULT_CLOTHES = "images/chosenCharacter1.png"; //Default character image
-    private static int NORMAL_HEALTH = 500; //Normal health per life
-    private static int HIGH_HEALTH = 700; //More HP for players with high strength
+    private static int LOW_HEALTH = 130; //Low full health for players with high intelligence (low strength)
+    private static int NORMAL_HEALTH = 140; //Normal full health
+    private static int HIGH_HEALTH = 150; //More HP for players with high strength
     
     /**
      * Constructor creates a new instance of the Player class with the name entered and character clothing 
@@ -69,10 +70,14 @@ public class Player {
         if (characterTraits == 1) {
             //Set user HP to higher value if user has high strength
             this.fullHealth = HIGH_HEALTH;
-        //Otherwise, characterTrait is equal to 0 or 2 and the character has low to medium strength
+        //If characterTraits is equal to 0, character has neutral strength/intelligence
+        } else if (characterTraits == 1) {
+            //Set user HP to slightly higher value if user has neutral strength/intelligence
+            this.fullHealth = NORMAL_HEALTH;    
+        //Otherwise, characterTrait is equal to 2 and the character has low strength
         } else {
-            //Assign low to medium strength characterTrait distribution
-            this.fullHealth = NORMAL_HEALTH;
+            //Set user HP low value if user has high intelligence (low strenght)
+            this.fullHealth = LOW_HEALTH;
         } //End if statement for assigning initial health points
         //Set player's initial health to full health
         health = fullHealth;
