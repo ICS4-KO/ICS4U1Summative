@@ -1959,11 +1959,11 @@ public class MySketch extends PApplet {
         } else if (stage == -4) {
             //If player presses A
             if (key == 'A' || key == 'a')
-                stage = -5; //Go to Stage -5 (Boar Fight Game Leaderboard)
+                stage = -5; //Go to Stage -5 (Boar Fight Game Stats)
             else if (key == 'B' || key == 'b')
-                stage = -6; //Go to Stage -6 (Rhythm Game Leaderboard)
+                stage = -6; //Go to Stage -6 (Rhythm Game Stats)
             else if (key == 'C' || key == 'c')
-                stage = -7; //Go to Stage -7 (Well Escape Game Leaderboard)
+                stage = -7; //Go to Stage -7 (Well Escape Game Stats)
             
         //If key is pressed in Stage 3 (Fork in the Road)
         } else if (stage == 3) {
@@ -1996,7 +1996,7 @@ public class MySketch extends PApplet {
      
     
    /**
-    * Checks if the player's mouse is over an image, and is used in determing when buttons (images) are clicked in the game
+    * Checks if the player's mouse is over an image, and is used in determining when buttons (images) are clicked in the game
     * 
     * @param image  Image representing the button
     * @param x      X position of button (image)
