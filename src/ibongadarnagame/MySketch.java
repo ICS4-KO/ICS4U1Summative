@@ -69,7 +69,7 @@ public class MySketch extends PApplet {
                                     {636, 289},
                                     {636, 329},
                                     {636, 369},
-                                                };
+                                                }; //Array list of the (x, y) positions of data displayed on the leaderboard
     int[][] gamePositions = {{279, 229}, //Names
                              {279, 269},
                              {279, 309},
@@ -85,7 +85,7 @@ public class MySketch extends PApplet {
                              {553, 309},
                              {553, 349},
                              {553, 389},
-                                        };
+                                        }; //Array list of the (x, y) positions of data displayed for each minigame
     //Variables for Stage 1 (Begin Story)
     int currentScreen1 = 1; //Keeps track of the different screens being shown in the same stage
     int traitDistribution; //0 means neutral, 1 means high strength, 2 means high intelligence
@@ -127,9 +127,6 @@ public class MySketch extends PApplet {
     int eatFoodX = 237; //Set x position of eat food button
     int eatFoodY = 341; //Set y position of eat food button
     //Buttons for Stage 0 (Main Menu)
-    boolean overTestImg = false; ////Set variable indicating mouse is over button to false
-    int testImgX = 0; ////Set x position of button
-    int testImgY = 0; ////Set y position of button
     boolean overStartGame = false; //Set variable indicating mouse is over button to false
     int startGameX = 230; //Set x position of start game button
     int startGameY = 230; //Set y position of start game button
@@ -282,6 +279,7 @@ public class MySketch extends PApplet {
     PImage ignoreHermitButton; //Press to ignore the hermit
     PImage hermit; //Hermit character
     PImage hermitWithFood; //Hermit character holding food
+    PImage noFoodMessage; //Message covers help hermit button if player has no food left
     //Declare images for Stage 8 (Walking in the Forest 2)
     PImage fillerForest2; //Filler forest scene 2
     //Declare images for Stage 9 (Find Adarna Bird)
@@ -457,6 +455,7 @@ public class MySketch extends PApplet {
         ignoreHermitButton = loadImage("images/ignorehim.jpg"); //Press to ignore the hermit
         hermit = loadImage("images/hermit.png"); //Hermit character
         hermitWithFood = loadImage("images/hermitwithfood.png"); //Hermit character holding food
+        noFoodMessage = loadImage("images/nofoodmessage.jpg"); //Message covers help hermit button if player has no food left
         
         //Load images for Stage 8 (Walking in the Forest 2)
         fillerForest2 = loadImage("images/fillerforest2.jpg"); //Filler forest scene 2
@@ -525,6 +524,8 @@ public class MySketch extends PApplet {
      * Draw graphics/animations on the screen
      */
     public void draw() {
+        if (stage > 3)
+            System.out.println(player.getInventory().getNumFood());
         background(255); //Reset background
         update(mouseX, mouseY); //Update variables indicating button clicks
         
@@ -810,7 +811,7 @@ public class MySketch extends PApplet {
                         //Set background where user does not encounter boar
                         background (noBoarBG);
                         player.draw(); //Draw character on the screen
-                        player.move(2, 0); //Move character to the right
+                        player.move(3, 0); //Move character to the right
                     } //End if statement checking if the user chose the path with the boar
                     
                 //Display instructions for boar fight minigame
@@ -853,6 +854,9 @@ public class MySketch extends PApplet {
                     image(hermit, 380, 220); //Draw hermit on the screen
                     image(helpHermitButton, helpHermitX, helpHermitY); //Draw button to help hermit
                     image(ignoreHermitButton, ignoreHermitX, ignoreHermitY); //Draw button to ignore hermit
+                    //If player has no food and is unable to help the ermit
+                    if (player.getInventory().getNumFood() <= 0)
+                        image(noFoodMessage, helpHermitX, helpHermitY); //Message covers help hermit button
                     
                 //If player made their choice in response to the hermit
                 } else if (currentScreen7 == 3) {
@@ -861,12 +865,6 @@ public class MySketch extends PApplet {
                         //Set background to leaving the hermit
                         background(meetHermitBG3); 
                         image(hermitWithFood, 380, 220); //Draw hermit on the screen with food
-                        player.getInventory().consumeFood(); //Remove one food item from player's inventory (given to hermit)
-                        //Add items given by the hermit in response to the player's decision to help
-                        player.getInventory().addItem("Lime Juice"); //Add lime juice to player's inventory
-                        player.getInventory().addItem("Rope"); //Add rope to player's inventory
-                        player.getInventory().addItem("Golden Cage"); //Add golden cage to player's inventory
-                        player.addVirtue(50); //Give player virtue points for helping the hermit
                     //If player chose to ignore the hermit
                     } else {
                         //Set background to leaving the hermit
@@ -917,10 +915,6 @@ public class MySketch extends PApplet {
 
             //Catch the Adarna Bird
             } else if (stage == 11) {
-                //If player has lime juice in their inventory, which would have been used in the last stage, remove it
-                if (player.getInventory().hasItem("Lime Juice"))
-                    player.getInventory().removeItem("Lime Juice"); //Remove lime juice from their inventory
-
                 //If player has rope and golden cage in their inventory, given by the hermit
                 if (player.getInventory().hasItem("Rope") && player.getInventory().hasItem("Golden Cage")) {
                     //Set background to catching the Adarna bird (player has rope and golden cage)
@@ -1352,7 +1346,7 @@ public class MySketch extends PApplet {
             //Stage 7 (Meet Hermit)
             } else if (stage == 7) {
                 //Mouse is over a specific button in Stage 7 (Meet Hermit)
-                if (overImage(helpHermitButton, helpHermitX, helpHermitY)) //Button to help hermit
+                if (player.getInventory().getNumFood() > 0 && overImage(helpHermitButton, helpHermitX, helpHermitY)) //Button to help hermit
                     overHelpHermit = true; //Set variable indicating mouse is over help hermit button to true
                 //Mouse is over a specific button in Stage 7 (Meet Hermit)
                 if (overImage(ignoreHermitButton, ignoreHermitX, ignoreHermitY)) //Button to ignore hermit
@@ -1558,12 +1552,20 @@ public class MySketch extends PApplet {
                 //If user is deciding on whether to help or ignore the hermit
                 if (currentScreen7 == 2) {
                     //If mouse is over help hermit button when mouse is clicked
-                    if (overHelpHermit)
+                    if (player.getInventory().getNumFood() > 0 && overHelpHermit) {
                         playerHelpsHermit = true; //Indicate that player helped hermit, determines the next screen
+                        player.addVirtue(50); //Give player virtue points for helping the hermit
+                        player.getInventory().consumeFood(); //Remove one food item from player's inventory (given to hermit)
+                        //Add items given by the hermit in response to the player's decision to help
+                        player.getInventory().addItem("Lime Juice"); //Add lime juice to player's inventory
+                        player.getInventory().addItem("Rope"); //Add rope to player's inventory
+                        player.getInventory().addItem("Golden Cage"); //Add golden cage to player's inventory
+                        currentScreen7 = 3; //Set current screen of Stage 7 to the leaving the hermit
                     //If mouse is over ignore hermit button when mouse is clicked
-                    else if (overIgnoreHermit)
+                    } else if (overIgnoreHermit) {
                         playerHelpsHermit = false; //Indicate that player didn't help hermit, determines the next screen
-                    currentScreen7 = 3; //Set current screen of Stage 7 to the leaving the hermit
+                        currentScreen7 = 3; //Set current screen of Stage 7 to the leaving the hermit
+                    } //End if statement checking which button was clicked
                 } //End if statement checking for screen 2 of Stage 7
 
             //Stage 9 (Adarna Bird)
@@ -1593,7 +1595,8 @@ public class MySketch extends PApplet {
                     if (clickedRope) { //If user already clicked rope as well
                        player.moveTo(360, 255); //Set new player position
                        adarnaBirdX = 320; //Set x position of Adarna bird in cage
-                       adarnaBirdY = 315; //Set x position of Adarna bird in cage
+                       adarnaBirdY = 315; //Set y position of Adarna bird in cage
+                       player.getInventory().removeItem("Rope"); //Remove rope from the player's inventory
                        stage = 12; //Go to the next stage (Caught Bird) 
                     } //End if statement checking if user already clicked rope as well
                 //If mouse is over rope when mouse is clicked
@@ -1602,7 +1605,8 @@ public class MySketch extends PApplet {
                     if (clickedCage) { //If user already clicked cage as well
                        player.moveTo(360, 255); //Set new player position
                        adarnaBirdX = 320; //Set x position of Adarna bird in cage
-                       adarnaBirdY = 315; //Set x position of Adarna bird in cage
+                       adarnaBirdY = 315; //Set y position of Adarna bird in cage
+                       player.getInventory().removeItem("Rope"); //Remove rope from the player's inventory
                        stage = 12; //Go to the next stage (Caught Bird) 
                     } //End if statement checking if user already clicked rope as well
                 } //End if statmenet checking if mouse is over golden cage/rope
@@ -1776,15 +1780,15 @@ public class MySketch extends PApplet {
                         //If the user's character clothing is v1
                         if (chooseCharacter1)
                             //Create instance of boar fight minigame with character clothing image v1
-                            currentGame = new BoarFightGame(this, player.getName(), 100, 0, "images/chosenCharacter1.png", traitDistribution);
+                            currentGame = new BoarFightGame(this, player.getName(), 50, "images/chosenCharacter1.png", traitDistribution);
                         //If the user's character clothing is v2
                         else if (chooseCharacter2)
                             //Create instance of boar fight minigame with character clothing image v2
-                            currentGame = new BoarFightGame(this, player.getName(), 100, 0, "images/chosenCharacter2.png", traitDistribution);
+                            currentGame = new BoarFightGame(this, player.getName(), 50, "images/chosenCharacter2.png", traitDistribution);
                         //If the user's character clothing is v3
                         else
                             //Create instance of boar fight minigame with character clothing image v3
-                            currentGame = new BoarFightGame(this, player.getName(), 100, 0, "images/chosenCharacter3.png", traitDistribution);
+                            currentGame = new BoarFightGame(this, player.getName(), 50, "images/chosenCharacter3.png", traitDistribution);
 
                         stage = 5; //Go to the boar fight minigame
                     } //If statement for which screen of Stage 4 is being shown
@@ -1812,15 +1816,15 @@ public class MySketch extends PApplet {
                         //If the user's character clothing is v1
                         if (chooseCharacter1)
                             //Create instance of rhythm minigame with character clothing image v1
-                            currentGame = new RhythmGame(this, player.getName(), 245, 1, "images/chosenCharacter1.png", traitDistribution, sheerWill);
+                            currentGame = new RhythmGame(this, player.getName(), 98, "images/chosenCharacter1.png", traitDistribution, sheerWill);
                         //If the user's character clothing is v1 
                          else if (chooseCharacter2)
                             //Create instance of rhythm minigame with character clothing image v2
-                            currentGame = new RhythmGame(this, player.getName(), 245, 1, "images/chosenCharacter2.png", traitDistribution, sheerWill);
+                            currentGame = new RhythmGame(this, player.getName(), 98, "images/chosenCharacter2.png", traitDistribution, sheerWill);
                         //If the user's character clothing is v1
                         else
                             //Create instance of rhythm minigame with character clothing image v3
-                            currentGame = new RhythmGame(this, player.getName(), 245, 1, "images/chosenCharacter3.png", traitDistribution, sheerWill);
+                            currentGame = new RhythmGame(this, player.getName(), 98, "images/chosenCharacter3.png", traitDistribution, sheerWill);
 
                         adarnaBirdX = -100; //Set x position of Adarna bird
                         adarnaBirdY = 225; //Set y position of Adarna bird
@@ -1886,15 +1890,15 @@ public class MySketch extends PApplet {
                         //If the user's character clothing is v1
                         if (chooseCharacter1)
                             //Create instance of escape well minigame with character clothing image v1
-                            currentGame = new EscapeWellGame(this, player.getName(), 50, 1, "images/chosenCharacter1.png", traitDistribution);
+                            currentGame = new EscapeWellGame(this, player.getName(), 50, "images/chosenCharacter1.png", traitDistribution);
                         //If the user's character clothing is v2
                         else if (chooseCharacter2)
                             //Create instance of escape well minigame with character clothing image v2
-                            currentGame = new EscapeWellGame(this, player.getName(), 50, 1, "images/chosenCharacter2.png", traitDistribution);
+                            currentGame = new EscapeWellGame(this, player.getName(), 50, "images/chosenCharacter2.png", traitDistribution);
                         //If the user's character clothing is v3
                         else
                             //Create instance of escape well minigame with character clothing image v3
-                            currentGame = new EscapeWellGame(this, player.getName(), 50, 1, "images/chosenCharacter3.png", traitDistribution);
+                            currentGame = new EscapeWellGame(this, player.getName(), 50, "images/chosenCharacter3.png", traitDistribution);
 
                         stage = 15; //Go to the next stage (Well Minigame)
                     } //End if statement checking which screen of Stage 14 is being shown

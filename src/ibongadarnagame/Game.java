@@ -3,6 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package ibongadarnagame;
+
+//Import packages
 import processing.core.PApplet;
 
 /**
@@ -15,23 +17,15 @@ import processing.core.PApplet;
  */
 public abstract class Game {
     //Instance variables
-    PApplet gameApp;
+    PApplet gameApp; //The canvas used to display graphical elements
     String name; //Name of the player
     int maxScore; //Maximum amount of points user can earn from playing the game
-    int gameIndex; //Index number of game in user's 2D array of game scores
     int score = 0; //Current player's score
-    int numTries = 0; //Number of tries the current player makes
-    
     int damageTaken = 0; //Amount of damage taken by the user
-    
     boolean gameWon = false; //True if user wins the game
-    boolean gameOver = false;
+    boolean gameOver = false; //True once the game is over
+    boolean calculatedPoints = false; //True once the points are calculated for the minigame
     
-    //Static variables
-    private static int highestScore = 0; //Highest score among all players
-    
-    //Constants
-    private static final int NUM_TRIES = 3; //Total number of tries per game
     
     /**
      * Constructor creates an instance of the Game class with its own name and maximum score
@@ -39,67 +33,58 @@ public abstract class Game {
      * @param p            Reference to canvas
      * @param name         Name of game
      * @param maxScore     Maximum number of points that can possibly be earned
-     * @param gameIndex    Index number of game in user's 2D array of game scores
      * @param chosenCharacter  Character appearance chosen by the user
      */
-    public Game(PApplet p, String name, int maxScore, int gameIndex, String chosenCharacter) {
-        this.gameApp = p;
+    public Game(PApplet p, String name, int maxScore, String chosenCharacter) {
+        this.gameApp = p; //Set reference to canvas
         this.name = name; //Set name attribute to entered value
         this.maxScore = maxScore; //Set masScore attribute to entered value
-        this.gameIndex = gameIndex; //Set gameIndex attribute to entered value
     }
     
     
     /**
-     * Logs game score and number of tries after player finishes a mini-game into their 2D array of game scores
+     * Getter method for name attribute of a Game object
      * 
-     * @param player  Player that played the mini-game
-     * @param points  Number of points player earned
-     * @param tries   Number of tries before completing the game
+     * @return  Name of player that played the minigame
      */
-    public void setScoreAndTries(Player player, int points, int tries) {
-        int[][] gameScores = player.getGameScores();
-        gameScores[gameIndex][0] = points;
-        gameScores[gameIndex][1] = tries;
+    public String getName() {
+        return name; //Return name of player that played the game
+    } 
+    
+    /**
+     * Getter method for score attribute of a Game object
+     * 
+     * @return  Score/total number of points earned by the user in the minigame
+     */
+    public int getScore() {
+        return score; //Return player's score in the minigame
+    } 
+    
+    /**
+     * Getter method for the gameWon attribute of a Game object
+     * 
+     * @return  True if the player won the minigame, false if they lost
+     */
+    public boolean playerWonGame() {
+        return gameWon; //Return variable indicating whether user won/lost
     }
     
-    public boolean isGameOver() {
-        return gameOver;
-    }
     
+    /**
+     * Returns a String containing information about how the player did during the minigame
+     * 
+     * @return  String containing points earned and damage taken in the minigame
+     */
     public String returnGameResults() {
+        //Return string of minigame results
         return "Points Earned: " + score + "\n\nDamage Taken: " + damageTaken + "\n\n";
     }
     
-    public String getName() {
-        return name; //Return name of player that played the game
-    }
     
-    public int getScore() {
-        return score;
-    }
+    //Abstract methods for subclasses
+    abstract void update(); //Update method
+    abstract void draw(); //Draw method
+    abstract void mousePressed(); //Mouse pressed method
+    abstract void keyPressed(); //Key pressed method
     
-    public boolean playerWonGame() {
-        return gameWon;
-    }
-    public int getNumTries() {
-        return numTries;
-    }
-    
-    /**
-     * Getter method for damageTaken attribute of Game object
-     * 
-     * @return  Amount of damage player takes in the minigame
-     */
-    public int getDamageTaken() {
-        return damageTaken; //Return the amount of damage taken from the current game
-    } /////may be unneeded
-    
-    abstract void update();
-    abstract void draw();
-    abstract void mousePressed();
-    abstract void keyPressed();
-    
-    
-    
-}
+} //End Game class

@@ -4,6 +4,7 @@
  */
 package ibongadarnagame;
 
+//Import packages
 import java.util.ArrayList;
 
 /**
@@ -19,16 +20,15 @@ public class Inventory {
     private ArrayList<String> items = new ArrayList<>(); //List of items in player's inventory
     private int numFood; //Number of food items (health boosts) the player has
     
+    
     /**
-     * Constructor creates an instance of the Inventory class and sets the number of food the player has as the entered amount (won in
-     * the mini-game) 
+     * Constructor creates an instance of the Inventory class and sets the number of food the player has as the entered amount
      * 
      * @param numFood  Number of food items the player has
      */
     public Inventory(int numFood) {
-        this.numFood = numFood;
+        this.numFood = numFood; //Set number of food imems
     }
-    
     
     
     /**
@@ -39,8 +39,6 @@ public class Inventory {
     public int getNumFood() {
         return numFood; //Returns number of food items left in inventory
     }
-    
-    
     
     
     /**
@@ -78,5 +76,4 @@ public class Inventory {
         numFood -= 1; //Reduce number of food in inventory by one
     }
     
-    
-}
+} //End Inventory class

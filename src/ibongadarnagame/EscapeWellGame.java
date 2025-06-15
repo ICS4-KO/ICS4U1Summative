@@ -3,6 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package ibongadarnagame;
+
+//Import packages
 import java.util.ArrayList;
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -18,16 +20,15 @@ import processing.core.PImage;
 public class EscapeWellGame extends Game {
     //Instance variables
     boolean rungDropping = false; //True if rung is dropping 
-    private int wellHeight = 500; //Height of well that rung falls through
     private Rung currentRung; //Current rung that is falling
-    private boolean hitsBottom = false; //True once rung hits the bottom
-    private int currentRungNumber = 1; //Number of current rung the player is interacting with
-    private ArrayList<Rung> assembledRungs; //ArrayList of rungs that have been successfully placed
-    private Rung previousRung; //Previous rung that was successfully paced
-    //private int originalNumRungs = 15; //Original number of rungs the user starts with
     private int totalNumRungs = 15; //Current total number of rungs the user has
+    private int currentRungNumber = 1; //Number of current rung the player is interacting with
+    private Rung previousRung; //Previous rung that was successfully paced
+    private ArrayList<Rung> assembledRungs; //ArrayList of rungs that have been successfully placed
     private String message = "Press SPACE to drop the rung!"; //Tells player to press space to drop make the rung fall
     
+    //Static variables
+    private static int highestWellScore = 0; //Highest well escape game score among all players
     
     //Declare images
     PImage player; //Player
@@ -35,10 +36,19 @@ public class EscapeWellGame extends Game {
     PImage wellGameVictory; //Well escape game victory screen
     PImage wellGameDefeat; //Well escape game defeat screen
     
-    public EscapeWellGame(PApplet p, String name, int maxScore, int gameIndex, String chosenCharacter, int traitsDistribution) {
-        super(p, name, maxScore, gameIndex, chosenCharacter); //Call parent constructor
-        assembledRungs = new ArrayList<>(); //Initialize array list of rungs that have been placed successfully
-        currentRung = new Rung(p, 250, 130); //Create first Rung object
+    
+    /**
+     * Constructor creates an instance of the EscapeWellGame class, which represents minigame #3 in the story game
+     *
+     * @param p            Reference to canvas
+     * @param name         Name of game
+     * @param maxScore     Maximum number of points that can possibly be earned
+     * @param chosenCharacter     Character appearance chosen by the user
+     * @param traitsDistribution  Integer indicating whether user has high strength, high intelligence, or neutral strength/intelligence
+     */
+    public EscapeWellGame(PApplet p, String name, int maxScore, String chosenCharacter, int traitsDistribution) {
+        //Call parent constructor with parameters for variables that all the minigames have
+        super(p, name, maxScore, chosenCharacter); 
         
         //If player has high intelligence, they get the advantage of having more rungs (more tries)
         if (traitsDistribution == 2) { 
@@ -55,9 +65,16 @@ public class EscapeWellGame extends Game {
         
         player = gameApp.loadImage(chosenCharacter); //Load character image
         player.resize(155, 300); //Make character smaller for the minigame
+        
+        assembledRungs = new ArrayList<>(); //Initialize array list of rungs that have been placed successfully
+        currentRung = new Rung(p, 250, 130); //Create first Rung object
     }
     
     
+    @Override
+    /**
+     * Update method implementation for EscapeWellGame class
+     */
     void update() {
         //If game is still running
         if (!gameOver) {
@@ -66,11 +83,6 @@ public class EscapeWellGame extends Game {
                 gameWon = true; //Set game won to true
                 gameOver = true; //Set game over to true
             } //End if statement if the user has assembled the entire 12-rung ladder
-            
-            //if (currentRungNumber > totalNumRungs) { ////may not need because of method below
-                //gameWon = false; //Set game won to false
-                //gameOver = true; //Set game over to true
-            //}
             
             //If the number of rungs the user has left is less than the rungs they need to complete the ladder (player loses the game)
             if (totalNumRungs - currentRungNumber + 1 <  12 - assembledRungs.size()) {
@@ -82,7 +94,6 @@ public class EscapeWellGame extends Game {
             if (rungDropping) {
                 //If the rung is still above the ground
                 if (currentRung.y + currentRung.height <= 585) {
-                    //currentRung.rungFalling(); //Keep rung falling until it hits or passes a certain point
 		    //If the rung is not the first one the user places (the first rung does not need to collide with any other rungs to continue building the ladder)
                     if (currentRungNumber != 1) {
 			//If the current rung the user is placing lines up with and collides with the previous rung before it hits the ground
@@ -97,11 +108,6 @@ public class EscapeWellGame extends Game {
                     
                 //If rung is hits/passes the ground
                 } else {
-                    //if (currentRungNumber == 1) {
-                        //assembledRungs.add(currentRung);
-                      //  rungDropping = false;
-                    //If any rung other than the first rung hits the ground, they were ot placed succesfully
-                    //} else {
 		    //If the rung is the first one the user places (the first rung does not need to collide with any other rungs to continue building the ladder)
                     if (currentRungNumber == 1) {
                         previousRung = currentRung; //Set current rung to the previous rung that is checked for collisions to continue building the ladder
@@ -111,20 +117,17 @@ public class EscapeWellGame extends Game {
                     //For all rungs that hit the ground, including the first rung
                     rungDropping = false; //Set variable indicating that a rung is dropping to false
                     currentRung = new Rung(gameApp, 250, 130); //Create new Rung object and set it as the current rung
-                    currentRungNumber += 1; //Incrememt number of current rung that is falling
-                    
-                    //}
+                    currentRungNumber += 1; //Incrememt number of current rung that is falling                   
                 } //End if statement checking if the rung has reached the ground
-
-	    ////
-            } else {
-                //currentRung.move();
-            }
-        }//End if statement checking if game is still running
-        
-    }
+            } //End if statement checking if a rung is curerntly dropping
+            
+        } //End if statement checking if game is still running
+    } //End update method
     
     @Override
+    /**
+     * Draw method implementation for EscapeWellGame class
+     */        
     void draw() {
         //If game is still running
         if (!gameOver) {
@@ -156,7 +159,6 @@ public class EscapeWellGame extends Game {
             //gameApp.text("Rungs Needed: " + (11 - assembledRungs.size()), gameApp.width / 2, 80);
             gameApp.text(message, gameApp.width / 2, 110); //Display message that lets the user know to oress the down arrow key to drop a rung
             
-            //gameApp.text(currentRungNumber, gameApp.width / 2, 140);
 	    //If a rung is currently dropping
             if (rungDropping)
                 message = ""; //Clear the message
@@ -164,11 +166,18 @@ public class EscapeWellGame extends Game {
             else
                 message = "Press the DOWN arrow key to drop the rung!"; //Let the user know that they should press the down arrow key to drop the rung
             
-            
         //If the game is over
         } else {
-            calculatePoints(); //Calculate the number of points the player earned
-            damageTaken = 5 * (currentRungNumber - assembledRungs.size()); //Set damage taken depending on the number of times the user missed
+            //If points have not yet been calculated
+            if (!calculatedPoints) {
+                calculatePoints(); //Calculate the number of points the player earned 
+                calculatedPoints = true; //Indicate that points have been calculated
+
+                damageTaken = 5 * (currentRungNumber - assembledRungs.size()); //Set damage taken depending on the number of times the user missed
+                //If player lost the game
+                if (!gameWon)
+                    damageTaken *= 2; //Damage taken is doubled
+            } //End if statement checking if points have been calculated
             
             //If the game is over and the player won the game
             if (gameWon) 
@@ -182,20 +191,22 @@ public class EscapeWellGame extends Game {
             gameApp.textAlign(gameApp.LEFT, gameApp.LEFT); //Align text to the left
             gameApp.textSize(24); //Set text size
             gameApp.text(returnGameResults(), 245, 250); //Display game results
-            
         } //End if statement checking if the game is still running
-        
-    }
+    } //End draw method
     
     @Override
+    /**
+     * Mouse pressed method implementation for EscapeWellGame class
+     */
     void mousePressed() {
         if (!gameOver) {
-            ////
-    }
-        
-    }
+        }
+    } //End mouse pressed method
     
     @Override
+    /**
+     * Key pressed method implementation for EscapeWellGame class
+     */
     void keyPressed() {
         //If game is still running
         if (!gameOver) {
@@ -204,74 +215,67 @@ public class EscapeWellGame extends Game {
                 if (!rungDropping) 
                     rungDropping = true; //Set variable indicating that a rung is dropping to true;
             } //End if statement checking if the player presses the downn arrow key
-            /**
-            //If the spacebar is pressed while the player is deciding when to press the spacebar to drop the rung
-            if (gameApp.key == 'F') {
-                if (!rungDropping) {
-                    rungDropping = true; //Set variable indicating that a rung is dropping to true;
-                    numSpaceClicks += 1;////
-                }
-            } //End if statement for when the spacebar is pressed
-            * */
-            
+           
         //If the game is over
         } else {
 	//If the spacebar is pressed
             if (gameApp.key == ' ') { 
+                //Check if player's score exceeds the highest score for all well escape games
+                if (score > highestWellScore) {
+                    highestWellScore = score; //Set player's score to highest score
+                    ((MySketch) gameApp).player.healthBoost(10); //Reward player with health boost
+                } //End if statement checking if player's score exceeds the highest score for all well escape games
+                
                 ((MySketch) gameApp).player.setWellEscapePoints(score); //Set the points the player earned in the game
                 ((MySketch) gameApp).gameResults.add(this); //Add game to array list of games that have been played
                 ((MySketch) gameApp).player.takeDamage(damageTaken); //Transfer damage taken to player
+                
                 ((MySketch) gameApp).stage = 16; //Go to the next stage (Escaped Well)
                 ((MySketch) gameApp).player.moveTo(285, 255); //Set new player position
             } //End if statement for if the spacebar is pressed
         } //End if statement checking if the game is still running
-        
-    }
+    } //End key pressed method
     
     
+    /**
+     * Calculates the number of points the player earned in the well escape minigame based on the how many rungs they used
+     */
     public void calculatePoints() {
-        //int rungsUsed = totalNumRungs - assembledRungs.size(); //Calculate number of rungs used
-        
         //If the number of rungs used is greater than 17
         if (currentRungNumber >= 18)
-            score = 5; //Set very low player score
+            score = 10; //Set very low player score
         //If the number of rungs used is greater than 15
         else if (currentRungNumber >= 16)
-            score = 10; //Set low player score
-        //If the number of rungs usedis greater than 13
+            score = 20; //Set low player score
+        //If the number of rungs used is greater than 13
         else if (currentRungNumber >= 14)
-            score = 15; //Set average player score
+            score = 30; //Set average player score
         //If the number of rungs used is greater than 11
         else if (currentRungNumber >= 12)
-            score = 20; //Set good player score
+            score = 40; //Set good player score
         //If the player completed the ladder without wasting any rungs
         else
-            score = 25; //Set best player score
+            score = 50; //Set best player score
         
         //If the player lost the game
         if (!gameWon)
-            score -= (score/2); //Deduct an amount from the points they earned
-    }
+            score = (score/2); //They get have the amount of points they earned
+    } //End calculate points method
     
-    
+    /**
+     * Getter method for the number of rungs the player used before the game ended
+     * 
+     * @return  Number of rungs used by the player
+     */
     public int getRungsUsed() {
-        return (currentRungNumber - 1);
-    }
+        return (currentRungNumber - 1); //Game ends at the rung number of the next rung the player would have used
+    } //End getter method for rungs used
+    
     
     @Override
     public String returnGameResults() {
         //Call parent method that returns game results shared across all games, add the total number of rungs the user used from this game to the String that will be returned
         return super.returnGameResults() + "Rungs Used: " + (currentRungNumber-1);
-    }
-    //Move left/right, press space to drop a rung, sets first rung
-    //Drop rung, once collides with bottom rung 
-    //Rung is a class, where it has a collides with method with loop through arraylist of rung objects 
-    //If in line with rung, they stack, if not, disappear
-    //Win with least amount of rungs, max 10 score
-    //User has maximum of 15 rungs but high intelligence gets 20
-    //Stage rung dropping
-    //Timer to drop rungs
+    } //End return game results method
     
-}
-
-
+} //End EscapeWellGame class

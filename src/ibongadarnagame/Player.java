@@ -15,40 +15,35 @@ import processing.core.PImage;
  * @since    2025-06-15
  */
 public class Player {
-
     //Instance Variables
     public int x, y; //Position of the character
     private String name; //Name of the player
-    private int lives = 3;  //Player has 3 lives
+    private int characterTraits; //0 means neutral, 1 means high strength, 2 means high intelligence
+    private Inventory inventory; //Player's inventory
     private int health; //Current health
     private int fullHealth; //Value of full health
-    private int virtuePoints = 0; //Virtue points earned, starting from 0
+    private int virtuePoints = 0; //Virtue points earned by the player
     private int gamePoints = 0; //Total points player earns from the minigames they play
     private int totalPoints = 0; //Combined virtue points and game points
     private int boarFightGamePoints = 0; //Points earned from boar fight minigame
     private int rhythmGamePoints = 0; //Points earned from rhythm minigame
     private int escapeWellGamePoints = 0; //Points earned from well escape minigame
-    private int characterTraits; //0 means neutral, 1 means high strength, 2 means high intelligence
-    private boolean playerDeath = false; //Marker for player death
-    private Inventory inventory; //Player's inventory
-    private int[][] gameScores = new int[5][2]; //Array of player's mini-game scores
+    private boolean savedBrothers; //True if player chose to save their brothers, who were turned to stone
+    private boolean forgaveBrothers = false; //True if player chose to forgive their brothers for their betrayal (after saving them)
     private PApplet app; //The canvas used to display graphical elements
     private PImage image; //Image of the character
     
-    private boolean savedBrothers; //True if player chose to save their brothers, who were turned to stone
-    private boolean forgaveBrothers = false; //True if player chose to forgive their brothers for their betrayal (after saving them)
-
-    
     //Static Variables
     private static int numPlayers = 0; //Number of users who have played the game
-    private static int healthPerFood = 15; //HP each food item is worth
     
     //Default Constants
-    private static String DEFAULT_NAME = "Don Juan"; //Default player name
-    private static String DEFAULT_CLOTHES = "images/chosenCharacter1.png"; //Default character image
-    private static int LOW_HEALTH = 130; //Low full health for players with high intelligence (low strength)
-    private static int NORMAL_HEALTH = 140; //Normal full health
-    private static int HIGH_HEALTH = 150; //More HP for players with high strength
+    private static final String DEFAULT_NAME = "Don Juan"; //Default player name
+    private static final String DEFAULT_CLOTHES = "images/chosenCharacter1.png"; //Default character image
+    private static final int LOW_HEALTH = 130; //Low full health for players with high intelligence (low strength)
+    private static final int NORMAL_HEALTH = 140; //Normal full health
+    private static final int HIGH_HEALTH = 150; //Higher full health for players with high strength
+    private static final int HEALTH_PER_FOOD = 15; //HP each food item is worth
+    
     
     /**
      * Constructor creates a new instance of the Player class with the name entered and character clothing 
@@ -63,12 +58,12 @@ public class Player {
      * @param imagePath        Image of character based on user's selection
      */
     public Player(PApplet p, int x, int y, String name, int characterTraits, Inventory inventory, String imagePath) {
-        this.app = p;
-        this.x = x;
-        this.y = y;
-        this.name = name;
-        this.inventory = inventory;
-        this.image = app.loadImage(imagePath);
+        this.app = p; //Set reference to canvas
+        this.x = x; //Set x position of character
+        this.y = y; //Set y position of character
+        this.name = name; //Set player's name
+        this.inventory = inventory; //Set player's inventory
+        this.image = app.loadImage(imagePath); //Set character image
         
         //If characterTraits is equal to 1, character has high strengh
         if (characterTraits == 1) {
@@ -101,11 +96,11 @@ public class Player {
      * @param characterTraits  Character trait distribution made by user
      */
     public Player(PApplet p, int x, int y, String name, int characterTraits, Inventory inventory) {
-        this.app = p;
-        this.x = x;
-        this.y = y;
-        this.name = name;
-        this.inventory = inventory;
+        this.app = p; //Set reference to canvas
+        this.x = x; //Set x position of character
+        this.y = y; //Set y position of character
+        this.name = name; //Set player's name
+        this.inventory = inventory; //Set player's inventory
         
         //Set character image to default image
         this.image = app.loadImage(DEFAULT_CLOTHES);
@@ -138,11 +133,11 @@ public class Player {
      * @param imagePath        Image of character based on user's selection
      */
     public Player(PApplet p, int x, int y, int characterTraits, Inventory inventory, String imagePath) {
-        this.app = p;
-        this.x = x;
-        this.y = y;
-        this.inventory = inventory;
-        this.image = app.loadImage(imagePath);
+        this.app = p; //Set reference to canvas
+        this.x = x; //Set x position of character
+        this.y = y; //Set y position of character
+        this.inventory = inventory; //Set player's inventory
+        this.image = app.loadImage(imagePath); //Set character image
         
         //Set character name to default name
         this.name = DEFAULT_NAME;
@@ -173,10 +168,10 @@ public class Player {
      * @param inventory        Player's inventory object
      */
     public Player(PApplet p, int x, int y, int characterTraits, Inventory inventory) {
-        this.app = p;
-        this.x = x;
-        this.y = y;
-        this.inventory = inventory;
+        this.app = p; //Set reference to canvas
+        this.x = x; //Set x position of character
+        this.y = y; //Set y position of character
+        this.inventory = inventory; //Set player's inventory
         
         //Set character name to default name
         this.name = DEFAULT_NAME;
@@ -199,8 +194,6 @@ public class Player {
     }      
        
     
-    
-    
     /**
      * Getter method to return name attribute of Player object
      * 
@@ -208,15 +201,6 @@ public class Player {
      */
     public String getName() {
         return name; //Return player's name
-    }
-    
-    /**
-     * Getter method to return lives attribute of Player object
-     * 
-     * @return  Number of lives left
-     */
-    public int getLives() {
-        return lives; //Return number of lives left (3 in total)
     }
     
     /**
@@ -271,20 +255,14 @@ public class Player {
         return totalPoints; //Return sum of player's virtue points and game points
     }
     
-    
     /**
-     * Getter method to return gameScores attribute of Player object
+     * Getter method to return inventory attribute of Player object
      * 
-     * @return  Array of user's mini-game scores 
+     * @return  Inventory of player
      */
-    public int[][] getGameScores() {
-        return gameScores; //Return player's 2D array of mini-game scores
-    }
-    
     public Inventory getInventory() {
-        return inventory;
+        return inventory; //Return object representing player's inventory
     }
-    
     
     /**
      * Getter method to return savedBrothers attribute of Player object
@@ -303,8 +281,6 @@ public class Player {
     public boolean getForgaveBrothers() {
         return forgaveBrothers; //Return variable indicating whether player forgave brothers
     }
-    
-    
 
     /**
      * Getter method to return the static variable numPlayers shared across all Player objects
@@ -316,12 +292,42 @@ public class Player {
     }
     
     /**
-     * Getter method to return the static variable healthPerFood
+     * Sets the player's boar fight game points to the specified value
+     * 
+     * @param points  Points earned in the boar fight game
+     */
+    public void setBoarFightGamePoints(int points) {
+        boarFightGamePoints = points; //Set amount of points
+        gamePoints += points; //Add points to total number of game points the player has
+    }
+    
+    /**
+     * Sets the player's rhythm game points to the specified value
+     * 
+     * @param points  Points earned in the rhythm game
+     */
+    public void setRhythmGamePoints(int points) {
+        rhythmGamePoints = points; //Set amount of points
+        gamePoints += points; //Add points to total number of game points the player has
+    }
+    
+    /**
+     * Sets the player's well escape game points to the specified value
+     * 
+     * @param points  Points earned in the well escape game
+     */
+    public void setWellEscapePoints(int points) {
+        escapeWellGamePoints = points; //Set amount of points
+        gamePoints += points; //Add points to total number of game points the player has
+    }
+    
+    /**
+     * Getter method to return the constant HEALTH_PER_FOOD
      * 
      * @return  HP each food item is worth
      */
     public static int getHealthPerFood() { 
-        return healthPerFood; //Return the number of health points each food item is worth
+        return HEALTH_PER_FOOD; //Return the number of health points each food item is worth
     }
     
     /**
@@ -348,9 +354,21 @@ public class Player {
      */
     public void eatFood() {
         inventory.consumeFood(); //Remove 1 food item from the inventory
-        health += healthPerFood; //Increase player's health
+        healthBoost(HEALTH_PER_FOOD); //Increase player's health
     }
     
+    /**
+     * Adds specified number of health points to the player's health, health will not exceed their full health
+     * 
+     * @param points  Number of health points to add to the player's health
+     */
+    public void healthBoost(int points) {
+        health += points; //Add points from health boost to player's health points
+        //If the user's health in after adding the points is greater than their full health
+        if (health > fullHealth) 
+            health = fullHealth; //Set health points to full health (maximum amount)
+    }
+
     /**
      * Removes specified amount of HP from player's health and calls game over method if user has no more lives
      * 
@@ -364,23 +382,6 @@ public class Player {
         } else {
             health -= amount; //Subtract damage from the user's HP 
         } //End if statement checking if damage is greater/less than user's health
-        
-        /**
-        //Check if the amount of damage is greater than the user's health in the current life
-        if (amount > health) {
-            //If health is depleted and the user has at least one life left, go to the next life
-            if (lives > 1) {
-                lives -= 1; //Decrease number of lives by one
-                health = healthPerLife; //Reset next life to full health
-            //If health is depleted and the user has no more lives left, game over
-            } else {
-                ((MySketch) app).gameOver(); //Call game over method
-            } //End if statement checking if user has lives left
-        //If the amount of damage is less than the user's health in the current life
-        } else {
-            health -= amount; //Subtract damage from the user's HP in the current life
-        } //End if statement checking if damage is greater/less than HP in current life
-        * */
     }    
     
     /**
@@ -392,79 +393,33 @@ public class Player {
         virtuePoints += points; //Add amount to user's virtue points
     }
 
-    
     /**
-     * Sets the player's boar fight game points to the specified value
-     * 
-     * @param points  Points earned in the boar fight game
+     * Draws the character on the screen
      */
-    public void setBoarFightGamePoints(int points) {
-        boarFightGamePoints = points; //Set amount of points
-        gamePoints += points; //Add points to total number of game points the player has
-    }
-    
-    /**
-     * Sets the player's rhythm game points to the specified value
-     * 
-     * @param points  Points earned in the rhythm game
-     */
-    public void setRhythmGamePoints(int points) {
-        rhythmGamePoints = points; //Set amount of points
-        gamePoints += points; //Add points to total number of game points the player has
-    }
-    
-        
-    /**
-     * Sets the player's well escape game points to the specified value
-     * 
-     * @param points  Points earned in the well escape game
-     */
-    public void setWellEscapePoints(int points) {
-        escapeWellGamePoints = points; //Set amount of points
-        gamePoints += points; //Add points to total number of game points the player has
-    }
-    
-    
-    
-    /**
-     * Adds specified number of health points to the user's health in the current life, and transfers any surplus into the next life
-     * if the user has less than 3 lives, Health after health boost cannot exceed 3 lives left with full health
-     * 
-     * @param points  Number of health points to add
-     */
-    public void healthBoost(int points) {
-        health += points; //Add points from health boost to health points
-        //If the user's health in the current life after adding the points is greater than their health per life
-        if (health > fullHealth) {
-            int surplus = health - fullHealth; //Store the surplus health points
-            health = fullHealth; //Set health points in current life to maximum amount (health per life)
-            //If user has less than 3 lives, surplus can go to the next life
-            if (lives < 3) {
-                lives += 1; //Add back one of the user's lives if they had 1 or 2 lives before the health boost
-                //If the surplus is less than or equal to their health per life
-                if (surplus <= fullHealth)
-                    health = surplus; //Set health in new life to the surplus HP amount
-                //If the suprlus is greater than their health per life
-                else
-                    health = fullHealth; //Set health in new life to maximum amount (health per life)
-            } //End if statement checking if user has less than 3 lives and surplus HP can transfer into additional life
-        } //End if statement checking if user has a surplus of HP after health boost   
-    }
-    
     public void draw() {
         app.image(image, x, y); //Draw the image at the character's position
     }
     
+    /**
+     * Moves the character across the screen
+     * 
+     * @param dx  Horizontal speed, left or right
+     * @param dy  Vertical speed, up or down
+     */
     public void move(int dx, int dy) {
-        x += dx;
-        y += dy;
+        x += dx; //Add horizontal speed to character's x position
+        y += dy; //Add vertical speed to character's y position
     }
     
+    /**
+     * Set new position for the character
+     * 
+     * @param dx   New x position
+     * @param dy   New y position
+     */
     public void moveTo(int dx, int dy) {
-        x = dx;
-        y = dy;
+        x = dx; //Set character's x position to the new position
+        y = dy; //Set character's y position to the new position
     }
-
-
-
-}
+    
+} //End Player class
