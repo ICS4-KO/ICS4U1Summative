@@ -70,7 +70,7 @@ public class Player {
             //Set user HP to higher value if user has high strength
             this.fullHealth = HIGH_HEALTH;
         //If characterTraits is equal to 0, character has neutral strength/intelligence
-        } else if (characterTraits == 1) {
+        } else if (characterTraits == 0) {
             //Set user HP to slightly higher value if user has neutral strength/intelligence
             this.fullHealth = NORMAL_HEALTH;    
         //Otherwise, characterTrait is equal to 2 and the character has low strength
@@ -292,6 +292,15 @@ public class Player {
     }
     
     /**
+     * Getter method to return the constant HEALTH_PER_FOOD
+     * 
+     * @return  HP each food item is worth
+     */
+    public static int getHealthPerFood() { 
+        return HEALTH_PER_FOOD; //Return the number of health points each food item is worth
+    }
+    
+    /**
      * Sets the player's boar fight game points to the specified value
      * 
      * @param points  Points earned in the boar fight game
@@ -319,15 +328,6 @@ public class Player {
     public void setWellEscapePoints(int points) {
         escapeWellGamePoints = points; //Set amount of points
         gamePoints += points; //Add points to total number of game points the player has
-    }
-    
-    /**
-     * Getter method to return the constant HEALTH_PER_FOOD
-     * 
-     * @return  HP each food item is worth
-     */
-    public static int getHealthPerFood() { 
-        return HEALTH_PER_FOOD; //Return the number of health points each food item is worth
     }
     
     /**
