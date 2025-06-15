@@ -676,7 +676,7 @@ public class MySketch extends PApplet {
 
                     //Display player data on the screen
                     fill(0); //Set fill colour to black
-                    textSize(24); //Set text size
+                    textSize(20); //Set text size
                     textAlign(CENTER, CENTER); //Align text at the center of its specified coordinates
 
                     //Loop through each player (row)
@@ -1829,8 +1829,7 @@ public class MySketch extends PApplet {
                         adarnaBirdX = -100; //Set x position of Adarna bird
                         adarnaBirdY = 225; //Set y position of Adarna bird
 
-                        //stage = 10; //Go to the Rhythm Minigame //////////skip minigame
-                        stage = 11;
+                        stage = 10; //Go to the Rhythm Minigame
                     } //If statement for which screen of Stage 9 is being shown
 
                 //Caught the Adarna Bird

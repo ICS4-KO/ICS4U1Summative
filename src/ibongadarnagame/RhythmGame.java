@@ -28,7 +28,7 @@ public class RhythmGame extends Game {
     private int lettersMatched = 0; //Number of letters the player matched correctly
     
     private int timer = 0; //Timer to keep track of rounds
-    private int roundInterval = 600; //Maximum time duration of each round
+    private int roundInterval = 400; //Maximum time duration of each round
     private int breakInterval = 200; //Time duration of breaks between rounds
     private boolean roundRunning = false; //True if a round is currently being played
       
@@ -175,7 +175,6 @@ public class RhythmGame extends Game {
                 } else {                  
 	            //Get currently expected letter (currentLetter represents an index from 0 to 6) from sequence of available keys
                     expectedKey = sequence.get(currentLetter);
-                    System.out.println(expectedKey + " " + userInput + " " + userInput.trim().toUpperCase().equalsIgnoreCase(expectedKey) + " " + timer); /////
 
 	            //If the user has entered a letter
                     if (!userInput.trim().equals("")) {

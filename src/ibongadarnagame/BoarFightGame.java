@@ -99,12 +99,14 @@ public class BoarFightGame extends Game {
         //If the game is still running
         if (!gameOver) {
             timer++; //Increment the timer
+            totalTime++; //Increment total time user spends playing the game
+            
             //If the game is running and it is nobody’s attack turn
             if (neutralTime) {
                 //Check if the time that passed has surpassed the time interval when it is nobody’s attack turn (neutral period has ended)
                 if (timer >= neutralInterval) {
-                    totalTime += neutralInterval; //Add time length of neutral period to the total time user spends playing the game
                     neutralTime = false; //Set indicator that it is nobody’s attack turn to false
+                    timer = 0; //Reset timer
                 } //End if statement checking if the neutral period has ended
 
             //If the game is running and it’s either the boar or the player’s attack turn
@@ -112,10 +114,9 @@ public class BoarFightGame extends Game {
                 //If the time that passed has surpassed the time interval of an attack turn (attack turn is over)
                 if (timer >= attackInterval) {
                     boarAttackTurn = !boarAttackTurn; //Invert variable indicating whose attack turn it is
-                    totalTime += attackInterval; //Add time length of attack turn to the total time user spends playing the game
-                    timer = 0; //Reset timer /////this isn't in the neutral time statements
                     neutralTime = true; //Set variable indicating that is currently nobody’s attack turn to true
-                    return; //Exit method before running collision check /////
+                    timer = 0; //Reset timer 
+                    return; //Exit method before running collision check
                 } //End if statement checking if attack turn is over
             
                 //Check if boar and player are colliding
@@ -124,7 +125,6 @@ public class BoarFightGame extends Game {
                     if (boarAttackTurn) {
                         playerHealth -= boarAttackPower; //Subtract attack power of the boar from the player’s health
                         neutralTime = true; //Set variable indicating that is currently nobody’s attack turn to true
-                        totalTime += timer; //Add time length of attack turn to the total time user spends playing the game
                         timer = 0; //Reset timer
                         boarAttackTurn = false; //Set variable indicating whose attack turn it is to the player’s
                         //If player’s health is depleted during the boar’s attack turn
@@ -221,7 +221,6 @@ public class BoarFightGame extends Game {
 	
             //If boar’s health is depleted during the player’s attack turn
             if (boarHealth <= 0) {
-                totalTime += timer; //Add time during player's attack turn to the total time
                 boarHealth = 0; //Set boar health to zero
                 gameWon = true; //Set variable indicating if player won the game to true
                 gameOver = true; //Set variable indicating that the game is over to true

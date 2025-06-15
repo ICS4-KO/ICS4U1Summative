@@ -82,12 +82,14 @@ public class EscapeWellGame extends Game {
             if (assembledRungs.size() >= 12) {
                 gameWon = true; //Set game won to true
                 gameOver = true; //Set game over to true
+                return; //Exit method before unnecessary checks
             } //End if statement if the user has assembled the entire 12-rung ladder
             
             //If the number of rungs the user has left is less than the rungs they need to complete the ladder (player loses the game)
             if (totalNumRungs - currentRungNumber + 1 <  12 - assembledRungs.size()) {
                 gameWon = false; //Set game won to false
                 gameOver = true; //Set game over to true
+                return; //Exit method before unnecessary checks
             } //End if statement checking if the user no longer has enough rungs to complete the ladder
             
             //If a rung is currently dropping
@@ -139,13 +141,12 @@ public class EscapeWellGame extends Game {
                 rung.draw(); //Draw each old rung onto the screen
             } //End for loop iterating through each of the successfully placed rungs
         
+            currentRung.draw(); //Draw rung on the screen
             //If a rung is currently dropping
             if (rungDropping) {
                 currentRung.rungFalling(); //Draw rung falling down screen
-                currentRung.draw(); //Draw rung on the screen
             //If the player is deciding when to click the down arrow to let the rung fall
             } else {
-                currentRung.draw(); //Draw rung on the screen
                 currentRung.move(); //Draw rung moving left and right
             } //End if statement checking if a rung is currently dropping or moving side to side
             
@@ -156,7 +157,6 @@ public class EscapeWellGame extends Game {
             //Display number of rungs left including rung the user is currently interacting with
             gameApp.text("Rungs Left: " + (totalNumRungs - currentRungNumber + 1), gameApp.width / 2, 50); //Display number of rungs (tries) the user has left
             gameApp.text("Ladder Completion: " + assembledRungs.size() + " / 12 rungs" , gameApp.width / 2, 80); //Display the number of rungs that the user has assembled so far
-            //gameApp.text("Rungs Needed: " + (11 - assembledRungs.size()), gameApp.width / 2, 80);
             gameApp.text(message, gameApp.width / 2, 110); //Display message that lets the user know to oress the down arrow key to drop a rung
             
 	    //If a rung is currently dropping
@@ -173,7 +173,7 @@ public class EscapeWellGame extends Game {
                 calculatePoints(); //Calculate the number of points the player earned 
                 calculatedPoints = true; //Indicate that points have been calculated
 
-                damageTaken = 5 * (currentRungNumber - assembledRungs.size()); //Set damage taken depending on the number of times the user missed
+                damageTaken = 3 * (currentRungNumber - assembledRungs.size()); //Set damage taken depending on the number of times the user missed
                 //If player lost the game
                 if (!gameWon)
                     damageTaken *= 2; //Damage taken is doubled
