@@ -524,8 +524,6 @@ public class MySketch extends PApplet {
      * Draw graphics/animations on the screen
      */
     public void draw() {
-        if (stage > 3)
-            System.out.println(player.getInventory().getNumFood());
         background(255); //Reset background
         update(mouseX, mouseY); //Update variables indicating button clicks
         
@@ -562,7 +560,6 @@ public class MySketch extends PApplet {
             
         //If the player is still alive and the game is not paused, continue drawing the story/game    
         } else {
-            
             //Main menu
             if (stage == 0) {
                 //Set home screen background with title
